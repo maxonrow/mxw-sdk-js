@@ -1,0 +1,34 @@
+{
+  "name": "mxw-sdk-js",
+  "version": "0.0.1-beta.1",
+  "description": "Maxonrow blockchain SDK",
+  "main": "dist/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "babel src -d dist"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/maxonrow/mxw-sdk-js.git"
+  },
+  "author": "Andrej Budinčević <andrej@blockblox.io>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/maxonrow/mxw-sdk-js/issues"
+  },
+  "homepage": "https://github.com/maxonrow/mxw-sdk-js#readme",
+  "dependencies": {
+    "axios": "^0.18.0",
+    "bech32": "^1.1.3",
+    "deterministic-json": "^1.0.5",
+    "elliptic": "^6.4.1",
+    "lodash.assign": "^4.2.0",
+    "tendermint": "git+https://github.com/maxonrow/js-tendermint.git"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.2.3",
+    "@babel/core": "^7.3.4",
+    "@babel/preset-env": "^7.3.4",
+    "@babel/preset-es2015": "^7.0.0-beta.53"
+  }
+}
