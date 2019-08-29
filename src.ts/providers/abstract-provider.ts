@@ -1,0 +1,229 @@
+
+import { BigNumber } from '../utils/bignumber';
+import { isType, setType } from '../utils/properties';
+
+///////////////////////////////
+// Imported Types
+
+import { BigNumberish } from '../utils/bignumber';
+import { Network } from '../utils/networks';
+import { OnceBlockable } from '../utils/web';
+import { Transaction, TransactionLog } from '../utils/transaction';
+
+///////////////////////////////
+// Exported Types
+
+export interface KeyValue {
+    key: string,
+    value: string
+};
+
+export interface TypeAttribute {
+    type: string,
+    attributes: Array<KeyValue>
+};
+
+export interface Status {
+};
+
+export interface TokenList {
+    fungible: string[],
+    nonFungible: string[]
+};
+
+export interface AliasState {
+    name: string,
+    approved: boolean,
+    owner: string,
+    metadata: string,
+    fee: BigNumber
+}
+
+export interface TokenState {
+    type: string,
+    name: string,
+    symbol: string,
+    decimals: number,
+    fixedSupply: boolean,
+    totalSupply: BigNumber,
+    approved: boolean,
+    frozen: boolean,
+    owner: string,
+    metadata: string,
+    transferFee: BigNumber,
+    burnable: boolean
+}
+
+export interface TokenAccountState {
+    owner: string,
+    frozen: boolean,
+    balance: BigNumber
+}
+
+export interface AccountState {
+    type: string,
+    value: {
+        address: string,
+        coins: [
+            {
+                denom: string,
+                amount: BigNumberish,
+            }
+        ],
+        publicKey: {
+            type: string,
+            value: string
+        },
+        accountNumber: BigNumberish,
+        sequence: BigNumberish,
+    }
+};
+
+export interface Block {
+    blockNumber: number,
+    results: {
+        transactions: Array<BlockTransaction>
+    }
+};
+
+export interface BlockTransaction {
+    hash: string,
+    logs: Array<TransactionLog> | string,
+    events: Array<TransactionEvent>,
+    nonce: BigNumberish,
+    transactionIndex: number
+};
+
+export interface TransactionEvent {
+    address: string,
+    transactionIndex: number,
+    eventIndex: number,
+    hash: string,
+    params: Array<string>
+}
+
+export type BlockTag = string | number;
+
+export type TransactionFee = {
+    amount: Array<{ denom: string, amount: BigNumber }>,
+    gas: BigNumber
+};
+
+export type TransactionFeeSetting = {
+    min: BigNumberish,
+    max: BigNumberish,
+    percentage: BigNumberish
+};
+
+export type TransactionSignature = {
+    publicKey: {
+        type: string,
+        value: string
+    },
+    signature: string
+};
+
+export type TransactionRequest = {
+    type?: string,
+    value?: {
+        msg?: Array<{ type: string, value: any }>,
+        fee?: TransactionFee | Promise<TransactionFee>,
+        signatures?: Array<TransactionSignature>,
+        memo?: string
+    },
+    nonce?: BigNumberish | Promise<BigNumberish>,
+    accountNumber?: BigNumberish | Promise<BigNumberish>,
+    chainId?: string | Promise<string>,
+    fee?: TransactionFee | Promise<TransactionFee>
+};
+
+export interface TransactionResponse extends TransactionReceipt {
+    // This function waits until the transaction has been mined
+    wait: (confirmations?: number) => Promise<TransactionReceipt>
+};
+
+export interface DeliverTransaction {
+    hash: string,
+    log: TransactionLog,
+    nonce: BigNumberish,
+}
+
+export interface TransactionReceipt extends Transaction {
+    deliverTransaction: DeliverTransaction,
+    result: {
+        logs: Array<TransactionLog> | string,
+        events: Array<TransactionEvent>
+    },
+    payload: any,
+    hash: string;
+    blockNumber?: number,
+    nonce: BigNumberish,
+    status: number,
+    confirmations: number,
+};
+
+export type EventType = string | Array<string>;
+
+export type Listener = (...args: Array<any>) => void;
+
+///////////////////////////////
+// Exported Abstracts
+
+export abstract class Provider implements OnceBlockable {
+    abstract getNetwork(): Promise<Network>;
+
+    abstract getBlockNumber(): Promise<number>;
+
+    abstract getTransactionRequest(route: string, transactionType: string, overrides?: any): TransactionRequest;
+    abstract getTransactionFee(route: string, transactionType: string, overrides?: any): Promise<TransactionFee>;
+    abstract getTransactionFeeSetting(transactionType: string, overrides?: any): Promise<TransactionFeeSetting>;
+
+    abstract getStatus(): Promise<Status>;
+
+    abstract getTokenTransactionFee(symbol: string, transactionType: string, overrides?: any, ...args): Promise<TransactionFee>;
+    abstract getTokenState(symbol: string | Promise<string>, blockTag?: BlockTag | Promise<BlockTag>): Promise<TokenState>;
+    abstract getTokenList(blockTag?: BlockTag | Promise<BlockTag>): Promise<TokenList>;
+    abstract getTokenAccountState(symbol: string | Promise<string>, address: string | Promise<string>, blockTag?: BlockTag | Promise<BlockTag>): Promise<TokenAccountState>;
+
+    abstract getAccountState(addressOrName: string | Promise<string>, blockTag?: BlockTag | Promise<BlockTag>): Promise<AccountState>;
+    abstract getAccountNumber(addressOrName: string | Promise<string>, blockTag?: BlockTag | Promise<BlockTag>): Promise<BigNumber>;
+    abstract getBalance(addressOrName: string | Promise<string>, blockTag?: BlockTag | Promise<BlockTag>): Promise<BigNumber>;
+
+    abstract getTransactionCount(addressOrName: string | Promise<string>, blockTag?: BlockTag | Promise<BlockTag>): Promise<BigNumber>;
+
+    abstract sendTransaction(signedTransaction: string | Promise<string>, overrides?: any): Promise<TransactionResponse>;
+
+    abstract getBlock(blockHashOrBlockTag: BlockTag | string | Promise<BlockTag | string>): Promise<Block>;
+    abstract getTransaction(transactionHash: string): Promise<TransactionResponse>;
+    abstract getTransactionReceipt(transactionHash: string): Promise<TransactionReceipt>;
+
+    abstract isWhitelisted(addressOrName: string | Promise<string>, blockTag?: BlockTag | Promise<BlockTag>): Promise<boolean>;
+    abstract getKycAddress(addressOrName: string | Promise<string>, blockTag?: BlockTag | Promise<BlockTag>): Promise<string>;
+
+    abstract resolveName(name: string | Promise<string>, blockTag?: BlockTag | Promise<BlockTag>): Promise<string>;
+    abstract lookupAddress(address: string | Promise<string>, blockTag?: BlockTag | Promise<BlockTag>): Promise<string>;
+    abstract getAliasState(address: string | Promise<string>, blockTag?: BlockTag | Promise<BlockTag>): Promise<AliasState>;
+
+    abstract on(eventName: EventType, listener: Listener): Provider;
+    abstract once(eventName: EventType, listener: Listener): Provider;
+    abstract listenerCount(eventName?: EventType): number;
+    abstract listeners(eventName: EventType): Array<Listener>;
+    abstract removeAllListeners(eventName: EventType): Provider;
+    abstract removeListener(eventName: EventType, listener: Listener): Provider;
+
+    // // @TODO: This *could* be implemented here, but would pull in events...
+    abstract waitForTransaction(transactionHash: string, confirmations?: number): Promise<TransactionReceipt>;
+
+    constructor() {
+        setType(this, 'Provider');
+    }
+
+    static isProvider(value: any): value is Provider {
+        return isType(value, 'Provider');
+    }
+
+    //    readonly inherits: (child: any) => void;
+}
+
+//defineReadOnly(Signer, 'inherits', inheritable(Abstract));
+

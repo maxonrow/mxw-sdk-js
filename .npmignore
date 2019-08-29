@@ -1,4 +1,9 @@
-node_modules
-src
-examples
-.DS_Store
+node_modules/
+src.ts/
+tests/
+docs/
+Makefile
+package-lock.json
+webpack.config.js
+tsconfig.json
+.babelrc

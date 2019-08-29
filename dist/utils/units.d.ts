@@ -1,0 +1,18 @@
+import { BigNumber } from './bignumber';
+import { BigNumberish } from './bignumber';
+declare const power18UnitName = "cin";
+declare const power16UnitName = "kcin";
+declare const power13UnitName = "Mcin";
+declare const power10UnitName = "Gcin";
+declare const power7UnitName = "Tcin";
+declare const power4UnitName = "Jcin";
+declare const power1UnitName = "mxw";
+declare const unitDecimals = 18;
+declare const unitName = "mxw";
+declare const smallestUnitName = "cin";
+export { unitName, smallestUnitName, unitDecimals, power18UnitName, power16UnitName, power13UnitName, power10UnitName, power7UnitName, power4UnitName, power1UnitName, };
+export declare function commify(value: string | number): string;
+export declare function formatUnits(value: BigNumberish, unitType?: string | number): string;
+export declare function parseUnits(value: string, unitType?: string | number): BigNumber;
+export declare function formatMxw(cin: BigNumberish): string;
+export declare function parseMxw(mxw: string): BigNumber;

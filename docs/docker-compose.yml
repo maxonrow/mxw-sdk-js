@@ -1,0 +1,7 @@
+version: '2'
+
+services:
+  host:
+    image: mxw-sdk-js-doc
+    ports:
+     - "9000:80"

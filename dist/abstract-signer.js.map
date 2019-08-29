@@ -1,0 +1,1 @@
+{"version":3,"file":"abstract-signer.js","sourceRoot":"","sources":["../src.ts/abstract-signer.ts"],"names":[],"mappings":";;AACA,mDAAqD;AAUrD,MAAsB,MAAM;IAiBxB;QACI,oBAAO,CAAC,IAAI,EAAE,QAAQ,CAAC,CAAC;IAC5B,CAAC;IAED,MAAM,CAAC,QAAQ,CAAC,KAAU;QACtB,OAAO,mBAAM,CAAC,KAAK,EAAE,QAAQ,CAAC,CAAC;IACnC,CAAC;CAGJ;AA1BD,wBA0BC;AAED,0DAA0D"}
