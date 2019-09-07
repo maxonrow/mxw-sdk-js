@@ -419,7 +419,8 @@ function checkResponseLog(method: string, result: any, code: string, message: st
             return errors.createError('signature verification failed', errors.SIGNATURE_FAILED, { operation: method, response: result });
         }
         // Height must be less than or equal to the current blockchain height
-        if (0 <= log.indexOf('Height must be less than or equal to the current blockchain height')) {
+        // Could not find results for height #
+        if (0 <= log.indexOf('Height must be less than or equal to the current blockchain height') || 0 <= log.indexOf("Could not find results for height #")) {
             return errors.createError('block not found', errors.NOT_FOUND, { operation: method, response: result });
         }
 
