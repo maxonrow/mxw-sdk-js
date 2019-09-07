@@ -208,7 +208,7 @@ export abstract class Provider implements OnceBlockable {
     abstract once(eventName: EventType, listener: Listener): Provider;
     abstract listenerCount(eventName?: EventType): number;
     abstract listeners(eventName: EventType): Array<Listener>;
-    abstract removeAllListeners(eventName: EventType): Provider;
+    abstract removeAllListeners(eventName?: EventType): Provider;
     abstract removeListener(eventName: EventType, listener: Listener): Provider;
 
     // // @TODO: This *could* be implemented here, but would pull in events...
