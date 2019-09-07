@@ -15,7 +15,7 @@ import { encode as base64Encode, decode as base64Decode } from '../utils/base64'
 import { Network, Networkish } from '../utils/networks';
 import { ConnectionInfo } from '../utils/web';
 
-import { isUndefinedOrNull } from '../utils/misc';
+import { isUndefinedOrNull, isUndefinedOrNullOrEmpty } from '../utils/misc';
 
 function getResult(payload: { error?: { code?: number, data?: any, message?: string }, result?: any }): any {
     if (payload.error) {
@@ -196,20 +196,9 @@ export class JsonRpcProvider extends BaseProvider {
                 return this.send('latest_block_height', []);
 
             case 'isWhitelisted':
-                return this.send('abci_query', ["/custom/kyc/is_whitelisted/" + params.address, "", params.blockTag, null]).then(result => {
-                    if (result && result.response) {
-                        if (result.response.value) {
-                            try {
-                                let value = toUtf8String(base64Decode(result.response.value));
-                                return ("True" === value);
-                            }
-                            catch (error) {
-                            }
-                        }
-                        else {
-                            if (7 /* not whitelisted */ == result.response.code)
-                                return false;
-                        }
+                return this.send('is_whitelisted', [params.address]).then(result => {
+                    if (!isUndefinedOrNullOrEmpty(result)) {
+                        return result;
                     }
                     throw this.checkResponseLog(method, null, result);
                 });

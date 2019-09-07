@@ -175,20 +175,9 @@ class JsonRpcProvider extends base_provider_1.BaseProvider {
             case 'getBlockNumber':
                 return this.send('latest_block_height', []);
             case 'isWhitelisted':
-                return this.send('abci_query', ["/custom/kyc/is_whitelisted/" + params.address, "", params.blockTag, null]).then(result => {
-                    if (result && result.response) {
-                        if (result.response.value) {
-                            try {
-                                let value = utf8_1.toUtf8String(base64_1.decode(result.response.value));
-                                return ("True" === value);
-                            }
-                            catch (error) {
-                            }
-                        }
-                        else {
-                            if (7 /* not whitelisted */ == result.response.code)
-                                return false;
-                        }
+                return this.send('is_whitelisted', [params.address]).then(result => {
+                    if (!misc_1.isUndefinedOrNullOrEmpty(result)) {
+                        return result;
                     }
                     throw this.checkResponseLog(method, null, result);
                 });
