@@ -110,9 +110,16 @@ describe('Suite: Provider', function () {
     });
 
     it("Check KYC whitelist status", function () {
-        let address = "mxw1qj75krmwsug5le85quhxjmy4pjj2uh9mmyaqdv";
+        let address = "mxw1wv3kquk24x8lh06905z98r9wydzu6e55lfdeae";
         return provider.isWhitelisted(address).then((whitelisted) => {
             if (!silent) console.log(indent, "isWhitelisted", address + ":", whitelisted ? "YES" : "NO");
+        });
+    });
+
+    it("Check KYC address", function () {
+        let address = "mxw1wv3kquk24x8lh06905z98r9wydzu6e55lfdeae";
+        return provider.getKycAddress(address).then((kycAddress) => {
+            if (!silent) console.log(indent, "KYC address:", kycAddress);
         });
     });
 
