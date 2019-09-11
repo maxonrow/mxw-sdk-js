@@ -4,6 +4,7 @@ import { BigNumber, bigNumberify } from './utils/bignumber';
 import { smallestUnitName } from './utils/units';
 
 const AddressPrefix = 'mxw';
+const ValidatorAddressPrefix = 'mxwvaloper';
 
 // Do we have a zero address?
 const AddressZero = 'mxw000000000000000000000000000000000000000';
@@ -30,6 +31,7 @@ export {
     ZeroFee,
     
     AddressPrefix,
+    ValidatorAddressPrefix,
 
     AddressZero,
     HashZero,

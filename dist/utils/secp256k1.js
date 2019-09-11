@@ -83,11 +83,23 @@ function computePublicKey(key, compressed) {
     return null;
 }
 exports.computePublicKey = computePublicKey;
-function computeAddress(key) {
-    // Strip off the leading "0x"
-    let publicKey = computePublicKey(key, true).substring(2);
-    let bytes = hash('ripemd160', hash('sha256', Buffer.from(publicKey, 'hex')));
-    return address_1.getAddress(bech32_1.encode(constants_1.AddressPrefix, bech32_1.toWords(bytes)));
+function computeAddress(key, prefix) {
+    let bytes;
+    if (typeof (key) == 'string') {
+        if (key.match(/^(0x)?[0-9a-fA-F]{40}$/) || key.match(/^(0x)?[0-9a-fA-F]{64}$/)) {
+            // Missing the 0x prefix
+            if (key.substring(0, 2) !== '0x') {
+                key = '0x' + key;
+            }
+            bytes = bytes_1.arrayify(key); // Hex based address
+        }
+    }
+    if (!bytes) {
+        // Strip off the leading "0x"
+        let publicKey = computePublicKey(key, true).substring(2);
+        bytes = hash('ripemd160', hash('sha256', Buffer.from(publicKey, 'hex')));
+    }
+    return address_1.getAddress(bech32_1.encode(prefix ? prefix : constants_1.AddressPrefix, bech32_1.toWords(bytes)));
 }
 exports.computeAddress = computeAddress;
 function computeHexAddress(address) {

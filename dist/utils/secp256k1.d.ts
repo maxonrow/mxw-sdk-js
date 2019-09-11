@@ -11,7 +11,7 @@ export declare class KeyPair {
     _addPoint(other: Arrayish | string): string;
 }
 export declare function computePublicKey(key: Arrayish | string, compressed?: boolean): string;
-export declare function computeAddress(key: Arrayish | string): string;
+export declare function computeAddress(key: Arrayish | string, prefix?: string): string;
 export declare function computeHexAddress(address: string): string;
 export declare function recoverPublicKey(digest: Arrayish | string, signature: Signature | string, recoveryParam?: number): string;
 export declare function recoverAddress(digest: Arrayish | string, signature: Signature | string, recoveryParam?: number): string;

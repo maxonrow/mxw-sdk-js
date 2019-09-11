@@ -51,7 +51,7 @@ function getAddress(address) {
     if (typeof (address) !== 'string') {
         errors.throwError('invalid address', errors.INVALID_ADDRESS, { value: address });
     }
-    if (address.startsWith(constants_1.AddressPrefix)) {
+    if (address.startsWith(constants_1.AddressPrefix) || address.startsWith(constants_1.ValidatorAddressPrefix)) {
         // TODO: We need more checking on this!
         result = address;
     }

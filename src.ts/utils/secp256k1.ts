@@ -101,12 +101,23 @@ export function computePublicKey(key: Arrayish | string, compressed?: boolean): 
     return null;
 }
 
-export function computeAddress(key: Arrayish | string): string {
-    // Strip off the leading "0x"
-    let publicKey = computePublicKey(key, true).substring(2);
-    let bytes = hash('ripemd160', hash('sha256', Buffer.from(publicKey, 'hex')));
+export function computeAddress(key: Arrayish | string, prefix?: string): string {
+    let bytes;
 
-    return getAddress(bech32Encode(AddressPrefix, bech32ToWords(bytes)));
+    if (typeof (key) == 'string') {
+        if (key.match(/^(0x)?[0-9a-fA-F]{40}$/) || key.match(/^(0x)?[0-9a-fA-F]{64}$/)) {
+            // Missing the 0x prefix
+            if (key.substring(0, 2) !== '0x') { key = '0x' + key; }
+
+            bytes = arrayify(key); // Hex based address
+        }
+    }
+    if (!bytes) {
+        // Strip off the leading "0x"
+        let publicKey = computePublicKey(key, true).substring(2);
+        bytes = hash('ripemd160', hash('sha256', Buffer.from(publicKey, 'hex')));
+    }
+    return getAddress(bech32Encode(prefix ? prefix : AddressPrefix, bech32ToWords(bytes)));
 }
 
 export function computeHexAddress(address: string): string {

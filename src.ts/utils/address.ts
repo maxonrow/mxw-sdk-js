@@ -1,7 +1,7 @@
 'use strict';
 
 import { arrayify, hexlify, stripZeros, concat } from './bytes';
-import { AddressPrefix } from '../constants';
+import { AddressPrefix, ValidatorAddressPrefix } from '../constants';
 import { keccak256 } from './keccak256';
 import errors = require('../errors');
 import { BigNumber, Arrayish } from '.';
@@ -62,7 +62,7 @@ export function getAddress(address: string): string {
         errors.throwError('invalid address', errors.INVALID_ADDRESS, { value: address });
     }
 
-    if (address.startsWith(AddressPrefix)) {
+    if (address.startsWith(AddressPrefix) || address.startsWith(ValidatorAddressPrefix)) {
         // TODO: We need more checking on this!
         result = address;
     }
