@@ -163,7 +163,24 @@ class JsonRpcProvider extends base_provider_1.BaseProvider {
                     });
                 }
                 return this.send('block_results', [params.blockTag]).then(result => {
-                    if (!result.results) {
+                    if (!result || !result.results) {
+                        let returnError = this.checkResponseLog(method, null, result);
+                        if (errors.NOT_FOUND != returnError.code) {
+                            throw returnError;
+                        }
+                        result = null;
+                    }
+                    return result;
+                });
+            case 'getBlockInfo':
+                if ("0" == params.blockTag) {
+                    return this.getBlockNumber().then((blockNumber) => {
+                        params.blockTag = blockNumber.toString();
+                        return this.perform(method, params);
+                    });
+                }
+                return this.send('block', [params.blockTag]).then(result => {
+                    if (!result || !result.block) {
                         let returnError = this.checkResponseLog(method, null, result);
                         if (errors.NOT_FOUND != returnError.code) {
                             throw returnError;

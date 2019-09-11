@@ -363,6 +363,12 @@ Block Responses
     {
         // The block height
         blockNumber: 221950,
+        // The block timestamp
+        blockTime: "2019-08-21T11:11:11.674244178Z",
+        // The block proposer address
+        proposerAddress: "mxwvaloper1kzzum9s468h2xe9sgasvyqheth4qk3sjh8l8a3",
+        // The total committed transactions
+        totalTransactions: 1234,
 
         results: {
             // The transaction was validated in the block
@@ -375,7 +381,7 @@ Block Responses
 
                     events: [
                         {
-                            // the event owner
+                            // The event owner
                             address: "mxw1x7tp9tt7mu0jm6qdmljgntvzzp53lrtndr7h8x",
 
                             // The transaction event was emitted to

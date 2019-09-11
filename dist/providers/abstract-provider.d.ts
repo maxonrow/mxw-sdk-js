@@ -61,9 +61,18 @@ export interface AccountState {
 }
 export interface Block {
     blockNumber: number;
+    blockTime: string;
+    totalTransactions: number;
+    proposerAddress: string;
     results: {
         transactions: Array<BlockTransaction>;
     };
+}
+export interface BlockInfo {
+    blockNumber: number;
+    blockTime: string;
+    totalTransactions: number;
+    proposerAddress: string;
 }
 export interface BlockTransaction {
     hash: string;

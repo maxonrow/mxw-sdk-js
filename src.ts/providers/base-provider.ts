@@ -12,8 +12,9 @@ import {
     checkFormat, allowNullOrEmpty, arrayOf, checkHash, checkAddress, checkNumber, checkBigNumber, checkBoolean,
     checkString, checkTimestamp, checkHex, checkHexAddress, checkAny, iterate, sortObject
 } from '../utils/misc';
-import { toUtf8String, toUtf8Bytes } from '../utils';
+import { toUtf8String, toUtf8Bytes, computeAddress } from '../utils';
 import { TransactionRequest } from '.';
+import { ValidatorAddressPrefix } from '../constants';
 
 import * as errors from '../errors';
 
@@ -26,7 +27,7 @@ import { Provider, TransactionEvent, Status, DeliverTransaction, TransactionFeeS
 // Imported Types
 
 import {
-    Block, BlockTag,
+    Block, BlockTag, BlockInfo,
     EventType,
     Listener,
     AccountState,
@@ -227,6 +228,34 @@ function checkBlock(data: any): Block {
         }
     }
     return camelize(block);
+}
+
+function checkBlockInfo(data: any): BlockInfo {
+    data = camelize(checkFormat({
+        block: {
+            header: {
+                height: checkNumber,
+                time: checkTimestamp,
+                total_txs: checkNumber,
+                proposer_address: checkString
+            }
+        }
+    }, data), (key) => {
+        switch (key) {
+            case "height": return "blockNumber";
+            case "time": return "blockTime";
+            case "totalTxs": return "totalTransactions";
+        }
+        return key;
+    });
+
+    if (data.block && data.block.header) {
+        data.block.header.proposerAddress = computeAddress(data.block.header.proposerAddress, ValidatorAddressPrefix);
+        return {
+            ...data.block.header
+        }
+    }
+    return undefined;
 }
 
 function checkDeliverTransaction(value: any): DeliverTransaction {
@@ -878,14 +907,21 @@ export class BaseProvider extends Provider {
                     }
 
                     return poll(() => {
-                        return this.perform('getBlock', { blockTag: blockTag }).then((block) => {
-                            if (block == null) {
+                        return this.perform('getBlock', { blockTag: blockTag }).then((blockResult) => {
+                            if (blockResult == null) {
                                 if (blockNumber <= this._emitted.block) {
                                     return undefined;
                                 }
                                 return null;
                             }
-                            return checkBlock(block);
+                            let block = checkBlock(blockResult);
+                            return this.perform('getBlockInfo', { blockTag: blockTag }).then((infoResult) => {
+                                let info = checkBlockInfo(infoResult);
+                                return {
+                                    ...block,
+                                    ...info
+                                }
+                            });
                         });
                     }, { onceBlock: this });
                 } catch (error) { }

@@ -17,6 +17,7 @@ const web_1 = require("../utils/web");
 const base64_1 = require("../utils/base64");
 const misc_1 = require("../utils/misc");
 const utils_1 = require("../utils");
+const constants_1 = require("../constants");
 const errors = __importStar(require("../errors"));
 ///////////////////////////////
 // Imported Abstracts
@@ -196,6 +197,30 @@ function checkBlock(data) {
         }
     }
     return properties_1.camelize(block);
+}
+function checkBlockInfo(data) {
+    data = properties_1.camelize(misc_1.checkFormat({
+        block: {
+            header: {
+                height: misc_1.checkNumber,
+                time: misc_1.checkTimestamp,
+                total_txs: misc_1.checkNumber,
+                proposer_address: misc_1.checkString
+            }
+        }
+    }, data), (key) => {
+        switch (key) {
+            case "height": return "blockNumber";
+            case "time": return "blockTime";
+            case "totalTxs": return "totalTransactions";
+        }
+        return key;
+    });
+    if (data.block && data.block.header) {
+        data.block.header.proposerAddress = utils_1.computeAddress(data.block.header.proposerAddress, constants_1.ValidatorAddressPrefix);
+        return Object.assign({}, data.block.header);
+    }
+    return undefined;
 }
 function checkDeliverTransaction(value) {
     let transaction = properties_1.camelize(misc_1.checkFormat({
@@ -726,14 +751,18 @@ class BaseProvider extends abstract_provider_1.Provider {
                         });
                     }
                     return web_1.poll(() => {
-                        return this.perform('getBlock', { blockTag: blockTag }).then((block) => {
-                            if (block == null) {
+                        return this.perform('getBlock', { blockTag: blockTag }).then((blockResult) => {
+                            if (blockResult == null) {
                                 if (blockNumber <= this._emitted.block) {
                                     return undefined;
                                 }
                                 return null;
                             }
-                            return checkBlock(block);
+                            let block = checkBlock(blockResult);
+                            return this.perform('getBlockInfo', { blockTag: blockTag }).then((infoResult) => {
+                                let info = checkBlockInfo(infoResult);
+                                return Object.assign(Object.assign({}, block), info);
+                            });
                         });
                     }, { onceBlock: this });
                 }
