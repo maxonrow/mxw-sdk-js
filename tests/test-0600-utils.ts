@@ -3,7 +3,7 @@
 import { describe, it } from 'mocha';
 import { expect } from 'chai';
 import { utils } from '../src.ts/index';
-import { bigNumberify } from '../src.ts/utils';
+import { bigNumberify, toUtf8Bytes } from '../src.ts/utils';
 import { nodeProvider } from "./env";
 
 let indent = "     ";
@@ -76,6 +76,7 @@ describe('Suite: Utils', function () {
         let address = "0xa263d71e2455d0214357b6b8b0f16351b1776686";
         let normalized = utils.getAddress(address);
         if (!silent) console.log(indent, "Normalize:", normalized);
+        expect("0xa263D71e2455d0214357B6b8B0F16351b1776686").to.equal(normalized);
     });
 
     it("Generate random hash value", function () {
@@ -83,6 +84,12 @@ describe('Suite: Utils', function () {
         if (!silent) console.log(indent, hash);
     });
 
+    it("Test SHA256 hash value", function () {
+        let hash = utils.sha256(toUtf8Bytes("Hello, blockchain"));
+        if (!silent) console.log(indent, hash);
+        expect("0x6cabdb6b53060a1961f7cceede7e07022505a83870fadb64f9699074150f033e").to.equal(hash);
+    });
+        
     it("Adhoc test", function () {
 
     });
