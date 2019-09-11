@@ -36,6 +36,7 @@
     "dist-debug-provider": "npm run build && mocha --inspect-brk --timeout 3000000 -r ts-node/register tests/test-0500-provider.ts",
     "dist-debug-wallet": "npm run build && mocha --inspect-brk --timeout 3000000 -r ts-node/register tests/test-0200-wallet.ts",
     "dist-debug-kyc": "npm run build && mocha --inspect-brk --timeout 3000000 -r ts-node/register tests/test-0100-kyc.ts",
+    "dist-debug-kyc-bulk": "npm run build && mocha --inspect-brk --timeout 3000000 -r ts-node/register tests/test-0101-kyc-bulk.ts",
     "dist-debug-fungible-token": "npm run build && mocha --inspect-brk --timeout 3000000 -r ts-node/register tests/test-0300-fungible-token.ts",
     "dist-debug-alias": "npm run build && mocha --inspect-brk --timeout 3000000 -r ts-node/register tests/test-0400-alias.ts",
     "dist-debug-utils": "npm run build && mocha --inspect-brk --timeout 3000000 -r ts-node/register tests/test-0600-utils.ts",
