@@ -48,7 +48,7 @@ describe('Suite: Provider', function () {
     });
 
     it("Get block details", function () {
-        return provider.getBlock("1").then((block) => {
+        return provider.getBlock("100").then((block) => {
             expect(block).to.exist;
             if (!silent) console.log(indent, "Block:", JSON.stringify(block, null, 2));
 
