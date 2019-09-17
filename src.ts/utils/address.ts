@@ -1,11 +1,12 @@
 'use strict';
 
 import { arrayify, hexlify, stripZeros, concat } from './bytes';
-import { AddressPrefix, ValidatorAddressPrefix } from '../constants';
+import { AddressPrefix, ValOperatorAddressPrefix, KycAddressPrefix } from '../constants';
 import { keccak256 } from './keccak256';
 import errors = require('../errors');
 import { BigNumber, Arrayish } from '.';
 import { sha256 } from './sha2';
+import { isUndefinedOrNullOrEmpty } from './misc';
 
 function getChecksum(address: string): string {
     if (typeof (address) !== 'string') {
@@ -23,7 +24,7 @@ function getChecksum(address: string): string {
         }
         hashed = arrayify(keccak256(hashed));
 
-        for (var i = 0; i < 40; i += 2) {
+        for (let i = 0; i < 40; i += 2) {
             if ((hashed[i >> 1] >> 4) >= 8) {
                 chars[i] = chars[i].toUpperCase();
             }
@@ -39,7 +40,7 @@ function getChecksum(address: string): string {
         }
         hashed = arrayify(keccak256(hashed));
 
-        for (var i = 0; i < 64; i += 2) {
+        for (let i = 0; i < 64; i += 2) {
             if ((hashed[i >> 1] >> 4) >= 8) {
                 chars[i] = chars[i].toUpperCase();
             }
@@ -56,28 +57,35 @@ function getChecksum(address: string): string {
 }
 
 export function getAddress(address: string): string {
-    var result = null;
+    let result = null;
 
-    if (typeof (address) !== 'string') {
-        errors.throwError('invalid address', errors.INVALID_ADDRESS, { value: address });
-    }
-
-    if (address.startsWith(AddressPrefix) || address.startsWith(ValidatorAddressPrefix)) {
-        // TODO: We need more checking on this!
-        result = address;
-    }
-    else if (address.match(/^(0x)?[0-9a-fA-F]{40}$/)) {
-
-        // Missing the 0x prefix
-        if (address.substring(0, 2) !== '0x') { address = '0x' + address; }
-
-        result = getChecksum(address);
-
-        // It is a checksummed address with a bad checksum
-        if (address.match(/([A-F].*[a-f])|([a-f].*[A-F])/) && result !== address) {
-            errors.throwError('bad address checksum', errors.INVALID_ADDRESS, { value: address });
+    if (typeof (address) === 'string') {
+        if (address.startsWith(AddressPrefix)) {
+            // TODO: We need more checking on this!
+            result = address;
         }
-    } else {
+        else if (address.startsWith(KycAddressPrefix)) {
+            // TODO: We need more checking on this!
+            result = address;
+        }
+        else if (address.startsWith(ValOperatorAddressPrefix)) {
+            // TODO: We need more checking on this!
+            result = address;
+        }
+        else if (address.match(/^(0x)?[0-9a-fA-F]{40}$/)) {
+            // Missing the 0x prefix
+            if (address.substring(0, 2) !== '0x') { address = '0x' + address; }
+
+            result = getChecksum(address);
+
+            // It is a checksummed address with a bad checksum
+            if (address.match(/([A-F].*[a-f])|([a-f].*[A-F])/) && result !== address) {
+                errors.throwError('bad address checksum', errors.INVALID_ADDRESS, { value: address });
+            }
+        }
+    }
+
+    if (isUndefinedOrNullOrEmpty(result)) {
         errors.throwError('invalid address', errors.INVALID_ADDRESS, { value: address });
     }
 

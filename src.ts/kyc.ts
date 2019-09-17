@@ -15,7 +15,8 @@ import { Signer } from './abstract-signer';
 // Imported Types
 
 import { TransactionReceipt, TransactionResponse } from './providers/abstract-provider';
-import { BigNumber } from './utils';
+import { BigNumber, toUtf8Bytes, computeAddress } from './utils';
+import { KycAddressPrefix } from './constants';
 
 export interface KycKeyComponent {
     country: string,
@@ -214,7 +215,8 @@ export class Kyc {
         keyComponent = checkFormat(formatKycKeyComponent, keyComponent);
 
         // Hash the KYC components to become KYC address
-        return sha256(JSON.stringify(sortObject(keyComponent)));
+        let hash = sha256(toUtf8Bytes(JSON.stringify(sortObject(keyComponent))));
+        return computeAddress(hash, KycAddressPrefix);
     }
 
     /**
