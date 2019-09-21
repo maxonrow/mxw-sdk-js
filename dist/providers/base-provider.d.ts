@@ -29,7 +29,6 @@ export declare class BaseProvider extends Provider {
     protected ready: Promise<Network>;
     constructor(network: Networkish | Promise<Network>);
     getBlockNumber(): Promise<number>;
-    getTokenTransactionFee(symbol: string, transactionType: string, overrides?: any, ...args: any[]): Promise<TransactionFee>;
     getTransactionRequest(route: string, transactionType: string, overrides?: any): TransactionRequest;
     getTransactionFee(route: string, transactionType: string, overrides?: any): Promise<TransactionFee>;
     getTransactionFeeSetting(transactionType: string, overrides?: any): Promise<TransactionFeeSetting>;

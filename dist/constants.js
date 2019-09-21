@@ -4,8 +4,10 @@ const bignumber_1 = require("./utils/bignumber");
 const units_1 = require("./utils/units");
 const AddressPrefix = 'mxw';
 exports.AddressPrefix = AddressPrefix;
-const ValidatorAddressPrefix = 'mxwvaloper';
-exports.ValidatorAddressPrefix = ValidatorAddressPrefix;
+const ValOperatorAddressPrefix = 'mxwvaloper';
+exports.ValOperatorAddressPrefix = ValOperatorAddressPrefix;
+const KycAddressPrefix = 'kyc';
+exports.KycAddressPrefix = KycAddressPrefix;
 // Do we have a zero address?
 const AddressZero = 'mxw000000000000000000000000000000000000000';
 exports.AddressZero = AddressZero;
