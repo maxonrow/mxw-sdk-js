@@ -442,6 +442,19 @@ function checkResponseLog(method: string, result: any, code: string, message: st
             return errors.createError('block not found', errors.NOT_FOUND, { operation: method, response: result });
         }
 
+        // Token already exists
+        if (0 <= log.indexOf('"codespace":"mxw","code":2001,')) {
+            return errors.createError('token exists', errors.EXISTS, { operation: method, response: result });
+        }
+        // Token does not exists
+        if (0 <= log.indexOf('"codespace":"mxw","code":2002,')) {
+            return errors.createError('token not found', errors.NOT_FOUND, { operation: method, response: result });
+        }
+        // Token is already approved
+        if (0 <= log.indexOf('"codespace":"mxw","code":2003,')) {
+            return errors.createError('token is already approved', errors.NOT_ALLOWED, { operation: method, response: result });
+        }
+
         // // "Token already exists"
         // if (0 <= log.indexOf('Token already exists')) {
         //     return errors.createError('token is already exists', errors.EXISTS, { operation: method, response: result });

@@ -5,10 +5,11 @@ import { expect } from 'chai';
 import { mxw, token, errors } from '../src.ts/index';
 import { bigNumberify, hexlify, randomBytes } from '../src.ts/utils';
 import { nodeProvider } from "./env";
+import { FungibleTokenActions } from '../src.ts/token';
 
 let indent = "     ";
-let silent = true;
-let silentRpc = true;
+let silent = false;
+let silentRpc = false;
 let slowThreshold = 9000;
 
 let providerConnection: mxw.providers.Provider;
@@ -66,19 +67,19 @@ describe('Suite: FungibleToken', function () {
     });
 });
 
-describe('Suite: FungibleToken - Dynamic Supply', function () {
+describe('Suite: FungibleToken - Fixed Supply (Not Burnable)', function () {
     this.slow(slowThreshold); // define the threshold for slow indicator
 
     it("Create", function () {
         fungibleTokenProperties = {
-            name: "MY DYN " + hexlify(randomBytes(4)).substring(2),
-            symbol: "DYN" + hexlify(randomBytes(4)).substring(2),
+            name: "MY FIX " + hexlify(randomBytes(4)).substring(2),
+            symbol: "FIX" + hexlify(randomBytes(4)).substring(2),
             decimals: 18,
-            fixedSupply: false,
-            totalSupply: bigNumberify("0"),
+            fixedSupply: true,
+            totalSupply: bigNumberify("100000000000000000000000000"),
             fee: {
                 to: nodeProvider.fungibleToken.feeCollector,
-                value: bigNumberify("100000000000000000")
+                value: bigNumberify("1")
             },
             metadata: ""
         };
@@ -97,14 +98,14 @@ describe('Suite: FungibleToken - Dynamic Supply', function () {
         });
     });
 
-    it("Query - Wallet", function () {
+    it("Query - By wallet", function () {
         return token.FungibleToken.fromSymbol(fungibleToken.symbol, wallet).then((token) => {
             expect(token).to.exist;
             fungibleToken = token;
             if (!silent) console.log(indent, "Created Token:", JSON.stringify(token.state));
         });
     });
-    it("Query - Issuer", function () {
+    it("Query - By issuer", function () {
         return token.FungibleToken.fromSymbol(fungibleToken.symbol, issuer).then((token) => {
             expect(token).to.exist;
             issuerFungibleToken = token;
@@ -113,8 +114,12 @@ describe('Suite: FungibleToken - Dynamic Supply', function () {
 
     it("Approve", function () {
         let overrides = {
-            transferFee: bigNumberify("500000000000000000"),
-            burnable: true
+            tokenFees: [
+                { action: FungibleTokenActions.transfer, feeName: "default" },
+                { action: FungibleTokenActions.transferOwnership, feeName: "default" },
+                { action: FungibleTokenActions.acceptOwnership, feeName: "default" }
+            ],
+            burnable: false
         };
         return token.FungibleToken.approveFungibleToken(fungibleToken.symbol, provider, overrides).then((transaction) => {
             expect(transaction).to.exist;
@@ -133,8 +138,12 @@ describe('Suite: FungibleToken - Dynamic Supply', function () {
 
     it("Approve - checkDuplication", function () {
         let overrides = {
-            transferFee: bigNumberify("500000000000000000"),
-            burnable: true
+            tokenFees: [
+                { action: FungibleTokenActions.transfer, feeName: "default" },
+                { action: FungibleTokenActions.transferOwnership, feeName: "default" },
+                { action: FungibleTokenActions.acceptOwnership, feeName: "default" }
+            ],
+            burnable: false
         };
         return token.FungibleToken.approveFungibleToken(fungibleToken.symbol, provider, overrides).then((transaction) => {
             return token.FungibleToken.signFungibleTokenStatusTransaction(transaction, issuer);
@@ -157,14 +166,6 @@ describe('Suite: FungibleToken - Dynamic Supply', function () {
         });
     });
 
-    it("Mint", function () {
-        return fungibleToken.mint(wallet.address, "22000000000000000000").then((receipt) => {
-            expect(receipt).to.exist;
-            if (!silent) console.log(indent, "FungibleToken.mint RECEIPT:", JSON.stringify(receipt));
-            expect(receipt.status).to.equal(1);
-        });
-    });
-
     it("Balance - Owner", function () {
         return fungibleToken.refresh().then(() => {
             return fungibleToken.getBalance().then((balance) => {
@@ -177,7 +178,13 @@ describe('Suite: FungibleToken - Dynamic Supply', function () {
     it("Transfer", function () {
         return fungibleToken.getBalance().then((balance) => {
             balance = balance.div(2);
-            return fungibleToken.provider.getTokenTransactionFee(fungibleToken.symbol, "transfer").then((fee) => {
+            return wallet.provider.getTransactionFee("token", "token-transferFungibleToken", {
+                symbol: fungibleToken.symbol,
+                from: wallet.address,
+                to: issuer.address,
+                value: balance,
+                memo: "Hello blockchain"
+            }).then((fee) => {
                 return fungibleToken.transfer(issuer.address, balance, { fee: fee }).then((receipt) => {
                     expect(receipt).to.exist;
                     if (!silent) console.log(indent, "Owner transfer RECEIPT:", JSON.stringify(receipt));
@@ -196,12 +203,13 @@ describe('Suite: FungibleToken - Dynamic Supply', function () {
         });
     });
 
-    it("Burn", function () {
+    it("Burn - challenge non-burnable token", function () {
         return issuerFungibleToken.getBalance().then((balance) => {
             return issuerFungibleToken.burn(balance).then((receipt) => {
                 expect(receipt).to.exist;
-                if (!silent) console.log(indent, "Receiver burn RECEIPT:", JSON.stringify(receipt));
-                expect(receipt.status).to.equal(1);
+                expect(receipt.status).to.equal(0);
+            }).catch(error => {
+                expect(error.code).to.equal(errors.NOT_ALLOWED);
             });
         });
     });
@@ -255,6 +263,25 @@ describe('Suite: FungibleToken - Dynamic Supply', function () {
         });
     });
 
+    it("Transfer - challenge frozen token", function () {
+        return fungibleToken.getBalance().then((balance) => {
+            return wallet.provider.getTransactionFee("token", "token-transferFungibleToken", {
+                symbol: fungibleToken.symbol,
+                from: wallet.address,
+                to: issuer.address,
+                value: balance,
+                memo: "Hello blockchain"
+            }).then((fee) => {
+                return fungibleToken.transfer(issuer.address, balance, { fee: fee }).then((receipt) => {
+                    expect(receipt).to.exist;
+                    expect(receipt.status).to.equal(0);
+                }).catch(error => {
+                    expect(error.code).to.equal(errors.NOT_ALLOWED);
+                });
+            });
+        });
+    });
+
     it("Unfreeze", function () {
         return token.FungibleToken.unfreezeFungibleToken(fungibleToken.symbol, provider).then((transaction) => {
             expect(transaction).to.exist;
@@ -298,6 +325,25 @@ describe('Suite: FungibleToken - Dynamic Supply', function () {
         });
     });
 
+    it("Transfer - after unfreeze token", function () {
+        return fungibleToken.getBalance().then((balance) => {
+            balance = balance.div(2);
+            return wallet.provider.getTransactionFee("token", "token-transferFungibleToken", {
+                symbol: fungibleToken.symbol,
+                from: wallet.address,
+                to: issuer.address,
+                value: balance,
+                memo: "Hello blockchain"
+            }).then((fee) => {
+                return fungibleToken.transfer(issuer.address, balance, { fee: fee }).then((receipt) => {
+                    expect(receipt).to.exist;
+                    if (!silent) console.log(indent, "Owner transfer RECEIPT:", JSON.stringify(receipt));
+                    expect(receipt.status).to.equal(1);
+                });
+            });
+        });
+    });
+
     it("Freeze Account", function () {
         return token.FungibleToken.freezeFungibleTokenAccount(fungibleToken.symbol, wallet.address, provider).then((transaction) => {
             expect(transaction).to.exist;
@@ -332,83 +378,93 @@ describe('Suite: FungibleToken - Dynamic Supply', function () {
         });
     });
 
-    it("Freeze Account Status", function () {
+    it("Frozen Account Status", function () {
         let symbol = fungibleToken.symbol;
         return token.FungibleToken.fromSymbol(symbol, wallet).then((token) => {
             expect(token).to.exist;
             fungibleToken = token;
-            if (!silent) console.log(indent, "Freeze Token Account Status:", JSON.stringify(fungibleToken.state));
+            if (!silent) console.log(indent, "Frozen Account Status:", JSON.stringify(fungibleToken.state));
         });
     });
 
-});
-
-describe('Suite: FungibleToken - Dynamic Supply (Reject)', function () {
-    this.slow(slowThreshold); // define the threshold for slow indicator
-
-    it("Create", function () {
-        fungibleTokenProperties = {
-            name: "MY DYN " + hexlify(randomBytes(4)).substring(2),
-            symbol: "DYN" + hexlify(randomBytes(4)).substring(2),
-            decimals: 18,
-            fixedSupply: false,
-            totalSupply: bigNumberify("0"),
-            fee: {
-                to: nodeProvider.fungibleToken.feeCollector,
-                value: bigNumberify("100000000000000000")
-            },
-            metadata: ""
-        };
-
-        return token.FungibleToken.create(fungibleTokenProperties, wallet, defaultOverrides).then((token) => {
-            expect(token).to.exist;
-            fungibleToken = token as token.FungibleToken;
+    it("Transfer - challenge frozen account", function () {
+        return fungibleToken.getBalance().then((balance) => {
+            return wallet.provider.getTransactionFee("token", "token-transferFungibleToken", {
+                symbol: fungibleToken.symbol,
+                from: wallet.address,
+                to: issuer.address,
+                value: balance,
+                memo: "Hello blockchain"
+            }).then((fee) => {
+                return fungibleToken.transfer(issuer.address, balance, { fee: fee }).then((receipt) => {
+                    expect(receipt).to.exist;
+                    expect(receipt.status).to.equal(0);
+                }).catch(error => {
+                    expect(error.code).to.equal(errors.NOT_ALLOWED);
+                });
+            });
         });
     });
 
-    it("Query - Wallet", function () {
-        return token.FungibleToken.fromSymbol(fungibleToken.symbol, wallet).then((token) => {
-            expect(token).to.exist;
-            fungibleToken = token;
-            if (!silent) console.log(indent, "Created Token:", JSON.stringify(token.state));
-        });
-    });
-
-    it("Reject", function () {
-        return token.FungibleToken.rejectFungibleToken(fungibleToken.symbol, provider).then((transaction) => {
+    it("Unfreeze Account", function () {
+        return token.FungibleToken.unfreezeFungibleTokenAccount(fungibleToken.symbol, wallet.address, provider).then((transaction) => {
             expect(transaction).to.exist;
             if (!silent) console.log(indent, "Provider signed transaction:", JSON.stringify(transaction));
-            return token.FungibleToken.signFungibleTokenStatusTransaction(transaction, issuer);
+            return token.FungibleToken.signFungibleTokenAccountStatusTransaction(transaction, issuer);
         }).then((transaction) => {
             expect(transaction).to.exist;
             if (!silent) console.log(indent, "Issuer signed transaction:", JSON.stringify(transaction));
-            return token.FungibleToken.sendFungibleTokenStatusTransaction(transaction, middleware, defaultOverrides);
+            return token.FungibleToken.sendFungibleTokenAccountStatusTransaction(transaction, middleware, defaultOverrides);
         }).then((receipt) => {
             expect(receipt).to.exist;
-            if (!silent) console.log(indent, "RejectFungibleToken RECEIPT:", JSON.stringify(receipt));
+            if (!silent) console.log(indent, "UnfreezeFungibleTokenAccount RECEIPT:", JSON.stringify(receipt));
             expect(receipt.status).to.equal(1);
         });
     });
 
-    it("Reject - checkDuplication", function () {
-        return token.FungibleToken.rejectFungibleToken(fungibleToken.symbol, provider).then((transaction) => {
-            return token.FungibleToken.signFungibleTokenStatusTransaction(transaction, issuer);
+    it("Unfreeze Account - checkDuplication", function () {
+        return token.FungibleToken.unfreezeFungibleTokenAccount(fungibleToken.symbol, wallet.address, provider).then((transaction) => {
+            expect(transaction).to.exist;
+            if (!silent) console.log(indent, "Provider signed transaction:", JSON.stringify(transaction));
+            return token.FungibleToken.signFungibleTokenAccountStatusTransaction(transaction, issuer);
         }).then((transaction) => {
-            return token.FungibleToken.sendFungibleTokenStatusTransaction(transaction, middleware);
+            expect(transaction).to.exist;
+            if (!silent) console.log(indent, "Issuer signed transaction:", JSON.stringify(transaction));
+            return token.FungibleToken.sendFungibleTokenAccountStatusTransaction(transaction, middleware, defaultOverrides);
         }).then((receipt) => {
             expect(receipt).to.exist;
+            if (!silent) console.log(indent, "UnfreezeFungibleTokenAccount RECEIPT:", JSON.stringify(receipt));
             expect(receipt.status).to.equal(0);
         }).catch(error => {
-            expect(error.code).to.equal(errors.NOT_FOUND);
+            expect(error.code).to.equal(errors.NOT_ALLOWED);
         });
     });
 
-    it("Status", function () {
+    it("Unfreeze Account Status", function () {
         let symbol = fungibleToken.symbol;
         return token.FungibleToken.fromSymbol(symbol, wallet).then((token) => {
             expect(token).to.exist;
-        }).catch(error => {
-            expect(error.code).to.equal(errors.NOT_FOUND);
+            fungibleToken = token;
+            if (!silent) console.log(indent, "Unfreeze Account Status:", JSON.stringify(fungibleToken.state));
+        });
+    });
+
+    it("Transfer - after unfreeze account", function () {
+        return fungibleToken.getBalance().then((balance) => {
+            balance = balance.div(2);
+            return wallet.provider.getTransactionFee("token", "token-transferFungibleToken", {
+                symbol: fungibleToken.symbol,
+                from: wallet.address,
+                to: issuer.address,
+                value: balance,
+                memo: "Hello blockchain"
+            }).then((fee) => {
+                return fungibleToken.transfer(issuer.address, balance, { fee: fee }).then((receipt) => {
+                    expect(receipt).to.exist;
+                    if (!silent) console.log(indent, "Owner transfer RECEIPT:", JSON.stringify(receipt));
+                    expect(receipt.status).to.equal(1);
+                });
+            });
         });
     });
 });
@@ -425,7 +481,7 @@ describe('Suite: FungibleToken - Fixed Supply (Burnable)', function () {
             totalSupply: bigNumberify("100000000000000000000000000"),
             fee: {
                 to: nodeProvider.fungibleToken.feeCollector,
-                value: bigNumberify("100000000000000000")
+                value: bigNumberify("1")
             },
             metadata: ""
         };
@@ -444,14 +500,14 @@ describe('Suite: FungibleToken - Fixed Supply (Burnable)', function () {
         });
     });
 
-    it("Query - Wallet", function () {
+    it("Query - By wallet", function () {
         return token.FungibleToken.fromSymbol(fungibleToken.symbol, wallet).then((token) => {
             expect(token).to.exist;
             fungibleToken = token;
             if (!silent) console.log(indent, "Created Token:", JSON.stringify(token.state));
         });
     });
-    it("Query - Issuer", function () {
+    it("Query - By issuer", function () {
         return token.FungibleToken.fromSymbol(fungibleToken.symbol, issuer).then((token) => {
             expect(token).to.exist;
             issuerFungibleToken = token;
@@ -460,7 +516,12 @@ describe('Suite: FungibleToken - Fixed Supply (Burnable)', function () {
 
     it("Approve", function () {
         let overrides = {
-            transferFee: bigNumberify("500000000000000000"),
+            tokenFees: [
+                { action: FungibleTokenActions.transfer, feeName: "default" },
+                { action: FungibleTokenActions.burn, feeName: "zero" },
+                { action: FungibleTokenActions.transferOwnership, feeName: "default" },
+                { action: FungibleTokenActions.acceptOwnership, feeName: "default" }
+            ],
             burnable: true
         };
         return token.FungibleToken.approveFungibleToken(fungibleToken.symbol, provider, overrides).then((transaction) => {
@@ -480,7 +541,12 @@ describe('Suite: FungibleToken - Fixed Supply (Burnable)', function () {
 
     it("Approve - checkDuplication", function () {
         let overrides = {
-            transferFee: bigNumberify("500000000000000000"),
+            tokenFees: [
+                { action: FungibleTokenActions.transfer, feeName: "default" },
+                { action: FungibleTokenActions.burn, feeName: "zero" },
+                { action: FungibleTokenActions.transferOwnership, feeName: "default" },
+                { action: FungibleTokenActions.acceptOwnership, feeName: "default" }
+            ],
             burnable: true
         };
         return token.FungibleToken.approveFungibleToken(fungibleToken.symbol, provider, overrides).then((transaction) => {
@@ -516,7 +582,14 @@ describe('Suite: FungibleToken - Fixed Supply (Burnable)', function () {
     it("Transfer", function () {
         return fungibleToken.getBalance().then((balance) => {
             balance = balance.div(2);
-            return fungibleToken.provider.getTokenTransactionFee(fungibleToken.symbol, "transfer").then((fee) => {
+
+            return wallet.provider.getTransactionFee("token", "token-transferFungibleToken", {
+                symbol: fungibleToken.symbol,
+                from: wallet.address,
+                to: issuer.address,
+                value: balance,
+                memo: "Hello blockchain"
+            }).then((fee) => {
                 return fungibleToken.transfer(issuer.address, balance, { fee: fee }).then((receipt) => {
                     expect(receipt).to.exist;
                     if (!silent) console.log(indent, "Owner transfer RECEIPT:", JSON.stringify(receipt));
@@ -539,148 +612,7 @@ describe('Suite: FungibleToken - Fixed Supply (Burnable)', function () {
         return issuerFungibleToken.getBalance().then((balance) => {
             return issuerFungibleToken.burn(balance).then((receipt) => {
                 expect(receipt).to.exist;
-                if (!silent) console.log(indent, "Receiver burn RECEIPT:", JSON.stringify(receipt));
                 expect(receipt.status).to.equal(1);
-            });
-        });
-    });
-
-    it("Query Account", function () {
-        return wallet.provider.getTokenAccountState(fungibleToken.symbol, wallet.address).then((state) => {
-            if (!silent) console.log(indent, "Owner account:", JSON.stringify(state));
-        });
-    });
-});
-
-describe('Suite: FungibleToken - Fixed Supply (Not Burnable)', function () {
-    this.slow(slowThreshold); // define the threshold for slow indicator
-
-    it("Create", function () {
-        fungibleTokenProperties = {
-            name: "MY FIX " + hexlify(randomBytes(4)).substring(2),
-            symbol: "FIX" + hexlify(randomBytes(4)).substring(2),
-            decimals: 18,
-            fixedSupply: true,
-            totalSupply: bigNumberify("100000000000000000000000000"),
-            fee: {
-                to: nodeProvider.fungibleToken.feeCollector,
-                value: bigNumberify("100000000000000000")
-            },
-            metadata: ""
-        };
-
-        return token.FungibleToken.create(fungibleTokenProperties, wallet, defaultOverrides).then((token) => {
-            expect(token).to.exist;
-            fungibleToken = token as token.FungibleToken;
-        });
-    });
-
-    it("Create - checkDuplication", function () {
-        return token.FungibleToken.create(fungibleTokenProperties, wallet).then((token) => {
-            expect(token).is.not.exist;
-        }).catch(error => {
-            expect(error.code).to.equal(errors.EXISTS);
-        });
-    });
-
-    it("Query - Wallet", function () {
-        return token.FungibleToken.fromSymbol(fungibleToken.symbol, wallet).then((token) => {
-            expect(token).to.exist;
-            fungibleToken = token;
-            if (!silent) console.log(indent, "Created Token:", JSON.stringify(token.state));
-        });
-    });
-    it("Query - Issuer", function () {
-        return token.FungibleToken.fromSymbol(fungibleToken.symbol, issuer).then((token) => {
-            expect(token).to.exist;
-            issuerFungibleToken = token;
-        });
-    });
-
-    it("Approve", function () {
-        let overrides = {
-            transferFee: bigNumberify("500000000000000000"),
-            burnable: false
-        };
-        return token.FungibleToken.approveFungibleToken(fungibleToken.symbol, provider, overrides).then((transaction) => {
-            expect(transaction).to.exist;
-            if (!silent) console.log(indent, "Provider signed transaction:", JSON.stringify(transaction));
-            return token.FungibleToken.signFungibleTokenStatusTransaction(transaction, issuer);
-        }).then((transaction) => {
-            expect(transaction).to.exist;
-            if (!silent) console.log(indent, "Issuer signed transaction:", JSON.stringify(transaction));
-            return token.FungibleToken.sendFungibleTokenStatusTransaction(transaction, middleware, defaultOverrides);
-        }).then((receipt) => {
-            expect(receipt).to.exist;
-            if (!silent) console.log(indent, "ApproveFungibleToken RECEIPT:", JSON.stringify(receipt));
-            expect(receipt.status).to.equal(1);
-        });
-    });
-
-    it("Approve - checkDuplication", function () {
-        let overrides = {
-            transferFee: bigNumberify("500000000000000000"),
-            burnable: false
-        };
-        return token.FungibleToken.approveFungibleToken(fungibleToken.symbol, provider, overrides).then((transaction) => {
-            return token.FungibleToken.signFungibleTokenStatusTransaction(transaction, issuer);
-        }).then((transaction) => {
-            return token.FungibleToken.sendFungibleTokenStatusTransaction(transaction, middleware);
-        }).then((receipt) => {
-            expect(receipt).to.exist;
-            expect(receipt.status).to.equal(0);
-        }).catch(error => {
-            expect(error.code).to.equal(errors.NOT_ALLOWED);
-        });
-    });
-
-    it("Status", function () {
-        let symbol = fungibleToken.symbol;
-        return token.FungibleToken.fromSymbol(symbol, wallet).then((token) => {
-            expect(token).to.exist;
-            fungibleToken = token;
-            if (!silent) console.log(indent, "Approved Token:", JSON.stringify(fungibleToken.state));
-        });
-    });
-
-    it("Balance - Owner", function () {
-        return fungibleToken.refresh().then(() => {
-            return fungibleToken.getBalance().then((balance) => {
-                if (!silent) console.log(indent, "Owner balance:", mxw.utils.formatUnits(balance, fungibleToken.state.decimals));
-                expect(balance.toString()).to.equal(fungibleToken.state.totalSupply.toString());
-            });
-        });
-    });
-
-    it("Transfer", function () {
-        return fungibleToken.getBalance().then((balance) => {
-            balance = balance.div(2);
-            return fungibleToken.provider.getTokenTransactionFee(fungibleToken.symbol, "transfer").then((fee) => {
-                return fungibleToken.transfer(issuer.address, balance, { fee: fee }).then((receipt) => {
-                    expect(receipt).to.exist;
-                    if (!silent) console.log(indent, "Owner transfer RECEIPT:", JSON.stringify(receipt));
-                    expect(receipt.status).to.equal(1);
-                });
-            });
-        });
-    });
-
-    it("Balance - Receiver", function () {
-        return issuerFungibleToken.refresh().then(() => {
-            return issuerFungibleToken.getBalance().then((balance) => {
-                if (!silent) console.log(indent, "Receiver balance:", mxw.utils.formatUnits(balance, issuerFungibleToken.state.decimals));
-                expect(balance.toString()).to.equal(issuerFungibleToken.state.totalSupply.div(2).toString());
-            });
-        });
-    });
-
-    it("Burn", function () {
-        return issuerFungibleToken.getBalance().then((balance) => {
-            return issuerFungibleToken.burn(balance).then((receipt) => {
-                expect(receipt).to.exist;
-                expect(receipt.status).to.equal(0);
-            }).catch(error => {
-                expect(error.code).to.equal(errors.NOT_ALLOWED);
             });
         });
     });
@@ -704,7 +636,7 @@ describe('Suite: FungibleToken - Fixed Supply (Reject)', function () {
             totalSupply: bigNumberify("100000000000000000000000000"),
             fee: {
                 to: nodeProvider.fungibleToken.feeCollector,
-                value: bigNumberify("100000000000000000")
+                value: bigNumberify("1")
             },
             metadata: ""
         };
@@ -723,7 +655,7 @@ describe('Suite: FungibleToken - Fixed Supply (Reject)', function () {
         });
     });
 
-    it("Query - Wallet", function () {
+    it("Query - By wallet", function () {
         return token.FungibleToken.fromSymbol(fungibleToken.symbol, wallet).then((token) => {
             expect(token).to.exist;
             fungibleToken = token;
@@ -769,6 +701,353 @@ describe('Suite: FungibleToken - Fixed Supply (Reject)', function () {
         });
     });
 });
+
+// describe('Suite: FungibleToken - Dynamic Supply', function () {
+//     this.slow(slowThreshold); // define the threshold for slow indicator
+
+//     it("Create", function () {
+//         fungibleTokenProperties = {
+//             name: "MY DYN " + hexlify(randomBytes(4)).substring(2),
+//             symbol: "DYN" + hexlify(randomBytes(4)).substring(2),
+//             decimals: 18,
+//             fixedSupply: false,
+//             totalSupply: bigNumberify("0"),
+//             fee: {
+//                 to: nodeProvider.fungibleToken.feeCollector,
+//                 value: bigNumberify("100000000000000000")
+//             },
+//             metadata: ""
+//         };
+
+//         return token.FungibleToken.create(fungibleTokenProperties, wallet, defaultOverrides).then((token) => {
+//             expect(token).to.exist;
+//             fungibleToken = token as token.FungibleToken;
+//         });
+//     });
+
+//     it("Create - checkDuplication", function () {
+//         return token.FungibleToken.create(fungibleTokenProperties, wallet).then((token) => {
+//             expect(token).is.not.exist;
+//         }).catch(error => {
+//             expect(error.code).to.equal(errors.EXISTS);
+//         });
+//     });
+
+//     it("Query - Wallet", function () {
+//         return token.FungibleToken.fromSymbol(fungibleToken.symbol, wallet).then((token) => {
+//             expect(token).to.exist;
+//             fungibleToken = token;
+//             if (!silent) console.log(indent, "Created Token:", JSON.stringify(token.state));
+//         });
+//     });
+//     it("Query - Issuer", function () {
+//         return token.FungibleToken.fromSymbol(fungibleToken.symbol, issuer).then((token) => {
+//             expect(token).to.exist;
+//             issuerFungibleToken = token;
+//         });
+//     });
+
+//     it("Approve", function () {
+//         let overrides = {
+//             transferFee: bigNumberify("500000000000000000"),
+//             burnable: true
+//         };
+//         return token.FungibleToken.approveFungibleToken(fungibleToken.symbol, provider, overrides).then((transaction) => {
+//             expect(transaction).to.exist;
+//             if (!silent) console.log(indent, "Provider signed transaction:", JSON.stringify(transaction));
+//             return token.FungibleToken.signFungibleTokenStatusTransaction(transaction, issuer);
+//         }).then((transaction) => {
+//             expect(transaction).to.exist;
+//             if (!silent) console.log(indent, "Issuer signed transaction:", JSON.stringify(transaction));
+//             return token.FungibleToken.sendFungibleTokenStatusTransaction(transaction, middleware, defaultOverrides);
+//         }).then((receipt) => {
+//             expect(receipt).to.exist;
+//             if (!silent) console.log(indent, "ApproveFungibleToken RECEIPT:", JSON.stringify(receipt));
+//             expect(receipt.status).to.equal(1);
+//         });
+//     });
+
+//     it("Approve - checkDuplication", function () {
+//         let overrides = {
+//             transferFee: bigNumberify("500000000000000000"),
+//             burnable: true
+//         };
+//         return token.FungibleToken.approveFungibleToken(fungibleToken.symbol, provider, overrides).then((transaction) => {
+//             return token.FungibleToken.signFungibleTokenStatusTransaction(transaction, issuer);
+//         }).then((transaction) => {
+//             return token.FungibleToken.sendFungibleTokenStatusTransaction(transaction, middleware);
+//         }).then((receipt) => {
+//             expect(receipt).to.exist;
+//             expect(receipt.status).to.equal(0);
+//         }).catch(error => {
+//             expect(error.code).to.equal(errors.NOT_ALLOWED);
+//         });
+//     });
+
+//     it("Status", function () {
+//         let symbol = fungibleToken.symbol;
+//         return token.FungibleToken.fromSymbol(symbol, wallet).then((token) => {
+//             expect(token).to.exist;
+//             fungibleToken = token;
+//             if (!silent) console.log(indent, "Approved Token:", JSON.stringify(fungibleToken.state));
+//         });
+//     });
+
+//     it("Mint", function () {
+//         return fungibleToken.mint(wallet.address, "22000000000000000000").then((receipt) => {
+//             expect(receipt).to.exist;
+//             if (!silent) console.log(indent, "FungibleToken.mint RECEIPT:", JSON.stringify(receipt));
+//             expect(receipt.status).to.equal(1);
+//         });
+//     });
+
+//     it("Balance - Owner", function () {
+//         return fungibleToken.refresh().then(() => {
+//             return fungibleToken.getBalance().then((balance) => {
+//                 if (!silent) console.log(indent, "Owner balance:", mxw.utils.formatUnits(balance, fungibleToken.state.decimals));
+//                 expect(balance.toString()).to.equal(fungibleToken.state.totalSupply.toString());
+//             });
+//         });
+//     });
+
+//     it("Transfer", function () {
+//         return fungibleToken.getBalance().then((balance) => {
+//             balance = balance.div(2);
+//             return fungibleToken.provider.getTokenTransactionFee(fungibleToken.symbol, "transfer").then((fee) => {
+//                 return fungibleToken.transfer(issuer.address, balance, { fee: fee }).then((receipt) => {
+//                     expect(receipt).to.exist;
+//                     if (!silent) console.log(indent, "Owner transfer RECEIPT:", JSON.stringify(receipt));
+//                     expect(receipt.status).to.equal(1);
+//                 });
+//             });
+//         });
+//     });
+
+//     it("Balance - Receiver", function () {
+//         return issuerFungibleToken.refresh().then(() => {
+//             return issuerFungibleToken.getBalance().then((balance) => {
+//                 if (!silent) console.log(indent, "Receiver balance:", mxw.utils.formatUnits(balance, issuerFungibleToken.state.decimals));
+//                 expect(balance.toString()).to.equal(issuerFungibleToken.state.totalSupply.div(2).toString());
+//             });
+//         });
+//     });
+
+//     it("Burn", function () {
+//         return issuerFungibleToken.getBalance().then((balance) => {
+//             return issuerFungibleToken.burn(balance).then((receipt) => {
+//                 expect(receipt).to.exist;
+//                 if (!silent) console.log(indent, "Receiver burn RECEIPT:", JSON.stringify(receipt));
+//                 expect(receipt.status).to.equal(1);
+//             });
+//         });
+//     });
+
+//     it("Query Account", function () {
+//         return wallet.provider.getTokenAccountState(fungibleToken.symbol, wallet.address).then((state) => {
+//             if (!silent) console.log(indent, "Owner account:", JSON.stringify(state));
+//         });
+//     });
+
+//     it("Freeze", function () {
+//         return token.FungibleToken.freezeFungibleToken(fungibleToken.symbol, provider).then((transaction) => {
+//             expect(transaction).to.exist;
+//             if (!silent) console.log(indent, "Provider signed transaction:", JSON.stringify(transaction));
+//             return token.FungibleToken.signFungibleTokenStatusTransaction(transaction, issuer);
+//         }).then((transaction) => {
+//             expect(transaction).to.exist;
+//             if (!silent) console.log(indent, "Issuer signed transaction:", JSON.stringify(transaction));
+//             return token.FungibleToken.sendFungibleTokenStatusTransaction(transaction, middleware, defaultOverrides);
+//         }).then((receipt) => {
+//             expect(receipt).to.exist;
+//             if (!silent) console.log(indent, "FreezeFungibleToken RECEIPT:", JSON.stringify(receipt));
+//             expect(receipt.status).to.equal(1);
+//         });
+//     });
+
+//     it("Freeze - checkDuplication", function () {
+//         return token.FungibleToken.freezeFungibleToken(fungibleToken.symbol, provider).then((transaction) => {
+//             expect(transaction).to.exist;
+//             if (!silent) console.log(indent, "Provider signed transaction:", JSON.stringify(transaction));
+//             return token.FungibleToken.signFungibleTokenStatusTransaction(transaction, issuer);
+//         }).then((transaction) => {
+//             expect(transaction).to.exist;
+//             if (!silent) console.log(indent, "Issuer signed transaction:", JSON.stringify(transaction));
+//             return token.FungibleToken.sendFungibleTokenStatusTransaction(transaction, middleware, defaultOverrides);
+//         }).then((receipt) => {
+//             expect(receipt).to.exist;
+//             if (!silent) console.log(indent, "FreezeFungibleToken RECEIPT:", JSON.stringify(receipt));
+//             expect(receipt.status).to.equal(0);
+//         }).catch(error => {
+//             expect(error.code).to.equal(errors.NOT_ALLOWED);
+//         });
+//     });
+
+//     it("Frozen Status", function () {
+//         let symbol = fungibleToken.symbol;
+//         return token.FungibleToken.fromSymbol(symbol, wallet).then((token) => {
+//             expect(token).to.exist;
+//             fungibleToken = token;
+//             if (!silent) console.log(indent, "Frozen Token:", JSON.stringify(fungibleToken.state));
+//         });
+//     });
+
+//     it("Unfreeze", function () {
+//         return token.FungibleToken.unfreezeFungibleToken(fungibleToken.symbol, provider).then((transaction) => {
+//             expect(transaction).to.exist;
+//             if (!silent) console.log(indent, "Provider signed transaction:", JSON.stringify(transaction));
+//             return token.FungibleToken.signFungibleTokenStatusTransaction(transaction, issuer);
+//         }).then((transaction) => {
+//             expect(transaction).to.exist;
+//             if (!silent) console.log(indent, "Issuer signed transaction:", JSON.stringify(transaction));
+//             return token.FungibleToken.sendFungibleTokenStatusTransaction(transaction, middleware, defaultOverrides);
+//         }).then((receipt) => {
+//             expect(receipt).to.exist;
+//             if (!silent) console.log(indent, "UnfreezeFungibleToken RECEIPT:", JSON.stringify(receipt));
+//             expect(receipt.status).to.equal(1);
+//         });
+//     });
+
+//     it("Unfreeze - checkDuplication", function () {
+//         return token.FungibleToken.unfreezeFungibleToken(fungibleToken.symbol, provider).then((transaction) => {
+//             expect(transaction).to.exist;
+//             if (!silent) console.log(indent, "Provider signed transaction:", JSON.stringify(transaction));
+//             return token.FungibleToken.signFungibleTokenStatusTransaction(transaction, issuer);
+//         }).then((transaction) => {
+//             expect(transaction).to.exist;
+//             if (!silent) console.log(indent, "Issuer signed transaction:", JSON.stringify(transaction));
+//             return token.FungibleToken.sendFungibleTokenStatusTransaction(transaction, middleware, defaultOverrides);
+//         }).then((receipt) => {
+//             expect(receipt).to.exist;
+//             if (!silent) console.log(indent, "UnfreezeFungibleToken RECEIPT:", JSON.stringify(receipt));
+//             expect(receipt.status).to.equal(0);
+//         }).catch(error => {
+//             expect(error.code).to.equal(errors.NOT_ALLOWED);
+//         });
+//     });
+
+//     it("Unfreeze Status", function () {
+//         let symbol = fungibleToken.symbol;
+//         return token.FungibleToken.fromSymbol(symbol, wallet).then((token) => {
+//             expect(token).to.exist;
+//             fungibleToken = token;
+//             if (!silent) console.log(indent, "Unfreeze Token:", JSON.stringify(fungibleToken.state));
+//         });
+//     });
+
+//     it("Freeze Account", function () {
+//         return token.FungibleToken.freezeFungibleTokenAccount(fungibleToken.symbol, wallet.address, provider).then((transaction) => {
+//             expect(transaction).to.exist;
+//             if (!silent) console.log(indent, "Provider signed transaction:", JSON.stringify(transaction));
+//             return token.FungibleToken.signFungibleTokenAccountStatusTransaction(transaction, issuer);
+//         }).then((transaction) => {
+//             expect(transaction).to.exist;
+//             if (!silent) console.log(indent, "Issuer signed transaction:", JSON.stringify(transaction));
+//             return token.FungibleToken.sendFungibleTokenAccountStatusTransaction(transaction, middleware, defaultOverrides);
+//         }).then((receipt) => {
+//             expect(receipt).to.exist;
+//             if (!silent) console.log(indent, "FreezeFungibleTokenAccount RECEIPT:", JSON.stringify(receipt));
+//             expect(receipt.status).to.equal(1);
+//         });
+//     });
+
+//     it("Freeze Account - checkDuplication", function () {
+//         return token.FungibleToken.freezeFungibleTokenAccount(fungibleToken.symbol, wallet.address, provider).then((transaction) => {
+//             expect(transaction).to.exist;
+//             if (!silent) console.log(indent, "Provider signed transaction:", JSON.stringify(transaction));
+//             return token.FungibleToken.signFungibleTokenAccountStatusTransaction(transaction, issuer);
+//         }).then((transaction) => {
+//             expect(transaction).to.exist;
+//             if (!silent) console.log(indent, "Issuer signed transaction:", JSON.stringify(transaction));
+//             return token.FungibleToken.sendFungibleTokenAccountStatusTransaction(transaction, middleware, defaultOverrides);
+//         }).then((receipt) => {
+//             expect(receipt).to.exist;
+//             if (!silent) console.log(indent, "FreezeFungibleTokenAccount RECEIPT:", JSON.stringify(receipt));
+//             expect(receipt.status).to.equal(0);
+//         }).catch(error => {
+//             expect(error.code).to.equal(errors.NOT_ALLOWED);
+//         });
+//     });
+
+//     it("Freeze Account Status", function () {
+//         let symbol = fungibleToken.symbol;
+//         return token.FungibleToken.fromSymbol(symbol, wallet).then((token) => {
+//             expect(token).to.exist;
+//             fungibleToken = token;
+//             if (!silent) console.log(indent, "Freeze Token Account Status:", JSON.stringify(fungibleToken.state));
+//         });
+//     });
+
+// });
+
+// describe('Suite: FungibleToken - Dynamic Supply (Reject)', function () {
+//     this.slow(slowThreshold); // define the threshold for slow indicator
+
+//     it("Create", function () {
+//         fungibleTokenProperties = {
+//             name: "MY DYN " + hexlify(randomBytes(4)).substring(2),
+//             symbol: "DYN" + hexlify(randomBytes(4)).substring(2),
+//             decimals: 18,
+//             fixedSupply: false,
+//             totalSupply: bigNumberify("0"),
+//             fee: {
+//                 to: nodeProvider.fungibleToken.feeCollector,
+//                 value: bigNumberify("100000000000000000")
+//             },
+//             metadata: ""
+//         };
+
+//         return token.FungibleToken.create(fungibleTokenProperties, wallet, defaultOverrides).then((token) => {
+//             expect(token).to.exist;
+//             fungibleToken = token as token.FungibleToken;
+//         });
+//     });
+
+//     it("Query - Wallet", function () {
+//         return token.FungibleToken.fromSymbol(fungibleToken.symbol, wallet).then((token) => {
+//             expect(token).to.exist;
+//             fungibleToken = token;
+//             if (!silent) console.log(indent, "Created Token:", JSON.stringify(token.state));
+//         });
+//     });
+
+//     it("Reject", function () {
+//         return token.FungibleToken.rejectFungibleToken(fungibleToken.symbol, provider).then((transaction) => {
+//             expect(transaction).to.exist;
+//             if (!silent) console.log(indent, "Provider signed transaction:", JSON.stringify(transaction));
+//             return token.FungibleToken.signFungibleTokenStatusTransaction(transaction, issuer);
+//         }).then((transaction) => {
+//             expect(transaction).to.exist;
+//             if (!silent) console.log(indent, "Issuer signed transaction:", JSON.stringify(transaction));
+//             return token.FungibleToken.sendFungibleTokenStatusTransaction(transaction, middleware, defaultOverrides);
+//         }).then((receipt) => {
+//             expect(receipt).to.exist;
+//             if (!silent) console.log(indent, "RejectFungibleToken RECEIPT:", JSON.stringify(receipt));
+//             expect(receipt.status).to.equal(1);
+//         });
+//     });
+
+//     it("Reject - checkDuplication", function () {
+//         return token.FungibleToken.rejectFungibleToken(fungibleToken.symbol, provider).then((transaction) => {
+//             return token.FungibleToken.signFungibleTokenStatusTransaction(transaction, issuer);
+//         }).then((transaction) => {
+//             return token.FungibleToken.sendFungibleTokenStatusTransaction(transaction, middleware);
+//         }).then((receipt) => {
+//             expect(receipt).to.exist;
+//             expect(receipt.status).to.equal(0);
+//         }).catch(error => {
+//             expect(error.code).to.equal(errors.NOT_FOUND);
+//         });
+//     });
+
+//     it("Status", function () {
+//         let symbol = fungibleToken.symbol;
+//         return token.FungibleToken.fromSymbol(symbol, wallet).then((token) => {
+//             expect(token).to.exist;
+//         }).catch(error => {
+//             expect(error.code).to.equal(errors.NOT_FOUND);
+//         });
+//     });
+// });
 
 describe('Suite: FungibleToken', function () {
     this.slow(slowThreshold); // define the threshold for slow indicator

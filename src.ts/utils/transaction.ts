@@ -151,7 +151,7 @@ export function serialize(unsignedTransaction: UnsignedTransaction, signature?: 
         },
         signature: isArrayish(signature) ? signature : base64Encode(joinSignature(signature))
     });
-    
+
     // Convert number and big number to string
     transaction = iterate(transaction, function (key, value, type) {
         switch (type) {
@@ -449,7 +449,7 @@ export function getTransactionRequest(route: string, transactionType: string, ov
                     memo: allowNullOrEmpty(checkString),
                     decimals: checkNumber,
                     fixedSupply: checkBoolean,
-                    metadata: checkString,
+                    metadata: allowNullOrEmpty(checkString),
                     symbol: checkString,
                     totalSupply: checkBigNumber
                 }, overrides);
@@ -467,7 +467,7 @@ export function getTransactionRequest(route: string, transactionType: string, ov
                                         value: params.appFeeValue.toString()
                                     },
                                     fixedSupply: params.fixedSupply,
-                                    metadata: params.metadata || "",
+                                    metadata: params.metadata ? params.metadata : "",
                                     name: params.name,
                                     owner: params.owner,
                                     symbol: params.symbol,
@@ -540,6 +540,248 @@ export function getTransactionRequest(route: string, transactionType: string, ov
                                     payload: params.payload,
                                     signatures: params.signatures,
                                     owner: params.owner
+                                }
+                            }
+                        ],
+                        memo: params.memo ? params.memo : ""
+                    },
+                    fee: null
+                };
+            }
+            break;
+
+        case "token/token-transferFungibleToken":
+            {
+                let params: {
+                    symbol: string,
+                    from: string,
+                    to: string,
+                    value: BigNumber,
+                    memo: string
+                } = checkFormat({
+                    symbol: checkString,
+                    from: checkAddress,
+                    to: checkAddress,
+                    value: checkBigNumber,
+                    memo: allowNullOrEmpty(checkString)
+                }, overrides);
+
+                transaction = {
+                    type: "cosmos-sdk/StdTx",
+                    value: {
+                        msg: [
+                            {
+                                type: "token/transferFungibleToken",
+                                value: {
+                                    symbol: params.symbol,
+                                    from: params.from,
+                                    to: params.to,
+                                    value: params.value.toString()
+                                }
+                            }
+                        ],
+                        memo: params.memo ? params.memo : ""
+                    },
+                    fee: null
+                };
+            }
+            break;
+
+        case "token/token-mintFungibleToken":
+            {
+                let params: {
+                    symbol: string,
+                    owner: string,
+                    to: string,
+                    value: BigNumber,
+                    memo: string
+                } = checkFormat({
+                    symbol: checkString,
+                    owner: checkAddress,
+                    to: checkAddress,
+                    value: checkBigNumber,
+                    memo: allowNullOrEmpty(checkString)
+                }, overrides);
+
+                transaction = {
+                    type: "cosmos-sdk/StdTx",
+                    value: {
+                        msg: [
+                            {
+                                type: "token/mintFungibleToken",
+                                value: {
+                                    symbol: params.symbol,
+                                    owner: params.owner,
+                                    to: params.to,
+                                    value: params.value.toString()
+                                }
+                            }
+                        ],
+                        memo: params.memo ? params.memo : ""
+                    },
+                    fee: null
+                };
+            }
+            break;
+
+        case "token/token-burnFungibleToken":
+            {
+                let params: {
+                    symbol: string,
+                    from: string,
+                    value: BigNumber,
+                    memo: string
+                } = checkFormat({
+                    symbol: checkString,
+                    from: checkAddress,
+                    value: checkBigNumber,
+                    memo: allowNullOrEmpty(checkString)
+                }, overrides);
+
+                transaction = {
+                    type: "cosmos-sdk/StdTx",
+                    value: {
+                        msg: [
+                            {
+                                type: "token/burnFungibleToken",
+                                value: {
+                                    symbol: params.symbol,
+                                    from: params.from,
+                                    value: params.value.toString()
+                                }
+                            }
+                        ],
+                        memo: params.memo ? params.memo : ""
+                    },
+                    fee: null
+                };
+            }
+            break;
+
+        case "token/token-freezeFungibleToken":
+            {
+                let params: {
+                    symbol: string,
+                    target: string,
+                    owner: string,
+                    memo: string
+                } = checkFormat({
+                    symbol: checkString,
+                    target: checkAddress,
+                    owner: checkAddress,
+                    memo: allowNullOrEmpty(checkString)
+                }, overrides);
+
+                transaction = {
+                    type: "cosmos-sdk/StdTx",
+                    value: {
+                        msg: [
+                            {
+                                type: "token/freezeFungibleToken",
+                                value: {
+                                    symbol: params.symbol,
+                                    target: params.target,
+                                    owner: params.owner
+                                }
+                            }
+                        ],
+                        memo: params.memo ? params.memo : ""
+                    },
+                    fee: null
+                };
+            }
+            break;
+
+        case "token/token-unfreezeFungibleToken":
+            {
+                let params: {
+                    symbol: string,
+                    target: string,
+                    owner: string,
+                    memo: string
+                } = checkFormat({
+                    symbol: checkString,
+                    target: checkAddress,
+                    owner: checkAddress,
+                    memo: allowNullOrEmpty(checkString)
+                }, overrides);
+
+                transaction = {
+                    type: "cosmos-sdk/StdTx",
+                    value: {
+                        msg: [
+                            {
+                                type: "token/unfreezeFungibleToken",
+                                value: {
+                                    symbol: params.symbol,
+                                    target: params.target,
+                                    owner: params.owner
+                                }
+                            }
+                        ],
+                        memo: params.memo ? params.memo : ""
+                    },
+                    fee: null
+                };
+            }
+            break;
+
+        case "token/token-transferOwnership":
+            {
+                let params: {
+                    symbol: string,
+                    from: string,
+                    to: string,
+                    memo: string
+                } = checkFormat({
+                    symbol: checkString,
+                    from: checkAddress,
+                    to: checkAddress,
+                    memo: allowNullOrEmpty(checkString)
+                }, overrides);
+
+                transaction = {
+                    type: "cosmos-sdk/StdTx",
+                    value: {
+                        msg: [
+                            {
+                                type: "token/transferOwnership",
+                                value: {
+                                    symbol: params.symbol,
+                                    from: params.from,
+                                    to: params.to
+                                }
+                            }
+                        ],
+                        memo: params.memo ? params.memo : ""
+                    },
+                    fee: null
+                };
+            }
+            break;
+
+        case "token/token-acceptOwnership":
+            {
+                let params: {
+                    symbol: string,
+                    from: string,
+                    memo: string
+                } = checkFormat({
+                    symbol: checkString,
+                    from: checkAddress,
+                    to: checkAddress,
+                    memo: allowNullOrEmpty(checkString)
+                }, overrides);
+
+                transaction = {
+                    type: "cosmos-sdk/StdTx",
+                    value: {
+                        msg: [
+                            {
+                                type: "token/acceptOwnership",
+                                value: {
+                                    symbol: params.symbol,
+                                    from: params.from
                                 }
                             }
                         ],

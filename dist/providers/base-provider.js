@@ -66,7 +66,6 @@ function checkTokenState(data) {
         Frozen: misc_1.checkBoolean,
         Owner: misc_1.checkString,
         Metadata: misc_1.checkString,
-        TransferFee: misc_1.checkBigNumber,
         Burnable: misc_1.checkBoolean
     }, data), (key) => {
         switch (key) {
@@ -80,7 +79,6 @@ function checkTokenState(data) {
             case "TotalSupply": return "totalSupply";
             case "Approved": return "approved";
             case "Frozen": return "frozen";
-            case "TransferFee": return "transferFee";
             case "Burnable": return "burnable";
         }
         return key;
@@ -455,30 +453,6 @@ class BaseProvider extends abstract_provider_1.Provider {
             });
         });
     }
-    getTokenTransactionFee(symbol, transactionType, overrides, ...args) {
-        return this.ready.then(() => {
-            let params = {
-                path: "/custom/token/get_token_" + transactionType + "_fee/" + symbol,
-            };
-            if (args) {
-                let path = args.map((value => {
-                    let arg = encodeURI(String(value));
-                    return arg;
-                })).join("/");
-                if (path) {
-                    params.path += "/" + path;
-                }
-            }
-            return this.perform('getTransactionFee', params).then((result) => {
-                let fee = {
-                    amount: result,
-                    gas: (overrides && overrides.gas) ? overrides.gas.toString() : "0"
-                };
-                checkTransactionFee(fee);
-                return fee;
-            });
-        });
-    }
     getTransactionRequest(route, transactionType, overrides) {
         return transaction_1.getTransactionRequest(route, transactionType, overrides);
     }
@@ -539,7 +513,6 @@ class BaseProvider extends abstract_provider_1.Provider {
                             totalSupply: bignumber_1.bigNumberify(result.totalSupply),
                             approved: result.approved ? true : false,
                             frozen: result.frozen ? true : false,
-                            transferFee: bignumber_1.bigNumberify(result.transferFee),
                             burnable: result.burnable ? true : false
                         };
                         result = state;
@@ -759,6 +732,7 @@ class BaseProvider extends abstract_provider_1.Provider {
                                 return null;
                             }
                             let block = checkBlock(blockResult);
+                            // Query block 
                             return this.perform('getBlockInfo', { blockTag: blockTag }).then((infoResult) => {
                                 let info = checkBlockInfo(infoResult);
                                 return Object.assign(Object.assign({}, block), info);

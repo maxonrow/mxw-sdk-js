@@ -50,7 +50,6 @@ export interface TokenState {
     frozen: boolean,
     owner: string,
     metadata: string,
-    transferFee: BigNumber,
     burnable: boolean
 }
 
@@ -190,7 +189,6 @@ export abstract class Provider implements OnceBlockable {
 
     abstract getStatus(): Promise<Status>;
 
-    abstract getTokenTransactionFee(symbol: string, transactionType: string, overrides?: any, ...args): Promise<TransactionFee>;
     abstract getTokenState(symbol: string | Promise<string>, blockTag?: BlockTag | Promise<BlockTag>): Promise<TokenState>;
     abstract getTokenList(blockTag?: BlockTag | Promise<BlockTag>): Promise<TokenList>;
     abstract getTokenAccountState(symbol: string | Promise<string>, address: string | Promise<string>, blockTag?: BlockTag | Promise<BlockTag>): Promise<TokenAccountState>;

@@ -2,6 +2,15 @@ import { Provider } from './providers/abstract-provider';
 import { Signer } from './abstract-signer';
 import { TransactionReceipt, TransactionResponse, BlockTag, TokenState } from './providers/abstract-provider';
 import { BigNumberish, BigNumber } from './utils';
+export declare enum FungibleTokenActions {
+    transfer = "transfer",
+    mint = "mint",
+    burn = "burn",
+    freeze = "freeze",
+    unfreeze = "unfreeze",
+    transferOwnership = "transferOwnership",
+    acceptOwnership = "acceptOwnership"
+}
 export interface FungibleTokenProperties {
     name: string;
     symbol: string;
@@ -15,14 +24,18 @@ export interface FungibleTokenProperties {
     metadata?: string;
     owner?: string;
 }
+export interface FungibleTokenFee {
+    action: string;
+    feeName: string;
+}
 export interface FungibleTokenStatus {
     token: {
         from: string;
         nonce: BigNumber;
         status: string;
         symbol: string;
-        transferFee: BigNumber;
-        burnable: boolean;
+        tokenFees?: FungibleTokenFee[];
+        burnable?: boolean;
     };
     pub_key: {
         type: string;
@@ -152,11 +165,11 @@ export declare class FungibleToken {
      */
     static sendFungibleTokenStatusTransaction(transaction: FungibleTokenStatusTransaction, signer: Signer, overrides?: any): Promise<TransactionReceipt>;
     /**
- * Send fungible token account status transaction by middleware
- * @param transaction fungible token account status transaction
- * @param signer signer wallet
- * @param overrides options
- */
+     * Send fungible token account status transaction by middleware
+     * @param transaction fungible token account status transaction
+     * @param signer signer wallet
+     * @param overrides options
+     */
     static sendFungibleTokenAccountStatusTransaction(transaction: FungibleTokenAccountStatusTransaction, signer: Signer, overrides?: any): Promise<TransactionReceipt>;
     /**
      * Approve fungible token by provider
