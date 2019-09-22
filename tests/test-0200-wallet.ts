@@ -406,4 +406,9 @@ describe('Suite: Wallet', function () {
         expect(secret1With2).to.equal(secret2With1);
     });
 
+    it("Verify mnemonic", function () {
+        let wallet = mxw.Wallet.fromMnemonic("lady rebel cash silent object vault peace deal forward problem guide number");
+        expect("mxw1lgaaw7r5nw49d70vgm79k9hjjdpcrhqgum0vmm").to.equal(wallet.address);
+    });
+
 });
