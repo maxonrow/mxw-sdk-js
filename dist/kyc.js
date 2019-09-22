@@ -15,6 +15,8 @@ const errors = __importStar(require("./errors"));
 // Imported Abstracts
 const abstract_provider_1 = require("./providers/abstract-provider");
 const abstract_signer_1 = require("./abstract-signer");
+const utils_1 = require("./utils");
+const constants_1 = require("./constants");
 const formatKycKeyComponent = {
     country: misc_1.checkString,
     idType: misc_1.checkString,
@@ -142,7 +144,8 @@ class Kyc {
         properties_1.checkProperties(keyComponent, { country: true, idType: true, id: true, idExpiry: true, dob: true, seed: true });
         keyComponent = misc_1.checkFormat(formatKycKeyComponent, keyComponent);
         // Hash the KYC components to become KYC address
-        return sha2_1.sha256(JSON.stringify(misc_1.sortObject(keyComponent)));
+        let hash = sha2_1.sha256(utils_1.toUtf8Bytes(JSON.stringify(misc_1.sortObject(keyComponent))));
+        return utils_1.computeAddress(hash, constants_1.KycAddressPrefix);
     }
     /**
      * Wallet to sign kyc address

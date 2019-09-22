@@ -14,7 +14,7 @@ import {
 } from '../utils/misc';
 import { toUtf8String, toUtf8Bytes, computeAddress } from '../utils';
 import { TransactionRequest } from '.';
-import { ValidatorAddressPrefix } from '../constants';
+import { ValOperatorAddressPrefix } from '../constants';
 
 import * as errors from '../errors';
 
@@ -250,7 +250,7 @@ function checkBlockInfo(data: any): BlockInfo {
     });
 
     if (data.block && data.block.header) {
-        data.block.header.proposerAddress = computeAddress(data.block.header.proposerAddress, ValidatorAddressPrefix);
+        data.block.header.proposerAddress = computeAddress(data.block.header.proposerAddress, ValOperatorAddressPrefix);
         return {
             ...data.block.header
         }

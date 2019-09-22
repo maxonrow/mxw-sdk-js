@@ -217,7 +217,7 @@ function checkBlockInfo(data) {
         return key;
     });
     if (data.block && data.block.header) {
-        data.block.header.proposerAddress = utils_1.computeAddress(data.block.header.proposerAddress, constants_1.ValidatorAddressPrefix);
+        data.block.header.proposerAddress = utils_1.computeAddress(data.block.header.proposerAddress, constants_1.ValOperatorAddressPrefix);
         return Object.assign({}, data.block.header);
     }
     return undefined;

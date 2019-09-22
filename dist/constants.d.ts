@@ -1,6 +1,7 @@
 import { BigNumber } from './utils/bignumber';
 declare const AddressPrefix = "mxw";
-declare const ValidatorAddressPrefix = "mxwvaloper";
+declare const ValOperatorAddressPrefix = "mxwvaloper";
+declare const KycAddressPrefix = "kyc";
 declare const AddressZero = "mxw000000000000000000000000000000000000000";
 declare const HashZero = "0x0000000000000000000000000000000000000000000000000000000000000000";
 declare const ZeroFee: {
@@ -16,4 +17,4 @@ declare const One: BigNumber;
 declare const Two: BigNumber;
 declare const CinPerMxw: BigNumber;
 declare const MaxUint256: BigNumber;
-export { ZeroFee, AddressPrefix, ValidatorAddressPrefix, AddressZero, HashZero, NegativeOne, Zero, One, Two, CinPerMxw, MaxUint256 };
+export { ZeroFee, AddressPrefix, ValOperatorAddressPrefix, KycAddressPrefix, AddressZero, HashZero, NegativeOne, Zero, One, Two, CinPerMxw, MaxUint256 };
