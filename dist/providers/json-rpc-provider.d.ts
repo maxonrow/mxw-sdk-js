@@ -6,5 +6,5 @@ export declare class JsonRpcProvider extends BaseProvider {
     constructor(url?: ConnectionInfo | string, network?: Networkish);
     send(method: string, params: any): Promise<any>;
     perform(method: string, params: any): Promise<any>;
-    private checkResponseLog;
+    checkResponseLog(method: string, result: any, code?: string, message?: string, params?: any): any;
 }

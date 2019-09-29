@@ -322,7 +322,7 @@ function getTransactionRequest(route, transactionType, overrides) {
                     fixedSupply: misc_1.checkBoolean,
                     metadata: misc_1.allowNullOrEmpty(misc_1.checkString),
                     symbol: misc_1.checkString,
-                    totalSupply: misc_1.checkBigNumber
+                    maxSupply: misc_1.checkBigNumber
                 }, overrides);
                 transaction = {
                     type: "cosmos-sdk/StdTx",
@@ -341,7 +341,7 @@ function getTransactionRequest(route, transactionType, overrides) {
                                     name: params.name,
                                     owner: params.owner,
                                     symbol: params.symbol,
-                                    totalSupply: params.totalSupply.toString()
+                                    maxSupply: params.maxSupply.toString()
                                 }
                             }
                         ],

@@ -83,6 +83,7 @@ function checkTokenState(data: any): TokenState {
         Decimals: checkNumber,
         FixedSupply: checkBoolean,
         TotalSupply: checkBigNumber,
+        MaxSupply: checkBigNumber,
         Approved: checkBoolean,
         Frozen: checkBoolean,
         Owner: checkString,
@@ -98,6 +99,7 @@ function checkTokenState(data: any): TokenState {
             case "Metadata": return "metadata";
             case "FixedSupply": return "fixedSupply";
             case "TotalSupply": return "totalSupply";
+            case "MaxSupply": return "maxSupply";
             case "Approved": return "approved";
             case "Frozen": return "frozen";
             case "Burnable": return "burnable";
@@ -645,6 +647,7 @@ export class BaseProvider extends Provider {
                             metadata: result.metadata,
                             fixedSupply: result.fixedSupply ? true : false,
                             totalSupply: bigNumberify(result.totalSupply),
+                            maxSupply: bigNumberify(result.maxSupply),
                             approved: result.approved ? true : false,
                             frozen: result.frozen ? true : false,
                             burnable: result.burnable ? true : false
@@ -909,6 +912,10 @@ export class BaseProvider extends Provider {
         return <Promise<TransactionResponse>>this.getTransactionReceipt(transactionHash);
     }
 
+    checkTransactionReceipt(receipt: TransactionReceipt, code?: string, message?: string, params?: any) {
+        return this.checkResponseLog("", receipt, code, message, params);
+    }
+
     getTransactionReceipt(transactionHash: string): Promise<TransactionReceipt> {
         return this.ready.then(() => {
             return resolveProperties({ transactionHash: transactionHash }).then(({ transactionHash }) => {
@@ -1051,6 +1058,11 @@ export class BaseProvider extends Provider {
     }
 
     perform(method: string, params: any): Promise<any> {
+        errors.throwError(method + ' not implemented', errors.NOT_IMPLEMENTED, { operation: method });
+        return null;
+    }
+
+    checkResponseLog(method: string, result: any, code?: string, message?: string, params?: any) {
         errors.throwError(method + ' not implemented', errors.NOT_IMPLEMENTED, { operation: method });
         return null;
     }

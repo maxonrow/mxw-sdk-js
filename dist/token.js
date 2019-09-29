@@ -118,7 +118,8 @@ class FungibleToken {
         }
     }
     get state() { return this._state; }
-    refresh() {
+    get accountState() { return this._accountState; }
+    refresh(overrides) {
         if (!this.symbol) {
             errors.throwError('not initialized', errors.NOT_INITIALIZED, { arg: 'symbol' });
         }
@@ -133,15 +134,43 @@ class FungibleToken {
                 errors.throwError('token symbol mismatch', errors.UNEXPECTED_RESULT, { expected: this.symbol, returned: result });
             }
             this._state = result;
-            return;
+            if (!this.signer) {
+                return this;
+            }
+            return this.getAccountState(null, overrides).then((state) => {
+                return this;
+            });
         });
     }
     /**
-     * Query token balance
+     * Query token state
      * @param blockTag reserved for future
      * @param overrides options
      */
-    getBalance(blockTag, overrides) {
+    getState(blockTag, overrides) {
+        if (!this.symbol) {
+            errors.throwError('not initialized', errors.NOT_INITIALIZED, { arg: 'symbol' });
+        }
+        return this.provider.getTokenState(this.symbol).then((result) => {
+            if (!result) {
+                errors.throwError('token state is not available', errors.NOT_AVAILABLE, {});
+            }
+            if ("fungible" != result.type) {
+                errors.throwError('class type mismatch', errors.UNEXPECTED_RESULT, { expected: "fungible", returned: result });
+            }
+            if (this.symbol != result.symbol) {
+                errors.throwError('token symbol mismatch', errors.UNEXPECTED_RESULT, { expected: this.symbol, returned: result });
+            }
+            this._state = result;
+            return this;
+        });
+    }
+    /**
+     * Query token account
+     * @param blockTag reserved for future
+     * @param overrides options
+     */
+    getAccountState(blockTag, overrides) {
         if (!this.symbol) {
             errors.throwError('not initialized', errors.NOT_INITIALIZED, { arg: 'symbol' });
         }
@@ -150,11 +179,22 @@ class FungibleToken {
                 errors.throwError('query fungible token balance require signer address', errors.MISSING_ARGUMENT, { arg: 'signerAddress' });
             }
             return this.provider.getTokenAccountState(this.symbol, signerAddress, blockTag).then((result) => {
-                if (result && result.balance) {
-                    return utils_1.bigNumberify(result.balance);
-                }
-                return utils_1.bigNumberify("0");
+                this._accountState = result;
+                return this._accountState;
             });
+        });
+    }
+    /**
+     * Query token balance
+     * @param blockTag reserved for future
+     * @param overrides options
+     */
+    getBalance(blockTag, overrides) {
+        return this.getAccountState(blockTag, overrides).then((accountState) => {
+            if (accountState && accountState.balance) {
+                return utils_1.bigNumberify(accountState.balance);
+            }
+            return utils_1.bigNumberify("0");
         });
     }
     /**
@@ -192,10 +232,9 @@ class FungibleToken {
                         if (1 == receipt.status) {
                             return receipt;
                         }
-                        return errors.throwError("transfer fungible token failed", errors.CALL_EXCEPTION, {
+                        throw this.signer.provider.checkTransactionReceipt(receipt, errors.CALL_EXCEPTION, "transfer fungible token failed", {
                             method: "token-transferFungibleToken",
-                            response: response,
-                            receipt: receipt
+                            receipt
                         });
                     });
                 });
@@ -237,10 +276,9 @@ class FungibleToken {
                         if (1 == receipt.status) {
                             return receipt;
                         }
-                        return errors.throwError("mint fungible token failed", errors.CALL_EXCEPTION, {
+                        throw this.signer.provider.checkTransactionReceipt(receipt, errors.CALL_EXCEPTION, "mint fungible token failed", {
                             method: "token-mintFungibleToken",
-                            response: response,
-                            receipt: receipt
+                            receipt
                         });
                     });
                 });
@@ -279,10 +317,9 @@ class FungibleToken {
                     if (1 == receipt.status) {
                         return receipt;
                     }
-                    return errors.throwError("burn fungible token failed", errors.CALL_EXCEPTION, {
+                    throw this.signer.provider.checkTransactionReceipt(receipt, errors.CALL_EXCEPTION, "burn fungible token failed", {
                         method: "token-burnFungibleToken",
-                        response: response,
-                        receipt: receipt
+                        receipt
                     });
                 });
             });
@@ -321,10 +358,9 @@ class FungibleToken {
                         if (1 == receipt.status) {
                             return receipt;
                         }
-                        return errors.throwError("freeze fungible token failed", errors.CALL_EXCEPTION, {
+                        throw this.signer.provider.checkTransactionReceipt(receipt, errors.CALL_EXCEPTION, "freeze fungible token failed", {
                             method: "token-freezeFungibleToken",
-                            response: response,
-                            receipt: receipt
+                            receipt
                         });
                     });
                 });
@@ -364,10 +400,9 @@ class FungibleToken {
                         if (1 == receipt.status) {
                             return receipt;
                         }
-                        return errors.throwError("unfreeze fungible token failed", errors.CALL_EXCEPTION, {
+                        throw this.signer.provider.checkTransactionReceipt(receipt, errors.CALL_EXCEPTION, "unfreeze fungible token failed", {
                             method: "token-unfreezeFungibleToken",
-                            response: response,
-                            receipt: receipt
+                            receipt
                         });
                     });
                 });
@@ -407,10 +442,9 @@ class FungibleToken {
                         if (1 == receipt.status) {
                             return receipt;
                         }
-                        return errors.throwError("transfer fungible token ownership failed", errors.CALL_EXCEPTION, {
+                        throw this.signer.provider.checkTransactionReceipt(receipt, errors.CALL_EXCEPTION, "transfer fungible token ownership failed", {
                             method: "token-transferOwnership",
-                            response: response,
-                            receipt: receipt
+                            receipt
                         });
                     });
                 });
@@ -447,10 +481,10 @@ class FungibleToken {
                     if (1 == receipt.status) {
                         return receipt;
                     }
-                    return errors.throwError("accept fungible token ownership failed", errors.CALL_EXCEPTION, {
+                    throw this.signer.provider.checkTransactionReceipt(receipt, errors.CALL_EXCEPTION, "accept fungible token ownership failed", {
                         method: "token-acceptOwnership",
                         response: response,
-                        receipt: receipt
+                        receipt
                     });
                 });
             });
@@ -486,7 +520,7 @@ class FungibleToken {
             symbol: true,
             decimals: true,
             fixedSupply: true,
-            totalSupply: true,
+            maxSupply: true,
             fee: true,
             owner: false,
             metadata: false // Optional
@@ -502,7 +536,7 @@ class FungibleToken {
                 symbol: misc_1.checkString,
                 decimals: misc_1.checkNumber,
                 fixedSupply: misc_1.checkBoolean,
-                totalSupply: misc_1.checkBigNumber,
+                maxSupply: misc_1.checkBigNumber,
                 owner: misc_1.allowNull(misc_1.checkAddress),
                 metadata: misc_1.allowNullOrEmpty(misc_1.checkString),
                 fee: {
@@ -523,7 +557,7 @@ class FungibleToken {
                 fixedSupply: fungibleToken.fixedSupply,
                 metadata: fungibleToken.metadata || "",
                 symbol: fungibleToken.symbol,
-                totalSupply: fungibleToken.totalSupply
+                maxSupply: fungibleToken.maxSupply
             });
             transaction.fee = signer.provider.getTransactionFee(undefined, undefined, { tx: transaction });
             return signer.sendTransaction(transaction, overrides).then((response) => {
@@ -535,10 +569,9 @@ class FungibleToken {
                     if (1 == receipt.status) {
                         return this.fromSymbol(properties.symbol, signer, overrides);
                     }
-                    return errors.throwError("create fungible token failed", errors.CALL_EXCEPTION, {
-                        method: "token/createFungibleToken",
-                        response: response,
-                        receipt: receipt
+                    throw signer.provider.checkTransactionReceipt(receipt, errors.CALL_EXCEPTION, "create fungible token failed", {
+                        method: "token-createFungibleToken",
+                        receipt
                     });
                 });
             });
@@ -651,10 +684,9 @@ class FungibleToken {
                     if (1 == receipt.status) {
                         return receipt;
                     }
-                    return errors.throwError("set fungible token status failed", errors.CALL_EXCEPTION, {
-                        method: "token/setFungibleTokenStatus",
-                        response: response,
-                        receipt: receipt
+                    throw signer.provider.checkTransactionReceipt(receipt, errors.CALL_EXCEPTION, "set fungible token status failed", {
+                        method: "token-setFungibleTokenStatus",
+                        receipt
                     });
                 });
             });
@@ -689,10 +721,9 @@ class FungibleToken {
                     if (1 == receipt.status) {
                         return receipt;
                     }
-                    return errors.throwError("set fungible token account status failed", errors.CALL_EXCEPTION, {
-                        method: "token/setFungibleTokenAccountStatus",
-                        response: response,
-                        receipt: receipt
+                    throw signer.provider.checkTransactionReceipt(receipt, errors.CALL_EXCEPTION, "set fungible token account status failed", {
+                        method: "token-setFungibleTokenAccountStatus",
+                        receipt
                     });
                 });
             });
@@ -762,7 +793,7 @@ function setFungibleTokenStatus(symbol, status, signer, overrides) {
         errors.throwError('set fungible token status transaction require symbol', errors.MISSING_ARGUMENT, { arg: 'symbol' });
     }
     let tokenFees;
-    let burnable;
+    let burnable = true;
     switch (status) {
         case "APPROVE":
             if (overrides) {

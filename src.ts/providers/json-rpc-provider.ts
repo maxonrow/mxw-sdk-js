@@ -113,7 +113,7 @@ export class JsonRpcProvider extends BaseProvider {
                             return result;
                         }
                     }
-                    throw this.checkResponseLog(method, null, result);
+                    throw this.checkResponseLog(method, result, null);
                 });
 
             case 'sendTransactionAsync':
@@ -124,7 +124,7 @@ export class JsonRpcProvider extends BaseProvider {
                             return result;
                         }
                     }
-                    throw this.checkResponseLog(method, null, result);
+                    throw this.checkResponseLog(method, result, null);
                 });
 
             case 'getTransaction':
@@ -147,7 +147,7 @@ export class JsonRpcProvider extends BaseProvider {
                         }
                     }
 
-                    let returnError = this.checkResponseLog(method, null, result);
+                    let returnError = this.checkResponseLog(method, result, null);
                     if (errors.NOT_FOUND == returnError.code) {
                         return null;
                     }
@@ -156,7 +156,10 @@ export class JsonRpcProvider extends BaseProvider {
 
             case 'getTransactionFee':
                 return this.send('query_fee', [params.unsignedTransaction]).then(result => {
-                    return result;
+                    if (result && result.amount) {
+                        return result;
+                    }
+                    throw this.checkResponseLog(method, result, null);
                 });
 
             case 'getTransactionFeeSetting':
@@ -171,7 +174,7 @@ export class JsonRpcProvider extends BaseProvider {
                             }
                         }
                     }
-                    throw this.checkResponseLog(method, null, result);
+                    throw this.checkResponseLog(method, result, null);
                 });
 
             case 'getBlock':
@@ -183,7 +186,7 @@ export class JsonRpcProvider extends BaseProvider {
                 }
                 return this.send('block_results', [params.blockTag]).then(result => {
                     if (!result || !result.results) {
-                        let returnError = this.checkResponseLog(method, null, result);
+                        let returnError = this.checkResponseLog(method, result, null);
                         if (errors.NOT_FOUND != returnError.code) {
                             throw returnError;
                         }
@@ -201,7 +204,7 @@ export class JsonRpcProvider extends BaseProvider {
                 }
                 return this.send('block', [params.blockTag]).then(result => {
                     if (!result || !result.block) {
-                        let returnError = this.checkResponseLog(method, null, result);
+                        let returnError = this.checkResponseLog(method, result, null);
                         if (errors.NOT_FOUND != returnError.code) {
                             throw returnError;
                         }
@@ -218,7 +221,7 @@ export class JsonRpcProvider extends BaseProvider {
                     if (!isUndefinedOrNullOrEmpty(result)) {
                         return result;
                     }
-                    throw this.checkResponseLog(method, null, result);
+                    throw this.checkResponseLog(method, result, null);
                 });
 
             case 'getKycAddress':
@@ -238,7 +241,7 @@ export class JsonRpcProvider extends BaseProvider {
                         catch (error) {
                         }
                     }
-                    throw this.checkResponseLog(method, null, result);
+                    throw this.checkResponseLog(method, result, null);
                 });
 
             case 'getTokenState':
@@ -253,7 +256,7 @@ export class JsonRpcProvider extends BaseProvider {
                             }
                         }
                     }
-                    throw this.checkResponseLog(method, null, result);
+                    throw this.checkResponseLog(method, result, null);
                 });
 
             case 'getTokenList':
@@ -268,7 +271,7 @@ export class JsonRpcProvider extends BaseProvider {
                             }
                         }
                     }
-                    throw this.checkResponseLog(method, null, result);
+                    throw this.checkResponseLog(method, result, null);
                 });
 
             case 'getTokenAccountState':
@@ -283,7 +286,7 @@ export class JsonRpcProvider extends BaseProvider {
                             }
                         }
                     }
-                    throw this.checkResponseLog(method, null, result);
+                    throw this.checkResponseLog(method, result, null);
                 });
 
             case 'getAccountState':
@@ -296,7 +299,7 @@ export class JsonRpcProvider extends BaseProvider {
 
                         return null;
                     }
-                    throw this.checkResponseLog(method, null, result);
+                    throw this.checkResponseLog(method, result, null);
                 });
 
             case 'resolveName':
@@ -318,7 +321,7 @@ export class JsonRpcProvider extends BaseProvider {
                             }
                         }
                     }
-                    throw this.checkResponseLog(method, null, result);
+                    throw this.checkResponseLog(method, result, null);
                 });
 
             case 'lookupAddress':
@@ -340,7 +343,7 @@ export class JsonRpcProvider extends BaseProvider {
                             }
                         }
                     }
-                    throw this.checkResponseLog(method, null, result);
+                    throw this.checkResponseLog(method, result, null);
                 });
 
             case 'getAliasState':
@@ -362,7 +365,7 @@ export class JsonRpcProvider extends BaseProvider {
                             }
                         }
                     }
-                    throw this.checkResponseLog(method, null, result);
+                    throw this.checkResponseLog(method, result, null);
                 });
 
             case 'getStatus':
@@ -375,12 +378,12 @@ export class JsonRpcProvider extends BaseProvider {
         return errors.throwError(method + ' not implemented', errors.NOT_IMPLEMENTED, { operation: method });
     }
 
-    private checkResponseLog(method: string, log: string, result: any, params?: any): any {
-        return checkResponseLog(method, result, errors.UNEXPECTED_RESULT, "", params);
+    // checkResponseLog(method: string, log: string, result: any, params?: any): any {
+    checkResponseLog(method: string, result: any, code?: string, message?: string, params?: any): any {
+        return checkResponseLog(method, result, isUndefinedOrNullOrEmpty(code) ? errors.UNEXPECTED_RESULT : code, message, params);
     }
 }
-//throw this.checkResponseLog(method, null, result);
-//private checkResponseLog(method: string, log: string, result: any, info?: any): any {
+
 function checkResponseLog(method: string, result: any, code: string, message: string, params: any): any {
     if (!params) { params = {}; }
 
@@ -388,7 +391,12 @@ function checkResponseLog(method: string, result: any, code: string, message: st
 
     if (result) {
         if (result.tx_result && result.tx_result.log) {
-            log = result.tx_result.log;
+            try {
+                log = JSON.parse(result.tx_result.log);
+            }
+            catch (error) {
+                log = result.tx_result.log;
+            }
         }
         else {
             if (result.log) {
@@ -402,6 +410,13 @@ function checkResponseLog(method: string, result: any, code: string, message: st
                     if (result.response && result.response.log) {
                         log = result.response.log;
                     }
+                    else {
+                        if (result.result && result.result.logs && Array.isArray(result.result.logs)) {
+                            if (result.result.logs[0] && result.result.logs[0].info && result.result.logs[0].info.message) {
+                                log = result.result.logs[0].info.message;
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -411,6 +426,11 @@ function checkResponseLog(method: string, result: any, code: string, message: st
         // "transaction not found"
         if (0 <= log.indexOf(') not found') && log.startsWith("Tx (")) {
             return errors.createError('transaction not found', errors.NOT_FOUND, { operation: method, response: result });
+        }
+        // Height must be less than or equal to the current blockchain height
+        // Could not find results for height #
+        if (0 <= log.indexOf('Height must be less than or equal to the current blockchain height') || 0 <= log.indexOf("Could not find results for height #")) {
+            return errors.createError('block not found', errors.NOT_FOUND, { operation: method, response: result });
         }
         // "KYC registration is required"
         if (0 <= log.indexOf('"codespace":"mxw","code":1000,')) {
@@ -436,11 +456,6 @@ function checkResponseLog(method: string, result: any, code: string, message: st
         if (0 <= log.indexOf('"codespace":"sdk","code":4,')) {
             return errors.createError('signature verification failed', errors.SIGNATURE_FAILED, { operation: method, response: result });
         }
-        // Height must be less than or equal to the current blockchain height
-        // Could not find results for height #
-        if (0 <= log.indexOf('Height must be less than or equal to the current blockchain height') || 0 <= log.indexOf("Could not find results for height #")) {
-            return errors.createError('block not found', errors.NOT_FOUND, { operation: method, response: result });
-        }
 
         // Token already exists
         if (0 <= log.indexOf('"codespace":"mxw","code":2001,')) {
@@ -454,15 +469,48 @@ function checkResponseLog(method: string, result: any, code: string, message: st
         if (0 <= log.indexOf('"codespace":"mxw","code":2003,')) {
             return errors.createError('token is already approved', errors.NOT_ALLOWED, { operation: method, response: result });
         }
+        // Token is frozen
+        if (0 <= log.indexOf('"codespace":"mxw","code":2004,')) {
+            return errors.createError('token is frozen', errors.NOT_ALLOWED, { operation: method, response: result });
+        }
+        // Token already unfrozen
+        if (0 <= log.indexOf('"codespace":"mxw","code":2005,')) {
+            return errors.createError('token already unfrozen', errors.NOT_ALLOWED, { operation: method, response: result });
+        }
+        // Invalid token
+        if (0 <= log.indexOf('"codespace":"mxw","code":2006,')) {
+            return errors.createError('invalid token', errors.NOT_AVAILABLE, { operation: method, response: result });
+        }
+        // Token account frozen
+        if (0 <= log.indexOf('"codespace":"mxw","code":2007,')) {
+            return errors.createError('token account is frozen', errors.NOT_ALLOWED, { operation: method, response: result });
+        }
+        // Token account already Unfrozen
+        if (0 <= log.indexOf('"codespace":"mxw","code":2008,')) {
+            return errors.createError('token account already unfrozen', errors.NOT_ALLOWED, { operation: method, response: result });
+        }
+        // Invalid token minter
+        if (0 <= log.indexOf('"codespace":"mxw","code":2009,')) {
+            return errors.createError('invalid token minter', errors.NOT_ALLOWED, { operation: method, response: result });
+        }
+        // Invalid token supply
+        if (0 <= log.indexOf('"codespace":"mxw","code":2099,')) {
+            return errors.createError('exceeded maximum token supply', errors.NOT_ALLOWED, { operation: method, response: result });
+        }
+        // Insufficient token
+        if (0 <= log.indexOf('"codespace":"mxw","code":2100,')) {
+            return errors.createError('insufficient token', errors.INSUFFICIENT_FUNDS, { operation: method, response: result });
+        }
 
-        // // "Token already exists"
-        // if (0 <= log.indexOf('Token already exists')) {
-        //     return errors.createError('token is already exists', errors.EXISTS, { operation: method, response: result });
-        // }
-        // // "No such token"
-        // if (0 <= log.indexOf('No such token')) {
-        //     return errors.createError('token is not found', errors.NOT_FOUND, { operation: method, response: result });
-        // }
+        // Fee setting not found
+        if (0 <= log.indexOf('Fee setting not found')) {
+            return errors.createError('fee setting not found', errors.NOT_ALLOWED, { operation: method, response: result });
+        }
+        // Token fee setting not found
+        if (0 <= log.indexOf('"codespace":"mxw","code":3002,')) {
+            return errors.createError('token fee setting not found', errors.NOT_AVAILABLE, { operation: method, response: result });
+        }
+
         // if (0 <= log.indexOf('Alias in used')) {
         //     return errors.createError('Alias in used', errors.EXISTS, { operation: method, response: result });
         // }
@@ -471,33 +519,6 @@ function checkResponseLog(method: string, result: any, code: string, message: st
         // }
         // if (0 <= log.indexOf('Not allowed to create new alias, you have pending alias approval')) {
         //     return errors.createError('Creation is not allowed due to pending approval', errors.NOT_ALLOWED, params);
-        // }
-        // if (0 <= log.indexOf('Token does not exist')) {
-        //     return errors.createError('Token does not exist', errors.NOT_FOUND, params);
-        // }
-        // if (0 <= log.indexOf('Token class already exists')) {
-        //     return errors.createError('duplicated token class', errors.NOT_ALLOWED, params);
-        // }
-        // if (0 <= log.indexOf('Token is already approved')) {
-        //     return errors.createError('Token is already approved', errors.NOT_ALLOWED, params);
-        // }
-        // if (0 <= log.indexOf('Token already exists')) {
-        //     return errors.createError('Duplicated token', errors.EXISTS, params);
-        // }
-        // if (0 <= log.indexOf('Token is not burnable')) {
-        //     return errors.createError('Token is not burnable', errors.NOT_ALLOWED, params);
-        // }
-        // if (0 <= log.indexOf('Fungible token is not frozen')) {
-        //     return errors.createError('Fungible token is not frozen', errors.NOT_ALLOWED, params);
-        // }
-        // if (0 <= log.indexOf('Fungible token already frozen')) {
-        //     return errors.createError('Fungible token already frozen', errors.NOT_ALLOWED, params);
-        // }
-        // if (0 <= log.indexOf('Fungible token account not frozen')) {
-        //     return errors.createError('Fungible token account not frozen', errors.NOT_ALLOWED, params);
-        // }
-        // if (0 <= log.indexOf('Fungible token account already frozen')) {
-        //     return errors.createError('Fungible token account already frozen', errors.NOT_ALLOWED, params);
         // }
     }
 

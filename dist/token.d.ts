@@ -1,4 +1,4 @@
-import { Provider } from './providers/abstract-provider';
+import { Provider, TokenAccountState } from './providers/abstract-provider';
 import { Signer } from './abstract-signer';
 import { TransactionReceipt, TransactionResponse, BlockTag, TokenState } from './providers/abstract-provider';
 import { BigNumberish, BigNumber } from './utils';
@@ -16,7 +16,7 @@ export interface FungibleTokenProperties {
     symbol: string;
     decimals: number;
     fixedSupply: boolean;
-    totalSupply: BigNumber;
+    maxSupply: BigNumber;
     fee: {
         to: string;
         value: BigNumber;
@@ -77,9 +77,23 @@ export declare class FungibleToken {
     readonly provider: Provider;
     readonly symbol: string;
     private _state;
+    private _accountState;
     constructor(symbol: string, signerOrProvider: Signer | Provider);
     readonly state: TokenState;
-    refresh(): Promise<void>;
+    readonly accountState: TokenAccountState;
+    refresh(overrides?: any): Promise<FungibleToken>;
+    /**
+     * Query token state
+     * @param blockTag reserved for future
+     * @param overrides options
+     */
+    getState(blockTag?: BlockTag, overrides?: any): Promise<this>;
+    /**
+     * Query token account
+     * @param blockTag reserved for future
+     * @param overrides options
+     */
+    getAccountState(blockTag?: BlockTag, overrides?: any): Promise<TokenAccountState>;
     /**
      * Query token balance
      * @param blockTag reserved for future

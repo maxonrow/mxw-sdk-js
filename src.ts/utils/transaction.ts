@@ -440,7 +440,7 @@ export function getTransactionRequest(route: string, transactionType: string, ov
                     fixedSupply: boolean,
                     metadata: string,
                     symbol: string,
-                    totalSupply: BigNumberish
+                    maxSupply: BigNumberish
                 } = checkFormat({
                     appFeeTo: checkString,
                     appFeeValue: checkBigNumber,
@@ -451,7 +451,7 @@ export function getTransactionRequest(route: string, transactionType: string, ov
                     fixedSupply: checkBoolean,
                     metadata: allowNullOrEmpty(checkString),
                     symbol: checkString,
-                    totalSupply: checkBigNumber
+                    maxSupply: checkBigNumber
                 }, overrides);
 
                 transaction = {
@@ -471,7 +471,7 @@ export function getTransactionRequest(route: string, transactionType: string, ov
                                     name: params.name,
                                     owner: params.owner,
                                     symbol: params.symbol,
-                                    totalSupply: params.totalSupply.toString()
+                                    maxSupply: params.maxSupply.toString()
                                 }
                             }
                         ],

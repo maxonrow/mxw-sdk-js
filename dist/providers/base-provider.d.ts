@@ -45,6 +45,7 @@ export declare class BaseProvider extends Provider {
     _wrapTransaction(tx: Transaction, hash?: string, blockNumber?: number): TransactionResponse;
     getBlock(blockHashOrBlockTag: BlockTag | string | Promise<BlockTag | string>): Promise<Block>;
     getTransaction(transactionHash: string): Promise<TransactionResponse>;
+    checkTransactionReceipt(receipt: TransactionReceipt, code?: string, message?: string, params?: any): any;
     getTransactionReceipt(transactionHash: string): Promise<TransactionReceipt>;
     getPrice(): Promise<number>;
     isWhitelisted(addressOrName: string | Promise<string>, blockTag?: BlockTag | Promise<BlockTag>): Promise<boolean>;
@@ -54,6 +55,7 @@ export declare class BaseProvider extends Provider {
     static checkTransactionReceipt(transaction: any): TransactionReceipt;
     doPoll(): void;
     perform(method: string, params: any): Promise<any>;
+    checkResponseLog(method: string, result: any, code?: string, message?: string, params?: any): any;
     protected _startPending(): void;
     protected _stopPending(): void;
     private _addEventListener;

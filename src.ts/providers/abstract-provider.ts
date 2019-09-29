@@ -46,6 +46,7 @@ export interface TokenState {
     decimals: number,
     fixedSupply: boolean,
     totalSupply: BigNumber,
+    maxSupply: BigNumber,
     approved: boolean,
     frozen: boolean,
     owner: string,
@@ -204,6 +205,7 @@ export abstract class Provider implements OnceBlockable {
     abstract getBlock(blockHashOrBlockTag: BlockTag | string | Promise<BlockTag | string>): Promise<Block>;
     abstract getTransaction(transactionHash: string): Promise<TransactionResponse>;
     abstract getTransactionReceipt(transactionHash: string): Promise<TransactionReceipt>;
+    abstract checkTransactionReceipt(receipt: TransactionReceipt, code?: string, message?: string, params?: any);
 
     abstract isWhitelisted(addressOrName: string | Promise<string>, blockTag?: BlockTag | Promise<BlockTag>): Promise<boolean>;
     abstract getKycAddress(addressOrName: string | Promise<string>, blockTag?: BlockTag | Promise<BlockTag>): Promise<string>;
