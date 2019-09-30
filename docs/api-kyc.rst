@@ -18,7 +18,8 @@ Signing
 -------
 
 :sup:`prototype` . getKycAddress ( keyComponent ) |nbsp| `=> string`
-    Compute kyc address from key components by SHA2-256 cryptographic hash.
+    Compute kyc address from key components by SHA2-256 cryptographic hash and
+    convert into bech32 format.
 
     The valid key components are:
 
