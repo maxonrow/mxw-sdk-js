@@ -695,31 +695,17 @@ class BaseProvider extends abstract_provider_1.Provider {
         };
         return result;
     }
-    getBlock(blockHashOrBlockTag) {
+    getBlock(blockTag) {
         return this.ready.then(() => {
-            return properties_1.resolveProperties({ blockHashOrBlockTag: blockHashOrBlockTag }).then(({ blockHashOrBlockTag }) => {
+            return properties_1.resolveProperties({ blockTag }).then(({ blockTag }) => {
                 try {
-                    let blockHash = bytes_1.hexlify(blockHashOrBlockTag);
-                    if (bytes_1.hexDataLength(blockHash) === 32) {
-                        return web_1.poll(() => {
-                            return this.perform('getBlock', { blockHash: blockHash }).then((block) => {
-                                if (block == null) {
-                                    if (this._emitted['b:' + blockHash] == null) {
-                                        return null;
-                                    }
-                                    return undefined;
-                                }
-                                return checkBlock(block);
-                            });
-                        }, { onceBlock: this });
-                    }
-                }
-                catch (error) { }
-                try {
-                    let blockNumber = -128;
-                    let blockTag = checkBlockTag(blockHashOrBlockTag);
+                    let blockNumber;
+                    blockTag = checkBlockTag(blockTag);
                     if (bytes_1.isHexString(blockTag)) {
                         blockNumber = parseInt(blockTag.substring(2), 16);
+                    }
+                    else {
+                        blockNumber = parseInt(blockTag);
                     }
                     if (0 == blockNumber) {
                         return this.getBlockNumber().then((blockNumber) => {
@@ -727,24 +713,35 @@ class BaseProvider extends abstract_provider_1.Provider {
                         });
                     }
                     return web_1.poll(() => {
-                        return this.perform('getBlock', { blockTag: blockTag }).then((blockResult) => {
-                            if (blockResult == null) {
+                        let promises = [
+                            // Query block result
+                            this.perform('getBlock', { blockTag: blockNumber.toString() }),
+                            // Query block details (except timestamp)
+                            this.perform('getBlockInfo', { blockTag: blockNumber.toString() }),
+                            // Query block timestamp (only available in new block, this block might not be available at that point)
+                            this.perform('getBlockInfo', { blockTag: (blockNumber + 1).toString() })
+                        ];
+                        return Promise.all(promises).then((results) => {
+                            if (misc_1.isUndefinedOrNullOrEmpty(results) ||
+                                misc_1.isUndefinedOrNullOrEmpty(results[0]) || misc_1.isUndefinedOrNullOrEmpty(results[1])) {
                                 if (blockNumber <= this._emitted.block) {
                                     return undefined;
                                 }
                                 return null;
                             }
-                            let block = checkBlock(blockResult);
-                            // Query block 
-                            return this.perform('getBlockInfo', { blockTag: blockTag }).then((infoResult) => {
-                                let info = checkBlockInfo(infoResult);
-                                return Object.assign(Object.assign({}, block), info);
-                            });
+                            let block = checkBlock(results[0]);
+                            let blockInfo = checkBlockInfo(results[1]);
+                            blockInfo.blockTime = null;
+                            if (!misc_1.isUndefinedOrNullOrEmpty(results[2])) {
+                                let newBlockInfo = checkBlockInfo(results[2]);
+                                blockInfo.blockTime = newBlockInfo.blockTime;
+                            }
+                            return Object.assign(Object.assign({}, block), blockInfo);
                         });
                     }, { onceBlock: this });
                 }
                 catch (error) { }
-                throw new Error('invalid block hash or block tag');
+                throw new Error('invalid block tag');
             });
         });
     }

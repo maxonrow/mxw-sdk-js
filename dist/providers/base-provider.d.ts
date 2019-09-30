@@ -43,7 +43,7 @@ export declare class BaseProvider extends Provider {
     getTransactionCount(addressOrName: string | Promise<string>, blockTag?: BlockTag | Promise<BlockTag>): Promise<BigNumber>;
     sendTransaction(signedTransaction: string | Promise<string>, overrides?: any): Promise<TransactionResponse>;
     _wrapTransaction(tx: Transaction, hash?: string, blockNumber?: number): TransactionResponse;
-    getBlock(blockHashOrBlockTag: BlockTag | string | Promise<BlockTag | string>): Promise<Block>;
+    getBlock(blockTag: BlockTag | Promise<BlockTag>): Promise<Block>;
     getTransaction(transactionHash: string): Promise<TransactionResponse>;
     checkTransactionReceipt(receipt: TransactionReceipt, code?: string, message?: string, params?: any): any;
     getTransactionReceipt(transactionHash: string): Promise<TransactionReceipt>;

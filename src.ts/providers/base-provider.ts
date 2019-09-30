@@ -2,7 +2,7 @@
 
 import { getAddress } from '../utils/address';
 import { BigNumber, bigNumberify } from '../utils/bignumber';
-import { hexDataLength, hexlify, isHexString } from '../utils/bytes';
+import { hexDataLength, isHexString } from '../utils/bytes';
 import { getNetwork } from '../utils/networks';
 import { defineReadOnly, inheritable, resolveProperties, camelize } from '../utils/properties';
 import { parse as parseTransaction, TransactionLog, getTransactionRequest } from '../utils/transaction';
@@ -10,7 +10,7 @@ import { poll } from '../utils/web';
 import { encode as base64Encode, decode as base64Decode } from '../utils/base64';
 import {
     checkFormat, allowNullOrEmpty, arrayOf, checkHash, checkAddress, checkNumber, checkBigNumber, checkBoolean,
-    checkString, checkTimestamp, checkHex, checkHexAddress, checkAny, iterate, sortObject
+    checkString, checkTimestamp, checkHex, checkHexAddress, checkAny, iterate, sortObject, isUndefinedOrNullOrEmpty
 } from '../utils/misc';
 import { toUtf8String, toUtf8Bytes, computeAddress } from '../utils';
 import { TransactionRequest } from '.';
@@ -847,32 +847,18 @@ export class BaseProvider extends Provider {
         return result;
     }
 
-    getBlock(blockHashOrBlockTag: BlockTag | string | Promise<BlockTag | string>): Promise<Block> {
+    getBlock(blockTag: BlockTag | Promise<BlockTag>): Promise<Block> {
         return this.ready.then(() => {
-            return resolveProperties({ blockHashOrBlockTag: blockHashOrBlockTag }).then(({ blockHashOrBlockTag }) => {
+            return resolveProperties({ blockTag }).then(({ blockTag }) => {
                 try {
-                    let blockHash = hexlify(blockHashOrBlockTag);
-                    if (hexDataLength(blockHash) === 32) {
-                        return poll(() => {
-                            return this.perform('getBlock', { blockHash: blockHash }).then((block) => {
-                                if (block == null) {
-                                    if (this._emitted['b:' + blockHash] == null) {
-                                        return null;
-                                    }
-                                    return undefined;
-                                }
-                                return checkBlock(block);
-                            });
-                        }, { onceBlock: this });
-                    }
-                } catch (error) { }
+                    let blockNumber;
 
-                try {
-                    let blockNumber = -128;
-
-                    let blockTag = checkBlockTag(blockHashOrBlockTag);
+                    blockTag = checkBlockTag(blockTag);
                     if (isHexString(blockTag)) {
                         blockNumber = parseInt(blockTag.substring(2), 16);
+                    }
+                    else {
+                        blockNumber = parseInt(blockTag);
                     }
 
                     if (0 == blockNumber) {
@@ -882,28 +868,40 @@ export class BaseProvider extends Provider {
                     }
 
                     return poll(() => {
-                        return this.perform('getBlock', { blockTag: blockTag }).then((blockResult) => {
-                            if (blockResult == null) {
+                        let promises = [
+                            // Query block result
+                            this.perform('getBlock', { blockTag: blockNumber.toString() }),
+                            // Query block details (except timestamp)
+                            this.perform('getBlockInfo', { blockTag: blockNumber.toString() }),
+                            // Query block timestamp (only available in new block, this block might not be available at that point)
+                            this.perform('getBlockInfo', { blockTag: (blockNumber + 1).toString() })
+                        ];
+                        return Promise.all(promises).then((results) => {
+                            if (isUndefinedOrNullOrEmpty(results) ||
+                                isUndefinedOrNullOrEmpty(results[0]) || isUndefinedOrNullOrEmpty(results[1])) {
                                 if (blockNumber <= this._emitted.block) {
                                     return undefined;
                                 }
                                 return null;
                             }
-                            let block = checkBlock(blockResult);
+                            let block = checkBlock(results[0]);
+                            let blockInfo = checkBlockInfo(results[1]);
 
-                            // Query block 
-                            return this.perform('getBlockInfo', { blockTag: blockTag }).then((infoResult) => {
-                                let info = checkBlockInfo(infoResult);
-                                return {
-                                    ...block,
-                                    ...info
-                                }
-                            });
+                            blockInfo.blockTime = null;
+
+                            if (!isUndefinedOrNullOrEmpty(results[2])) {
+                                let newBlockInfo = checkBlockInfo(results[2]);
+                                blockInfo.blockTime = newBlockInfo.blockTime;
+                            }
+                            return {
+                                ...block,
+                                ...blockInfo
+                            }
                         });
                     }, { onceBlock: this });
                 } catch (error) { }
 
-                throw new Error('invalid block hash or block tag');
+                throw new Error('invalid block tag');
             });
         });
     }
