@@ -123,21 +123,11 @@ class FungibleToken {
         if (!this.symbol) {
             errors.throwError('not initialized', errors.NOT_INITIALIZED, { arg: 'symbol' });
         }
-        return this.provider.getTokenState(this.symbol).then((result) => {
-            if (!result) {
-                errors.throwError('token state is not available', errors.NOT_AVAILABLE, {});
-            }
-            if ("fungible" != result.type) {
-                errors.throwError('class type mismatch', errors.UNEXPECTED_RESULT, { expected: "fungible", returned: result });
-            }
-            if (this.symbol != result.symbol) {
-                errors.throwError('token symbol mismatch', errors.UNEXPECTED_RESULT, { expected: this.symbol, returned: result });
-            }
-            this._state = result;
+        return this.getState(null, overrides).then(() => {
             if (!this.signer) {
                 return this;
             }
-            return this.getAccountState(null, overrides).then((state) => {
+            return this.getAccountState(null, overrides).then(() => {
                 return this;
             });
         });
@@ -162,7 +152,7 @@ class FungibleToken {
                 errors.throwError('token symbol mismatch', errors.UNEXPECTED_RESULT, { expected: this.symbol, returned: result });
             }
             this._state = result;
-            return this;
+            return this._state;
         });
     }
     /**
@@ -171,12 +161,15 @@ class FungibleToken {
      * @param overrides options
      */
     getAccountState(blockTag, overrides) {
+        if (!this.signer) {
+            errors.throwError('query fungible token account require signer', errors.NOT_INITIALIZED, { arg: 'signer' });
+        }
         if (!this.symbol) {
             errors.throwError('not initialized', errors.NOT_INITIALIZED, { arg: 'symbol' });
         }
         return properties_1.resolveProperties({ signerAddress: this.signer.getAddress() }).then(({ signerAddress }) => {
             if (!signerAddress) {
-                errors.throwError('query fungible token balance require signer address', errors.MISSING_ARGUMENT, { arg: 'signerAddress' });
+                errors.throwError('query fungible token account require signer address', errors.MISSING_ARGUMENT, { arg: 'signerAddress' });
             }
             return this.provider.getTokenAccountState(this.symbol, signerAddress, blockTag).then((result) => {
                 this._accountState = result;

@@ -23,7 +23,7 @@ Creating Instances
         - **symbol** --- the unique fungible token symbol
         - **decimals** --- the number of decimals for balance
         - **fixedSupply** --- the supply mechanisms type (``true``: fixed, ``false``: dynamic)
-        - **totalSupply** --- the total supply is only applied to ``fixedSupply = true``, otherwise should set to 0
+        - **maxSupply** --- the maximum supply, set to 0 for unlimited supply (only applied to dynamic supply type)
         - **fee** --- the application fee
         - **owner** --- the owner for the fungible token (default to wallet creator)
         - **metadata** --- optional
@@ -45,12 +45,12 @@ Prototype
         - **symbol** --- the unique token symbol
         - **decimals** --- the number of decimals for balance
         - **fixedSupply** --- the supply mechanisms type (``true``: fixed, ``false``: dynamic)
-        - **totalSupply** --- the total supply for the token
+        - **totalSupply** --- the total current supply for the token
+        - **maxSupply** --- the maximum supply for the token
         - **approved** --- the approval status
         - **frozen** --- the frozen status
         - **owner** --- the token owner address
         - **metadata** --- optional
-        - **transferFee** --- the transfer fee that should be deduct from sender (in **cin**)
         - **burnable** --- the token balance allow to be burn or not. This will be always true for dynamic supply token.
 
 :sup:`prototype` . getBalance ( ) |nbsp| `=> Promise<BigNumber>`
@@ -88,7 +88,7 @@ Prototype
 
     The ``addressOrName`` can be set to target holder alias or wallet address that to be freeze.
 
-.. note:: Only fungible token owner is allowed to sign ``freeze`` transaction.
+.. note:: Only fungible token middleware is allowed to sign ``freeze`` transaction.
 
 :sup:`prototype` . unfreeze ( addressOrName ) |nbsp| `=> Promise<TransactionReceipt>`
     Sends the *unfreeze fungible token transaction* to the network and returns a :ref:`Promise <promise>` that resolves to a
@@ -96,4 +96,4 @@ Prototype
 
     The ``addressOrName`` can be set to target holder alias or wallet address that to be unfreeze.
 
-.. note:: Only fungible token owner is allowed to sign ``unfreeze`` transaction.
+.. note:: Only fungible token middleware is allowed to sign ``unfreeze`` transaction.

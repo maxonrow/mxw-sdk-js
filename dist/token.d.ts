@@ -87,7 +87,7 @@ export declare class FungibleToken {
      * @param blockTag reserved for future
      * @param overrides options
      */
-    getState(blockTag?: BlockTag, overrides?: any): Promise<this>;
+    getState(blockTag?: BlockTag, overrides?: any): Promise<TokenState>;
     /**
      * Query token account
      * @param blockTag reserved for future
