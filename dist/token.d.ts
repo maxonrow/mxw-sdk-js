@@ -11,6 +11,16 @@ export declare enum FungibleTokenActions {
     transferOwnership = "transferOwnership",
     acceptOwnership = "acceptOwnership"
 }
+export declare enum TokenStateFlags {
+    fungible = 1,
+    mint = 2,
+    burn = 4,
+    frozen = 8,
+    approved = 16
+}
+export declare const DynamicSupplyFungibleTokenFlag: number;
+export declare const FixedSupplyFungibleTokenFlag = TokenStateFlags.fungible;
+export declare const FixedSupplyBurnableFungibleTokenFlag: number;
 export interface FungibleTokenProperties {
     name: string;
     symbol: string;
@@ -81,7 +91,12 @@ export declare class FungibleToken {
     constructor(symbol: string, signerOrProvider: Signer | Provider);
     readonly state: TokenState;
     readonly accountState: TokenAccountState;
-    refresh(overrides?: any): Promise<FungibleToken>;
+    readonly isApproved: boolean;
+    readonly isFrozen: boolean;
+    readonly isUsable: boolean;
+    readonly isMintable: boolean;
+    readonly isBurnable: boolean;
+    refresh(overrides?: any): Promise<this>;
     /**
      * Query token state
      * @param blockTag reserved for future
@@ -137,7 +152,7 @@ export declare class FungibleToken {
      * @param addressOrName new owner address
      * @param overrides options
      */
-    transferOwnership(addressOrName: string | Promise<string>, overrides?: any): Promise<TransactionResponse | TransactionReceipt>;
+    transferOwnership(addressOrName: string | Promise<string>, overrides?: any): void;
     /**
      * Accept ownership by new owner
      * @param overrides options

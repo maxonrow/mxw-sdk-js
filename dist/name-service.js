@@ -112,10 +112,9 @@ class Alias {
                     if (1 == receipt.status) {
                         return receipt;
                     }
-                    return errors.throwError("set alias status failed", errors.CALL_EXCEPTION, {
+                    throw signer.provider.checkTransactionReceipt(receipt, errors.CALL_EXCEPTION, "set alias status failed", {
                         method: "nameservice/setAliasStatus",
-                        response: response,
-                        receipt: receipt
+                        receipt
                     });
                 });
             });

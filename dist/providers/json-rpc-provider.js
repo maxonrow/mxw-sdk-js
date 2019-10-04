@@ -344,40 +344,64 @@ class JsonRpcProvider extends base_provider_1.BaseProvider {
     }
     // checkResponseLog(method: string, log: string, result: any, params?: any): any {
     checkResponseLog(method, result, code, message, params) {
-        return checkResponseLog(method, result, misc_1.isUndefinedOrNullOrEmpty(code) ? errors.UNEXPECTED_RESULT : code, message, params);
+        return checkResponseLog(this, method, result, misc_1.isUndefinedOrNullOrEmpty(code) ? errors.UNEXPECTED_RESULT : code, message, params);
     }
 }
 exports.JsonRpcProvider = JsonRpcProvider;
-function checkResponseLog(method, result, code, message, params) {
+function extractLog(log) {
+    while ("string" === typeof (log)) {
+        try {
+            log = JSON.parse(log);
+        }
+        catch (error) {
+            break;
+        }
+    }
+    if ("object" === typeof (log)) {
+        return {
+            code: misc_1.isUndefinedOrNullOrEmpty(log.code) ? -1 : log.code,
+            codespace: misc_1.isUndefinedOrNullOrEmpty(log.codespace) ? "" : log.codespace,
+            message: misc_1.isUndefinedOrNullOrEmpty(log.message) ? "" : log.message,
+            log: JSON.stringify(log)
+        };
+    }
+    return {
+        code: -1,
+        codespace: "",
+        message: "",
+        log: ("string" === typeof (log)) ? log : JSON.stringify(log)
+    };
+}
+function checkResponseLog(self, method, result, defaultCode, defaultMessage, params) {
     if (!params) {
         params = {};
     }
-    let log = "";
+    let info = {
+        code: -1,
+        codespace: "",
+        message: "",
+        log: ""
+    };
     if (result) {
         if (result.tx_result && result.tx_result.log) {
-            try {
-                log = JSON.parse(result.tx_result.log);
-            }
-            catch (error) {
-                log = result.tx_result.log;
-            }
+            info.log = result.tx_result.log;
         }
         else {
             if (result.log) {
-                log = result.log;
+                info.log = result.log;
             }
             else {
                 if (result.data) {
-                    log = result.data;
+                    info.log = result.data;
                 }
                 else {
                     if (result.response && result.response.log) {
-                        log = result.response.log;
+                        info.log = result.response.log;
                     }
                     else {
                         if (result.result && result.result.logs && Array.isArray(result.result.logs)) {
                             if (result.result.logs[0] && result.result.logs[0].info && result.result.logs[0].info.message) {
-                                log = result.result.logs[0].info.message;
+                                info.log = result.result.logs[0].info.message;
                             }
                         }
                     }
@@ -385,114 +409,102 @@ function checkResponseLog(method, result, code, message, params) {
             }
         }
     }
-    if (log) {
+    if (info.log) {
+        info = extractLog(info.log);
+    }
+    self.emit('responseLog', {
+        action: 'checkResponseLog',
+        response: result,
+        info,
+        defaultCode,
+        defaultMessage,
+        params
+    });
+    if (info.codespace && info.code) {
+        switch (info.codespace) {
+            case "sdk":
+                switch (info.code) {
+                    case 4: // signature verification failed
+                        return errors.createError('signature verification failed', errors.SIGNATURE_FAILED, { operation: method, info, response: result, params });
+                    case 5: // CodeInsufficientFunds
+                    case 10: // CodeInsufficientCoins
+                        return errors.createError('insufficient funds', errors.INSUFFICIENT_FUNDS, { operation: method, info, response: result, params });
+                    case 11: // Invalid amount
+                        return errors.createError('invalid amount', errors.NUMERIC_FAULT, { operation: method, info, response: result, params });
+                    case 14: // CodeInsufficientFee
+                        return errors.createError('insufficient fees', errors.INSUFFICIENT_FEES, { operation: method, info, response: result, params });
+                }
+                break;
+            case "mxw":
+                switch (info.code) {
+                    case 1000: // KYC registration is required
+                        return errors.createError('KYC registration is required', errors.KYC_REQUIRED, { operation: method, info, response: result, params });
+                    case 1001: // KYC address duplicated
+                        return errors.createError('Duplicated KYC', errors.EXISTS, { operation: method, info, response: result, params });
+                    case 2001: // Token already exists
+                        return errors.createError('token exists', errors.EXISTS, { operation: method, info, response: result, params });
+                    case 2002: // Token does not exists
+                        return errors.createError('token not found', errors.NOT_FOUND, { operation: method, info, response: result, params });
+                    case 2003: // Token is already approved
+                        return errors.createError('token is already approved', errors.NOT_ALLOWED, { operation: method, info, response: result, params });
+                    case 2004: // Token is frozen
+                        return errors.createError('token is frozen', errors.NOT_ALLOWED, { operation: method, info, response: result, params });
+                    case 2005: // Token already unfrozen
+                        return errors.createError('token already unfrozen', errors.NOT_ALLOWED, { operation: method, info, response: result, params });
+                    case 2006: // Invalid token
+                        return errors.createError('invalid token', errors.NOT_AVAILABLE, { operation: method, info, response: result, params });
+                    case 2007: // Token account frozen
+                        return errors.createError('token account is frozen', errors.NOT_ALLOWED, { operation: method, info, response: result, params });
+                    case 2008: // Token account already Unfrozen
+                        return errors.createError('token account already unfrozen', errors.NOT_ALLOWED, { operation: method, info, response: result, params });
+                    case 2009: // Invalid token minter
+                        return errors.createError('invalid token minter', errors.NOT_ALLOWED, { operation: method, info, response: result, params });
+                    case 2099: // Invalid token supply
+                        return errors.createError('exceeded maximum token supply', errors.NOT_ALLOWED, { operation: method, info, response: result, params });
+                    case 2100: // Insufficient token
+                        return errors.createError('insufficient token', errors.INSUFFICIENT_FUNDS, { operation: method, info, response: result, params });
+                    case 3001: // Fee setting not found
+                        return errors.createError('fee setting not found', errors.MISSING_FEES, { operation: method, info, response: result, params });
+                    case 3002: // Token fee setting not found
+                        return errors.createError('token fee setting not found', errors.MISSING_FEES, { operation: method, info, response: result, params });
+                }
+        }
+    }
+    if (info.log) {
         // "transaction not found"
-        if (0 <= log.indexOf(') not found') && log.startsWith("Tx (")) {
-            return errors.createError('transaction not found', errors.NOT_FOUND, { operation: method, response: result });
+        if (0 <= info.log.indexOf(') not found') && info.log.startsWith("Tx (")) {
+            return errors.createError('transaction not found', errors.NOT_FOUND, { operation: method, info, response: result, params });
         }
         // Height must be less than or equal to the current blockchain height
         // Could not find results for height #
-        if (0 <= log.indexOf('Height must be less than or equal to the current blockchain height') || 0 <= log.indexOf("Could not find results for height #")) {
-            return errors.createError('block not found', errors.NOT_FOUND, { operation: method, response: result });
+        if (0 <= info.log.indexOf('Height must be less than or equal to the current blockchain height') || 0 <= info.log.indexOf("Could not find results for height #")) {
+            return errors.createError('block not found', errors.NOT_FOUND, { operation: method, info, response: result, params });
         }
-        // "KYC registration is required"
-        if (0 <= log.indexOf('"codespace":"mxw","code":1000,')) {
-            return errors.createError('KYC registration is required', errors.KYC_REQUIRED, { operation: method, response: result });
+        if (0 <= info.log.indexOf('Alias in used')) {
+            return errors.createError('Alias in used', errors.EXISTS, { operation: method, info, response: result, params });
         }
-        // "KYC address duplicated"
-        if (0 <= log.indexOf('"codespace":"mxw","code":1001,')) {
-            return errors.createError('Duplicated KYC', errors.EXISTS, { operation: method, response: result });
+        if (0 <= info.log.indexOf('Alias is in used')) {
+            return errors.createError('"Alias is in used', errors.EXISTS, params);
         }
-        // 5: CodeInsufficientFunds, 10: CodeInsufficientCoins
-        if (0 <= log.indexOf('"codespace":"sdk","code":5,') || 0 <= log.indexOf('"codespace":"sdk","code":10,')) {
-            return errors.createError('insufficient funds', errors.INSUFFICIENT_FUNDS, params);
+        if (0 <= info.log.indexOf('Not allowed to create new alias, you have pending alias approval')) {
+            return errors.createError('Creation is not allowed due to pending approval', errors.NOT_ALLOWED, params);
         }
-        // 14: CodeInsufficientFee
-        if (0 <= log.indexOf('"codespace":"sdk","code":14,')) {
-            return errors.createError('insufficient fees', errors.INSUFFICIENT_FEES, params);
+        // No such pending alias
+        if (0 <= info.log.indexOf('No such pending alias')) {
+            return errors.createError('No such pending alias', errors.NOT_FOUND, params);
         }
-        // Invalid amount
-        if (0 <= log.indexOf('"codespace":"sdk","code":11,')) {
-            return errors.createError('invalid amount', errors.NUMERIC_FAULT, { operation: method, response: result });
-        }
-        // signature verification failed
-        if (0 <= log.indexOf('"codespace":"sdk","code":4,')) {
-            return errors.createError('signature verification failed', errors.SIGNATURE_FAILED, { operation: method, response: result });
-        }
-        // Token already exists
-        if (0 <= log.indexOf('"codespace":"mxw","code":2001,')) {
-            return errors.createError('token exists', errors.EXISTS, { operation: method, response: result });
-        }
-        // Token does not exists
-        if (0 <= log.indexOf('"codespace":"mxw","code":2002,')) {
-            return errors.createError('token not found', errors.NOT_FOUND, { operation: method, response: result });
-        }
-        // Token is already approved
-        if (0 <= log.indexOf('"codespace":"mxw","code":2003,')) {
-            return errors.createError('token is already approved', errors.NOT_ALLOWED, { operation: method, response: result });
-        }
-        // Token is frozen
-        if (0 <= log.indexOf('"codespace":"mxw","code":2004,')) {
-            return errors.createError('token is frozen', errors.NOT_ALLOWED, { operation: method, response: result });
-        }
-        // Token already unfrozen
-        if (0 <= log.indexOf('"codespace":"mxw","code":2005,')) {
-            return errors.createError('token already unfrozen', errors.NOT_ALLOWED, { operation: method, response: result });
-        }
-        // Invalid token
-        if (0 <= log.indexOf('"codespace":"mxw","code":2006,')) {
-            return errors.createError('invalid token', errors.NOT_AVAILABLE, { operation: method, response: result });
-        }
-        // Token account frozen
-        if (0 <= log.indexOf('"codespace":"mxw","code":2007,')) {
-            return errors.createError('token account is frozen', errors.NOT_ALLOWED, { operation: method, response: result });
-        }
-        // Token account already Unfrozen
-        if (0 <= log.indexOf('"codespace":"mxw","code":2008,')) {
-            return errors.createError('token account already unfrozen', errors.NOT_ALLOWED, { operation: method, response: result });
-        }
-        // Invalid token minter
-        if (0 <= log.indexOf('"codespace":"mxw","code":2009,')) {
-            return errors.createError('invalid token minter', errors.NOT_ALLOWED, { operation: method, response: result });
-        }
-        // Invalid token supply
-        if (0 <= log.indexOf('"codespace":"mxw","code":2099,')) {
-            return errors.createError('exceeded maximum token supply', errors.NOT_ALLOWED, { operation: method, response: result });
-        }
-        // Insufficient token
-        if (0 <= log.indexOf('"codespace":"mxw","code":2100,')) {
-            return errors.createError('insufficient token', errors.INSUFFICIENT_FUNDS, { operation: method, response: result });
-        }
-        // Fee setting not found
-        if (0 <= log.indexOf('Fee setting not found')) {
-            return errors.createError('fee setting not found', errors.NOT_ALLOWED, { operation: method, response: result });
-        }
-        // Token fee setting not found
-        if (0 <= log.indexOf('"codespace":"mxw","code":3002,')) {
-            return errors.createError('token fee setting not found', errors.NOT_AVAILABLE, { operation: method, response: result });
-        }
-        // if (0 <= log.indexOf('Alias in used')) {
-        //     return errors.createError('Alias in used', errors.EXISTS, { operation: method, response: result });
-        // }
-        // if (0 <= log.indexOf('Alias is in used')) {
-        //     return errors.createError('"Alias is in used', errors.EXISTS, params);
-        // }
-        // if (0 <= log.indexOf('Not allowed to create new alias, you have pending alias approval')) {
-        //     return errors.createError('Creation is not allowed due to pending approval', errors.NOT_ALLOWED, params);
-        // }
     }
     try {
-        let l = JSON.parse(log);
-        message = l.code + ": " + l.message;
+        defaultMessage = info.code + ": " + (info.message ? info.message : "");
     }
     catch (error) { }
-    if (!code) {
-        code = errors.UNEXPECTED_RESULT;
+    if (!defaultCode) {
+        defaultCode = errors.UNEXPECTED_RESULT;
     }
-    if (!message) {
-        message = "invalid json response";
+    if (!defaultMessage) {
+        defaultMessage = "invalid json response";
     }
     params = Object.assign({ operation: method, response: result }, params);
-    return errors.createError(message, code, params);
+    return errors.createError(defaultMessage, defaultCode, params);
 }
 //# sourceMappingURL=json-rpc-provider.js.map

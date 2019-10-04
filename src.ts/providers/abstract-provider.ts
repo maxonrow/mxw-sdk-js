@@ -40,18 +40,14 @@ export interface AliasState {
 }
 
 export interface TokenState {
-    type: string,
+    flags: number,
     name: string,
     symbol: string,
     decimals: number,
-    fixedSupply: boolean,
     totalSupply: BigNumber,
     maxSupply: BigNumber,
-    approved: boolean,
-    frozen: boolean,
     owner: string,
-    metadata: string,
-    burnable: boolean
+    metadata: string
 }
 
 export interface TokenAccountState {

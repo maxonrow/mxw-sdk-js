@@ -56,32 +56,24 @@ function checkAliasState(data) {
 }
 function checkTokenState(data) {
     return properties_1.camelize(misc_1.checkFormat({
-        Type: misc_1.checkString,
+        Flags: misc_1.checkNumber,
         Name: misc_1.checkString,
         Symbol: misc_1.checkString,
         Decimals: misc_1.checkNumber,
-        FixedSupply: misc_1.checkBoolean,
         TotalSupply: misc_1.checkBigNumber,
         MaxSupply: misc_1.checkBigNumber,
-        Approved: misc_1.checkBoolean,
-        Frozen: misc_1.checkBoolean,
         Owner: misc_1.checkString,
-        Metadata: misc_1.checkString,
-        Burnable: misc_1.checkBoolean
+        Metadata: misc_1.checkString
     }, data), (key) => {
         switch (key) {
-            case "Type": return "type";
+            case "Flags": return "flags";
             case "Name": return "name";
             case "Symbol": return "symbol";
             case "Decimals": return "decimals";
             case "Owner": return "owner";
             case "Metadata": return "metadata";
-            case "FixedSupply": return "fixedSupply";
             case "TotalSupply": return "totalSupply";
             case "MaxSupply": return "maxSupply";
-            case "Approved": return "approved";
-            case "Frozen": return "frozen";
-            case "Burnable": return "burnable";
         }
         return key;
     });
@@ -502,25 +494,11 @@ class BaseProvider extends abstract_provider_1.Provider {
                     blockTag: checkBlockTag(blockTag)
                 };
                 return this.perform('getTokenState', params).then((result) => {
+                    let state = result;
                     if (result) {
-                        result = checkTokenState(result);
-                        let state = {
-                            type: result.type,
-                            name: result.name,
-                            symbol: result.symbol,
-                            decimals: Number(result.decimals),
-                            owner: result.owner,
-                            metadata: result.metadata,
-                            fixedSupply: result.fixedSupply ? true : false,
-                            totalSupply: bignumber_1.bigNumberify(result.totalSupply),
-                            maxSupply: bignumber_1.bigNumberify(result.maxSupply),
-                            approved: result.approved ? true : false,
-                            frozen: result.frozen ? true : false,
-                            burnable: result.burnable ? true : false
-                        };
-                        result = state;
+                        state = checkTokenState(result);
                     }
-                    return result;
+                    return state;
                 });
             });
         });

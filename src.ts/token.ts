@@ -29,6 +29,18 @@ export enum FungibleTokenActions {
     acceptOwnership = "acceptOwnership",
 };
 
+export enum TokenStateFlags {
+    fungible = 0x0001,
+    mint = 0x0002,
+    burn = 0x0004,
+    frozen = 0x0008,
+    approved = 0x0010
+};
+
+export const DynamicSupplyFungibleTokenFlag = TokenStateFlags.fungible + TokenStateFlags.mint + TokenStateFlags.burn;
+export const FixedSupplyFungibleTokenFlag = TokenStateFlags.fungible;
+export const FixedSupplyBurnableFungibleTokenFlag = TokenStateFlags.fungible + TokenStateFlags.burn;
+
 export interface FungibleTokenProperties {
     name: string,
     symbol: string,
@@ -205,15 +217,63 @@ export class FungibleToken {
     get state() { return this._state; }
     get accountState() { return this._accountState; }
 
-    refresh(overrides?: any): Promise<FungibleToken> {
+    get isApproved() {
+        if (isUndefinedOrNullOrEmpty(this._state)) {
+            errors.throwError('not initialized', errors.NOT_INITIALIZED, { arg: 'state' });
+        }
+        return (TokenStateFlags.approved & this._state.flags) ? true : false;
+    }
+
+    get isFrozen() {
+        if (isUndefinedOrNullOrEmpty(this._state)) {
+            errors.throwError('not initialized', errors.NOT_INITIALIZED, { arg: 'state' });
+        }
+        return (TokenStateFlags.frozen & this._state.flags) ? true : false;
+    }
+
+    get isUsable() {
         if (!this.symbol) {
             errors.throwError('not initialized', errors.NOT_INITIALIZED, { arg: 'symbol' });
         }
-        return this.getState(null, overrides).then(() => {
+        if (!this.isApproved) {
+            errors.throwError('required approval', errors.NOT_ALLOWED, { action: "useability", state: this._state });
+        }
+        if (this.isFrozen) {
+            errors.throwError('frozen', errors.NOT_ALLOWED, { action: "useability", state: this._state });
+        }
+        return true;
+    }
+
+    get isMintable() {
+        this.isUsable; // check token useability, otherwise throw error
+
+        if (!(TokenStateFlags.mint & this._state.flags)) {
+            errors.throwError('not mintable', errors.NOT_ALLOWED, { action: "mintable", state: this._state });
+        }
+        return true;
+    }
+
+    get isBurnable() {
+        this.isUsable; // check token useability, otherwise throw error
+
+        if (!(TokenStateFlags.burn & this._state.flags)) {
+            errors.throwError('not burnable', errors.NOT_ALLOWED, { action: "burnable", state: this._state });
+        }
+        return true;
+    }
+
+    refresh(overrides?: any) {
+        if (!this.symbol) {
+            errors.throwError('not initialized', errors.NOT_INITIALIZED, { arg: 'symbol' });
+        }
+        return this.getState(null, { ...overrides, queryOnly: true }).then((state) => {
             if (!this.signer) {
                 return this;
             }
-            return this.getAccountState(null, overrides).then(() => {
+            return this.getAccountState(null, { ...overrides, queryOnly: true }).then((accountState) => {
+                // Update states in one go
+                this._state = state;
+                this._accountState = accountState;
                 return this;
             });
         });
@@ -228,19 +288,20 @@ export class FungibleToken {
         if (!this.symbol) {
             errors.throwError('not initialized', errors.NOT_INITIALIZED, { arg: 'symbol' });
         }
-        return this.provider.getTokenState(this.symbol).then((result) => {
+        return this.provider.getTokenState(this.symbol, blockTag).then((result) => {
             if (!result) {
                 errors.throwError('token state is not available', errors.NOT_AVAILABLE, {});
             }
-            if ("fungible" != result.type) {
+            if (!(TokenStateFlags.fungible & result.flags)) {
                 errors.throwError('class type mismatch', errors.UNEXPECTED_RESULT, { expected: "fungible", returned: result });
             }
             if (this.symbol != result.symbol) {
                 errors.throwError('token symbol mismatch', errors.UNEXPECTED_RESULT, { expected: this.symbol, returned: result });
             }
-
-            this._state = result;
-            return this._state;
+            if (!(overrides && overrides.queryOnly)) {
+                this._state = result;
+            }
+            return result;
         });
     }
 
@@ -262,8 +323,10 @@ export class FungibleToken {
             }
 
             return this.provider.getTokenAccountState(this.symbol, signerAddress, blockTag).then((result) => {
-                this._accountState = result;
-                return this._accountState;
+                if (!(overrides && overrides.queryOnly)) {
+                    this._accountState = result;
+                }
+                return result;
             });
         });
     }
@@ -292,9 +355,8 @@ export class FungibleToken {
         if (!this.signer) {
             errors.throwError('transfer fungible token require signer', errors.NOT_INITIALIZED, { arg: 'signer' });
         }
-        if (!this.symbol) {
-            errors.throwError('not initialized', errors.NOT_INITIALIZED, { arg: 'symbol' });
-        }
+
+        this.isUsable; // check token useability, otherwise throw error
 
         return resolveProperties({ signerAddress: this.signer.getAddress(), toAddressOrName: toAddressOrName }).then(({ signerAddress, toAddressOrName }) => {
             if (!signerAddress) {
@@ -341,9 +403,8 @@ export class FungibleToken {
         if (!this.signer) {
             errors.throwError('mint fungible token require signer', errors.NOT_INITIALIZED, { arg: 'signer' });
         }
-        if (!this.symbol) {
-            errors.throwError('not initialized', errors.NOT_INITIALIZED, { arg: 'symbol' });
-        }
+
+        this.isMintable; // check token useability and mintable, otherwise throw error
 
         return resolveProperties({ signerAddress: this.signer.getAddress(), toAddressOrName: toAddressOrName }).then(({ signerAddress, toAddressOrName }) => {
             if (!signerAddress) {
@@ -389,9 +450,8 @@ export class FungibleToken {
         if (!this.signer) {
             errors.throwError('burn fungible token require signer', errors.NOT_INITIALIZED, { arg: 'signer' });
         }
-        if (!this.symbol) {
-            errors.throwError('not initialized', errors.NOT_INITIALIZED, { arg: 'symbol' });
-        }
+
+        this.isBurnable; // check token useability and burnable, otherwise throw error
 
         return resolveProperties({ signerAddress: this.signer.getAddress() }).then(({ signerAddress }) => {
             if (!signerAddress) {
@@ -524,46 +584,8 @@ export class FungibleToken {
      * @param addressOrName new owner address
      * @param overrides options
      */
-    transferOwnership(addressOrName: string | Promise<string>, overrides?: any): Promise<TransactionResponse | TransactionReceipt> {
-        if (!this.signer) {
-            errors.throwError('transfer fungible token ownership require signer', errors.NOT_INITIALIZED, { arg: 'signer' });
-        }
-        if (!this.symbol) {
-            errors.throwError('not initialized', errors.NOT_INITIALIZED, { arg: 'symbol' });
-        }
-
-        return resolveProperties({ signerAddress: this.signer.getAddress(), addressOrName: addressOrName }).then(({ signerAddress, addressOrName }) => {
-            if (!signerAddress) {
-                return errors.throwError('transfer fungible token ownership require signer address', errors.MISSING_ARGUMENT, { required: 'signerAddress' });
-            }
-
-            return this.provider.resolveName(addressOrName).then((toAddress) => {
-                let transaction = this.provider.getTransactionRequest("token", "token-transferOwnership", {
-                    symbol: this.symbol,
-                    from: signerAddress,
-                    to: toAddress,
-                    memo: (overrides && overrides.memo) ? overrides.memo : ""
-                });
-                transaction.fee = (overrides && overrides.fee) ? overrides.fee : this.provider.getTransactionFee(undefined, undefined, { tx: transaction });
-
-                return this.signer.sendTransaction(transaction, overrides).then((response) => {
-                    if (overrides && overrides.sendOnly) {
-                        return response;
-                    }
-                    let confirmations = (overrides && overrides.confirmations) ? Number(overrides.confirmations) : null;
-
-                    return this.signer.provider.waitForTransaction(response.hash, confirmations).then((receipt) => {
-                        if (1 == receipt.status) {
-                            return receipt;
-                        }
-                        throw this.signer.provider.checkTransactionReceipt(receipt, errors.CALL_EXCEPTION, "transfer fungible token ownership failed", {
-                            method: "token-transferOwnership",
-                            receipt
-                        });
-                    });
-                });
-            });
-        });
+    transferOwnership(addressOrName: string | Promise<string>, overrides?: any) {
+        errors.throwError('not implemented', errors.NOT_IMPLEMENTED, { action: 'transferOwnership' });
     }
 
     /**
@@ -574,9 +596,8 @@ export class FungibleToken {
         if (!this.signer) {
             errors.throwError('accept fungible token ownership require signer', errors.NOT_INITIALIZED, { arg: 'signer' });
         }
-        if (!this.symbol) {
-            errors.throwError('not initialized', errors.NOT_INITIALIZED, { arg: 'symbol' });
-        }
+
+        this.isUsable; // check token useability, otherwise throw error
 
         return resolveProperties({ signerAddress: this.signer.getAddress() }).then(({ signerAddress }) => {
             if (!signerAddress) {
@@ -618,7 +639,6 @@ export class FungibleToken {
      */
     static fromSymbol(symbol: string, signerOrProvider: Signer | Provider, overrides?: any) {
         let token = new FungibleToken(symbol, signerOrProvider);
-
         return token.refresh().then(() => {
             return token;
         });
@@ -720,10 +740,9 @@ export class FungibleToken {
         transaction = checkFungibleTokenStatus(transaction);
 
         return resolveProperties({
-            signerAddress: signer.getAddress(),
             publicKeyType: signer.getPublicKeyType(),
             compressedPublicKey: signer.getCompressedPublicKey()
-        }).then(({ signerAddress, publicKeyType, compressedPublicKey }) => {
+        }).then(({ publicKeyType, compressedPublicKey }) => {
             // Convert number and big number to string
             transaction = iterate(transaction, function (key, value, type) {
                 switch (type) {
@@ -762,10 +781,9 @@ export class FungibleToken {
         transaction = checkFungibleTokenAccountStatus(transaction);
 
         return resolveProperties({
-            signerAddress: signer.getAddress(),
             publicKeyType: signer.getPublicKeyType(),
             compressedPublicKey: signer.getCompressedPublicKey()
-        }).then(({ signerAddress, publicKeyType, compressedPublicKey }) => {
+        }).then(({ publicKeyType, compressedPublicKey }) => {
             // Convert number and big number to string
             transaction = iterate(transaction, function (key, value, type) {
                 switch (type) {
