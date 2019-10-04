@@ -138,14 +138,19 @@ describe('Suite: Wallet', function () {
     });
 
     it("Connect with JSON RPC provider", function () {
-        providerConnection = new mxw.providers.JsonRpcProvider(nodeProvider.connection, nodeProvider).on("rpc", function (args) {
-            if (!silentRpc) {
-                if ("response" == args.action) {
-                    console.log(indent, "RPC REQ:", JSON.stringify(args.request));
-                    console.log(indent, "    RES:", JSON.stringify(args.response));
+        providerConnection = new mxw.providers.JsonRpcProvider(nodeProvider.connection, nodeProvider)
+            .on("rpc", function (args) {
+                if (!silentRpc) {
+                    if ("response" == args.action) {
+                        console.log(indent, "RPC REQ:", JSON.stringify(args.request));
+                        console.log(indent, "    RES:", JSON.stringify(args.response));
+                    }
                 }
-            }
-        });
+            }).on("responseLog", function (args) {
+                if (!silentRpc) {
+                    console.log(indent, "RES LOG:", JSON.stringify({ info: args.info, response: args.response }));
+                }
+            });
 
         wallet1 = wallet1.connect(providerConnection);
         expect(wallet1).to.exist;

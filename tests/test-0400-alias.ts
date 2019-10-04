@@ -3,7 +3,7 @@
 import { describe, it } from 'mocha';
 import { expect } from 'chai';
 import { mxw, errors, nameService } from '../src.ts/index';
-import { bigNumberify, hexlify, randomBytes, BigNumber } from '../src.ts/utils';
+import { bigNumberify, hexlify, randomBytes } from '../src.ts/utils';
 import { nodeProvider } from "./env";
 
 let indent = "     ";
@@ -18,7 +18,6 @@ let issuer: mxw.Wallet;
 let middleware: mxw.Wallet;
 
 let name: string;
-let nonceProvider: BigNumber;
 
 let defaultOverrides = {
     logSignaturePayload: function (payload) {
@@ -36,14 +35,19 @@ describe('Suite: Alias', async function () {
     if (silentRpc) { silentRpc = nodeProvider.trace.silentRpc; }
 
     it("Initialize", function () {
-        providerConnection = new mxw.providers.JsonRpcProvider(nodeProvider.connection, nodeProvider).on("rpc", function (args) {
-            if (!silentRpc) {
-                if ("response" == args.action) {
-                    console.log(indent, "RPC REQ:", JSON.stringify(args.request));
-                    console.log(indent, "    RES:", JSON.stringify(args.response));
+        providerConnection = new mxw.providers.JsonRpcProvider(nodeProvider.connection, nodeProvider)
+            .on("rpc", function (args) {
+                if (!silentRpc) {
+                    if ("response" == args.action) {
+                        console.log(indent, "RPC REQ:", JSON.stringify(args.request));
+                        console.log(indent, "    RES:", JSON.stringify(args.response));
+                    }
                 }
-            }
-        });
+            }).on("responseLog", function (args) {
+                if (!silentRpc) {
+                    console.log(indent, "RES LOG:", JSON.stringify({ info: args.info, response: args.response }));
+                }
+            });
 
         // We need to use KYCed wallet to create fungible token
         wallet = mxw.Wallet.fromMnemonic(nodeProvider.kyc.issuer)
@@ -122,8 +126,6 @@ describe('Suite: Alias - Approve', function () {
 
     it("Approve", function () {
         return provider.getTransactionCount().then(async (nonce) => {
-            nonceProvider = nonce; // Mark the provider nonce value
-        }).then(() => {
             return nameService.Alias.approveAlias(name, provider).then((transaction) => {
                 expect(transaction).to.exist;
                 if (!silent) console.log(indent, "Provider signed transaction:", JSON.stringify(transaction));
@@ -148,7 +150,7 @@ describe('Suite: Alias - Approve', function () {
             expect(receipt).to.exist;
             expect(receipt.status).to.equal(0);
         }).catch(error => {
-            expect(error.code).to.equal(errors.NOT_ALLOWED);
+            expect(error.code).to.equal(errors.NOT_FOUND);
         });
     });
 
@@ -169,13 +171,6 @@ describe('Suite: Alias - Approve', function () {
     it("Application should not exists", function () {
         return wallet.getPendingAlias().then((state) => {
             expect(state).to.equal(null);
-        });
-    });
-
-    it("Check provider nonce", async function () {
-        return provider.getTransactionCount().then((nonce) => {
-            if (!silent) console.log("nonceProvider:", nonceProvider.toString(), "nonce:", nonce.toString());
-            expect(true).to.equal(nonce.gt(nonceProvider));
         });
     });
 });
@@ -259,7 +254,7 @@ describe('Suite: Alias - Reject', function () {
             expect(receipt).to.exist;
             expect(receipt.status).to.equal(0);
         }).catch(error => {
-            expect(error.code).to.equal(errors.NOT_ALLOWED);
+            expect(error.code).to.equal(errors.NOT_FOUND);
         });
     });
 
@@ -292,6 +287,6 @@ describe('Suite: Alias', function () {
     this.slow(slowThreshold); // define the threshold for slow indicator
 
     it("Clean up", function () {
-        providerConnection.removeAllListeners("rpc");
+        providerConnection.removeAllListeners();
     });
 });

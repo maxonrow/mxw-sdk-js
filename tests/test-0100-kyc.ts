@@ -35,16 +35,21 @@ describe('Suite: KYC', function () {
 
     if (silent) { silent = nodeProvider.trace.silent; }
     if (silentRpc) { silentRpc = nodeProvider.trace.silentRpc; }
-    
+
     it("Initialize", async function () {
-        providerConnection = new mxw.providers.JsonRpcProvider(nodeProvider.connection, nodeProvider).on("rpc", function (args) {
-            if (!silentRpc) {
-                if ("response" == args.action) {
-                    console.log(indent, "RPC REQ:", JSON.stringify(args.request));
-                    console.log(indent, "    RES:", JSON.stringify(args.response));
+        providerConnection = new mxw.providers.JsonRpcProvider(nodeProvider.connection, nodeProvider)
+            .on("rpc", function (args) {
+                if (!silentRpc) {
+                    if ("response" == args.action) {
+                        console.log(indent, "RPC REQ:", JSON.stringify(args.request));
+                        console.log(indent, "    RES:", JSON.stringify(args.response));
+                    }
                 }
-            }
-        });
+            }).on("responseLog", function (args) {
+                if (!silentRpc) {
+                    console.log(indent, "RES LOG:", JSON.stringify({ info: args.info, response: args.response }));
+                }
+            });
 
         // mxw1qrxglea6m8rzzadj60jwaesfdpks9p6uzyv8xw
         provider = mxw.Wallet.fromMnemonic(nodeProvider.kyc.provider).connect(providerConnection);

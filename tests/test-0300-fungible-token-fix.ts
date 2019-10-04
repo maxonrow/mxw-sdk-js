@@ -38,14 +38,19 @@ describe('Suite: FungibleToken - Fixed Supply', function () {
     if (silentRpc) { silentRpc = nodeProvider.trace.silentRpc; }
 
     it("Initialize", function () {
-        providerConnection = new mxw.providers.JsonRpcProvider(nodeProvider.connection, nodeProvider).on("rpc", function (args) {
-            if (!silentRpc) {
-                if ("response" == args.action) {
-                    console.log(indent, "RPC REQ:", JSON.stringify(args.request));
-                    console.log(indent, "    RES:", JSON.stringify(args.response));
+        providerConnection = new mxw.providers.JsonRpcProvider(nodeProvider.connection, nodeProvider)
+            .on("rpc", function (args) {
+                if (!silentRpc) {
+                    if ("response" == args.action) {
+                        console.log(indent, "RPC REQ:", JSON.stringify(args.request));
+                        console.log(indent, "    RES:", JSON.stringify(args.response));
+                    }
                 }
-            }
-        });
+            }).on("responseLog", function (args) {
+                if (!silentRpc) {
+                    console.log(indent, "RES LOG:", JSON.stringify({ info: args.info, response: args.response }));
+                }
+            });
 
         // We need to use KYCed wallet to create fungible token
         wallet = mxw.Wallet.fromMnemonic(nodeProvider.kyc.issuer)
@@ -112,26 +117,6 @@ describe('Suite: FungibleToken - Fixed Supply (Not Burnable)', function () {
         });
     });
 
-    it("Approve - challenge missing fee setting", function () {
-        let overrides = {
-            tokenFees: [
-                { action: FungibleTokenActions.transferOwnership, feeName: "default" },
-                { action: FungibleTokenActions.acceptOwnership, feeName: "default" }
-            ],
-            burnable: false
-        };
-        return token.FungibleToken.approveFungibleToken(fungibleToken.symbol, provider, overrides).then((transaction) => {
-            return token.FungibleToken.signFungibleTokenStatusTransaction(transaction, issuer);
-        }).then((transaction) => {
-            return token.FungibleToken.sendFungibleTokenStatusTransaction(transaction, middleware);
-        }).then((receipt) => {
-            expect(receipt).to.exist;
-            expect(receipt.status).to.equal(0);
-        }).catch(error => {
-            expect(error.code).to.equal(errors.NOT_AVAILABLE);
-        });
-    });
-
     it("Approve - challenge wrong fee setting", function () {
         let overrides = {
             tokenFees: [
@@ -149,7 +134,7 @@ describe('Suite: FungibleToken - Fixed Supply (Not Burnable)', function () {
             expect(receipt).to.exist;
             expect(receipt.status).to.equal(0);
         }).catch(error => {
-            expect(error.code).to.equal(errors.NOT_AVAILABLE);
+            expect(error.code).to.equal(errors.MISSING_FEES);
         });
     });
 
@@ -271,9 +256,9 @@ describe('Suite: FungibleToken - Fixed Supply (Not Burnable)', function () {
             return issuerFungibleToken.burn(balance).then((receipt) => {
                 expect(receipt).to.exist;
                 expect(receipt.status).to.equal(0);
-            }).catch(error => {
-                expect(error.code).to.equal(errors.NOT_AVAILABLE);
             });
+        }).catch(error => {
+            expect(error.code).to.equal(errors.NOT_ALLOWED);
         });
     });
 
@@ -317,6 +302,13 @@ describe('Suite: FungibleToken - Fixed Supply (Not Burnable)', function () {
         });
     });
 
+    it("Refresh status", function () {
+        return fungibleToken.refresh().then(() => {
+            return issuerFungibleToken.refresh().then(() => {
+            });
+        });
+    });
+
     it("Frozen Status", function () {
         let symbol = fungibleToken.symbol;
         return token.FungibleToken.fromSymbol(symbol, wallet).then((token) => {
@@ -338,9 +330,9 @@ describe('Suite: FungibleToken - Fixed Supply (Not Burnable)', function () {
                 return fungibleToken.transfer(issuer.address, balance, { fee }).then((receipt) => {
                     expect(receipt).to.exist;
                     expect(receipt.status).to.equal(0);
-                }).catch(error => {
-                    expect(error.code).to.equal(errors.NOT_ALLOWED);
                 });
+            }).catch(error => {
+                expect(error.code).to.equal(errors.NOT_ALLOWED);
             });
         });
     });
@@ -376,6 +368,13 @@ describe('Suite: FungibleToken - Fixed Supply (Not Burnable)', function () {
             expect(receipt.status).to.equal(0);
         }).catch(error => {
             expect(error.code).to.equal(errors.NOT_ALLOWED);
+        });
+    });
+
+    it("Refresh status", function () {
+        return fungibleToken.refresh().then(() => {
+            return issuerFungibleToken.refresh().then(() => {
+            });
         });
     });
 
@@ -441,6 +440,13 @@ describe('Suite: FungibleToken - Fixed Supply (Not Burnable)', function () {
         });
     });
 
+    it("Refresh status", function () {
+        return fungibleToken.refresh().then(() => {
+            return issuerFungibleToken.refresh().then(() => {
+            });
+        });
+    });
+
     it("Frozen Account Status", function () {
         let symbol = fungibleToken.symbol;
         return token.FungibleToken.fromSymbol(symbol, wallet).then((token) => {
@@ -500,6 +506,13 @@ describe('Suite: FungibleToken - Fixed Supply (Not Burnable)', function () {
             expect(receipt.status).to.equal(0);
         }).catch(error => {
             expect(error.code).to.equal(errors.NOT_ALLOWED);
+        });
+    });
+
+    it("Refresh status", function () {
+        return fungibleToken.refresh().then(() => {
+            return issuerFungibleToken.refresh().then(() => {
+            });
         });
     });
 
@@ -574,31 +587,6 @@ describe('Suite: FungibleToken - Fixed Supply (Burnable)', function () {
         return token.FungibleToken.fromSymbol(fungibleToken.symbol, issuer).then((token) => {
             expect(token).to.exist;
             issuerFungibleToken = token;
-        });
-    });
-
-    it("Approve - challenge missing fee setting", function () {
-        let overrides = {
-            tokenFees: [
-                { action: FungibleTokenActions.transfer, feeName: "default" },
-                { action: FungibleTokenActions.transferOwnership, feeName: "default" },
-                { action: FungibleTokenActions.acceptOwnership, feeName: "default" }
-            ],
-            burnable: true
-        };
-        return token.FungibleToken.approveFungibleToken(fungibleToken.symbol, provider, overrides).then((transaction) => {
-            expect(transaction).to.exist;
-            if (!silent) console.log(indent, "Provider signed transaction:", JSON.stringify(transaction));
-            return token.FungibleToken.signFungibleTokenStatusTransaction(transaction, issuer);
-        }).then((transaction) => {
-            expect(transaction).to.exist;
-            if (!silent) console.log(indent, "Issuer signed transaction:", JSON.stringify(transaction));
-            return token.FungibleToken.sendFungibleTokenStatusTransaction(transaction, middleware, defaultOverrides);
-        }).then((receipt) => {
-            expect(receipt).to.exist;
-            expect(receipt.status).to.equal(0);
-        }).catch(error => {
-            expect(error.code).to.equal(errors.NOT_AVAILABLE);
         });
     });
 
@@ -805,7 +793,7 @@ describe('Suite: FungibleToken - Fixed Supply (Reject)', function () {
     it("Status", function () {
         let symbol = fungibleToken.symbol;
         return token.FungibleToken.fromSymbol(symbol, wallet).then((token) => {
-            expect(token).to.exist;
+            expect(token).is.not.exist;
         }).catch(error => {
             expect(error.code).to.equal(errors.NOT_FOUND);
         });
@@ -816,6 +804,6 @@ describe('Suite: FungibleToken', function () {
     this.slow(slowThreshold); // define the threshold for slow indicator
 
     it("Clean up", function () {
-        providerConnection.removeAllListeners("rpc");
+        providerConnection.removeAllListeners();
     });
 });

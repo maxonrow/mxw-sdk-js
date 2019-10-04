@@ -38,14 +38,19 @@ describe('Suite: FungibleToken - Dynamic Supply - Limited', function () {
     if (silentRpc) { silentRpc = nodeProvider.trace.silentRpc; }
 
     it("Initialize", function () {
-        providerConnection = new mxw.providers.JsonRpcProvider(nodeProvider.connection, nodeProvider).on("rpc", function (args) {
-            if (!silentRpc) {
-                if ("response" == args.action) {
-                    console.log(indent, "RPC REQ:", JSON.stringify(args.request));
-                    console.log(indent, "    RES:", JSON.stringify(args.response));
+        providerConnection = new mxw.providers.JsonRpcProvider(nodeProvider.connection, nodeProvider)
+            .on("rpc", function (args) {
+                if (!silentRpc) {
+                    if ("response" == args.action) {
+                        console.log(indent, "RPC REQ:", JSON.stringify(args.request));
+                        console.log(indent, "    RES:", JSON.stringify(args.response));
+                    }
                 }
-            }
-        });
+            }).on("responseLog", function (args) {
+                if (!silentRpc) {
+                    console.log(indent, "RES LOG:", JSON.stringify({ info: args.info, response: args.response }));
+                }
+            });
 
         // We need to use KYCed wallet to create fungible token
         wallet = mxw.Wallet.fromMnemonic(nodeProvider.fungibleToken.provider).connect(providerConnection);
@@ -171,6 +176,13 @@ describe('Suite: FungibleToken - Dynamic Supply - Limited', function () {
             });
         });
     }
+
+    it("Refresh status", function () {
+        return fungibleToken.refresh().then(() => {
+            return issuerFungibleToken.refresh().then(() => {
+            });
+        });
+    });
 
     it("Status", function () {
         let symbol = fungibleToken.symbol;
@@ -624,6 +636,13 @@ describe('Suite: FungibleToken - Dynamic Supply - Limited', function () {
         });
     });
 
+    it("Refresh status", function () {
+        return fungibleToken.refresh().then(() => {
+            return issuerFungibleToken.refresh().then(() => {
+            });
+        });
+    });
+
     it("Frozen Status", function () {
         let symbol = fungibleToken.symbol;
         return token.FungibleToken.fromSymbol(symbol, wallet).then((token) => {
@@ -645,9 +664,9 @@ describe('Suite: FungibleToken - Dynamic Supply - Limited', function () {
             return issuerFungibleToken.mint(wallet.address, value, { fee }).then((receipt) => {
                 expect(receipt).to.exist;
                 expect(receipt.status).to.equal(0);
-            }).catch(error => {
-                expect(error.code).to.equal(errors.NOT_ALLOWED);
             });
+        }).catch(error => {
+            expect(error.code).to.equal(errors.NOT_ALLOWED);
         });
     });
 
@@ -679,9 +698,9 @@ describe('Suite: FungibleToken - Dynamic Supply - Limited', function () {
                 return fungibleToken.transfer(issuer.address, balance, { fee }).then((receipt) => {
                     expect(receipt).to.exist;
                     expect(receipt.status).to.equal(0);
-                }).catch(error => {
-                    expect(error.code).to.equal(errors.NOT_ALLOWED);
                 });
+            }).catch(error => {
+                expect(error.code).to.equal(errors.NOT_ALLOWED);
             });
         });
     });
@@ -707,9 +726,9 @@ describe('Suite: FungibleToken - Dynamic Supply - Limited', function () {
             return fungibleToken.burn(balance).then((receipt) => {
                 expect(receipt).to.exist;
                 expect(receipt.status).to.equal(0);
-            }).catch(error => {
-                expect(error.code).to.equal(errors.NOT_ALLOWED);
             });
+        }).catch(error => {
+            expect(error.code).to.equal(errors.NOT_ALLOWED);
         });
     });
 
@@ -760,6 +779,13 @@ describe('Suite: FungibleToken - Dynamic Supply - Limited', function () {
             expect(receipt.status).to.equal(0);
         }).catch(error => {
             expect(error.code).to.equal(errors.NOT_ALLOWED);
+        });
+    });
+
+    it("Refresh status", function () {
+        return fungibleToken.refresh().then(() => {
+            return issuerFungibleToken.refresh().then(() => {
+            });
         });
     });
 
