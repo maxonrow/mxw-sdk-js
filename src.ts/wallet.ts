@@ -250,10 +250,9 @@ export class Wallet extends AbstractSigner {
                     if (1 == receipt.status) {
                         return receipt;
                     }
-                    return errors.throwError("transfer failed", errors.CALL_EXCEPTION, {
+                    throw this.provider.checkTransactionReceipt(receipt, errors.CALL_EXCEPTION, "transfer failed", {
                         method: "mxw/msgSend",
-                        response: response,
-                        receipt: receipt
+                        receipt
                     });
                 });
             });
@@ -302,10 +301,9 @@ export class Wallet extends AbstractSigner {
                     if (1 == receipt.status) {
                         return receipt;
                     }
-                    return errors.throwError("create alias failed", errors.CALL_EXCEPTION, {
+                    throw this.provider.checkTransactionReceipt(receipt, errors.CALL_EXCEPTION, "create alias failed", {
                         method: "nameservice/createAlias",
-                        response: response,
-                        receipt: receipt
+                        receipt
                     });
                 });
             });
