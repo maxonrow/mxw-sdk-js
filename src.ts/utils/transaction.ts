@@ -726,7 +726,7 @@ export function getTransactionRequest(route: string, transactionType: string, ov
             }
             break;
 
-        case "token/token-transferOwnership":
+        case "token/token-transferFungibleTokenOwnership":
             {
                 let params: {
                     symbol: string,
@@ -745,7 +745,7 @@ export function getTransactionRequest(route: string, transactionType: string, ov
                     value: {
                         msg: [
                             {
-                                type: "token/transferOwnership",
+                                type: "token/transferFungibleTokenOwnership",
                                 value: {
                                     symbol: params.symbol,
                                     from: params.from,
@@ -760,7 +760,7 @@ export function getTransactionRequest(route: string, transactionType: string, ov
             }
             break;
 
-        case "token/token-acceptOwnership":
+        case "token/token-acceptFungibleTokenOwnership":
             {
                 let params: {
                     symbol: string,
@@ -769,7 +769,6 @@ export function getTransactionRequest(route: string, transactionType: string, ov
                 } = checkFormat({
                     symbol: checkString,
                     from: checkAddress,
-                    to: checkAddress,
                     memo: allowNullOrEmpty(checkString)
                 }, overrides);
 
@@ -778,7 +777,7 @@ export function getTransactionRequest(route: string, transactionType: string, ov
                     value: {
                         msg: [
                             {
-                                type: "token/acceptOwnership",
+                                type: "token/acceptFungibleTokenOwnership",
                                 value: {
                                     symbol: params.symbol,
                                     from: params.from

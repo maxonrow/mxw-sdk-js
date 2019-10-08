@@ -544,7 +544,7 @@ function getTransactionRequest(route, transactionType, overrides) {
                 };
             }
             break;
-        case "token/token-transferOwnership":
+        case "token/token-transferFungibleTokenOwnership":
             {
                 let params = misc_1.checkFormat({
                     symbol: misc_1.checkString,
@@ -557,7 +557,7 @@ function getTransactionRequest(route, transactionType, overrides) {
                     value: {
                         msg: [
                             {
-                                type: "token/transferOwnership",
+                                type: "token/transferFungibleTokenOwnership",
                                 value: {
                                     symbol: params.symbol,
                                     from: params.from,
@@ -571,12 +571,11 @@ function getTransactionRequest(route, transactionType, overrides) {
                 };
             }
             break;
-        case "token/token-acceptOwnership":
+        case "token/token-acceptFungibleTokenOwnership":
             {
                 let params = misc_1.checkFormat({
                     symbol: misc_1.checkString,
                     from: misc_1.checkAddress,
-                    to: misc_1.checkAddress,
                     memo: misc_1.allowNullOrEmpty(misc_1.checkString)
                 }, overrides);
                 transaction = {
@@ -584,7 +583,7 @@ function getTransactionRequest(route, transactionType, overrides) {
                     value: {
                         msg: [
                             {
-                                type: "token/acceptOwnership",
+                                type: "token/acceptFungibleTokenOwnership",
                                 value: {
                                     symbol: params.symbol,
                                     from: params.from

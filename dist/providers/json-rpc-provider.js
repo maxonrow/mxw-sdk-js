@@ -283,15 +283,12 @@ class JsonRpcProvider extends base_provider_1.BaseProvider {
                             catch (error) {
                             }
                         }
-                        else {
-                            switch (result.response.code) {
-                                case 6: // could not resolve name
-                                case 7: // name not set
-                                    return null;
-                            }
-                        }
                     }
-                    throw this.checkResponseLog(method, result, null);
+                    let error = this.checkResponseLog(method, result, null);
+                    if (error && errors.NOT_FOUND == error.code) {
+                        return null;
+                    }
+                    throw error;
                 });
             case 'lookupAddress':
                 return this.send('abci_query', ["/custom/nameservice/whois/" + params.address, "", params.blockTag, null]).then(result => {
@@ -304,15 +301,12 @@ class JsonRpcProvider extends base_provider_1.BaseProvider {
                             catch (error) {
                             }
                         }
-                        else {
-                            switch (result.response.code) {
-                                case 6: // could not resolve address
-                                case 7: // address not set
-                                    return null;
-                            }
-                        }
                     }
-                    throw this.checkResponseLog(method, result, null);
+                    let error = this.checkResponseLog(method, result, null);
+                    if (error && errors.NOT_FOUND == error.code) {
+                        return null;
+                    }
+                    throw error;
                 });
             case 'getAliasState':
                 return this.send('abci_query', ["/custom/nameservice/pending/" + params.address, "", params.blockTag, null]).then(result => {
@@ -325,15 +319,12 @@ class JsonRpcProvider extends base_provider_1.BaseProvider {
                             catch (error) {
                             }
                         }
-                        else {
-                            switch (result.response.code) {
-                                case 6: // could not resolve address
-                                case 7: // address not set
-                                    return null;
-                            }
-                        }
                     }
-                    throw this.checkResponseLog(method, result, null);
+                    let error = this.checkResponseLog(method, result, null);
+                    if (error && errors.NOT_FOUND == error.code) {
+                        return null;
+                    }
+                    throw error;
                 });
             case 'getStatus':
                 return this.send('status', []);
@@ -463,10 +454,28 @@ function checkResponseLog(self, method, result, defaultCode, defaultMessage, par
                         return errors.createError('exceeded maximum token supply', errors.NOT_ALLOWED, { operation: method, info, response: result, params });
                     case 2100: // Insufficient token
                         return errors.createError('insufficient token', errors.INSUFFICIENT_FUNDS, { operation: method, info, response: result, params });
+                    case 2101: // Invalid token action
+                        return errors.createError('invalid token action', errors.NOT_ALLOWED, { operation: method, info, response: result, params });
+                    case 2102: // Invalid token new owner
+                        return errors.createError('invalid new token owner', errors.NOT_ALLOWED, { operation: method, info, response: result, params });
+                    case 2103: // Invalid token owner
+                        return errors.createError('invalid token owner', errors.NOT_ALLOWED, { operation: method, info, response: result, params });
+                    case 2104: // Transfer token ownership approved
+                        return errors.createError('Token ownership is already approved', errors.EXISTS, { operation: method, info, response: result, params });
                     case 3001: // Fee setting not found
                         return errors.createError('fee setting not found', errors.MISSING_FEES, { operation: method, info, response: result, params });
                     case 3002: // Token fee setting not found
                         return errors.createError('token fee setting not found', errors.MISSING_FEES, { operation: method, info, response: result, params });
+                    case 4001: // Alias in used
+                        return errors.createError('alias in used', errors.EXISTS, { operation: method, info, response: result, params });
+                    case 4002: // No such pending alias
+                        return errors.createError('no such pending alias', errors.NOT_FOUND, { operation: method, info, response: result, params });
+                    case 4003: // Alias not allowed to create
+                        return errors.createError('not allowed to create alias', errors.NOT_ALLOWED, { operation: method, info, response: result, params });
+                    case 4004: // Alias not found
+                        return errors.createError('alias not found', errors.NOT_FOUND, { operation: method, info, response: result, params });
+                    case 4005: // Could not resolve address
+                        return errors.createError('could not resolve address', errors.NOT_FOUND, { operation: method, info, response: result, params });
                 }
         }
     }
@@ -479,19 +488,6 @@ function checkResponseLog(self, method, result, defaultCode, defaultMessage, par
         // Could not find results for height #
         if (0 <= info.log.indexOf('Height must be less than or equal to the current blockchain height') || 0 <= info.log.indexOf("Could not find results for height #")) {
             return errors.createError('block not found', errors.NOT_FOUND, { operation: method, info, response: result, params });
-        }
-        if (0 <= info.log.indexOf('Alias in used')) {
-            return errors.createError('Alias in used', errors.EXISTS, { operation: method, info, response: result, params });
-        }
-        if (0 <= info.log.indexOf('Alias is in used')) {
-            return errors.createError('"Alias is in used', errors.EXISTS, params);
-        }
-        if (0 <= info.log.indexOf('Not allowed to create new alias, you have pending alias approval')) {
-            return errors.createError('Creation is not allowed due to pending approval', errors.NOT_ALLOWED, params);
-        }
-        // No such pending alias
-        if (0 <= info.log.indexOf('No such pending alias')) {
-            return errors.createError('No such pending alias', errors.NOT_FOUND, params);
         }
     }
     try {

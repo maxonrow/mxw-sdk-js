@@ -47,6 +47,7 @@ export interface TokenState {
     totalSupply: BigNumber,
     maxSupply: BigNumber,
     owner: string,
+    newOwner: string,
     metadata: string
 }
 

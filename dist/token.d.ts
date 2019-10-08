@@ -136,23 +136,11 @@ export declare class FungibleToken {
      */
     burn(value: BigNumberish, overrides?: any): Promise<TransactionResponse | TransactionReceipt>;
     /**
-     * Freeze wallet token by owner
-     * @param addressOrName target address
-     * @param overrides options
-     */
-    freeze(addressOrName: string | Promise<string>, overrides?: any): Promise<TransactionResponse | TransactionReceipt>;
-    /**
-     * Unfreeze wallet token by owner
-     * @param addressOrName target address
-     * @param overrides options
-     */
-    unfreeze(addressOrName: string | Promise<string>, overrides?: any): Promise<TransactionResponse | TransactionReceipt>;
-    /**
      * Transfer token ownership
      * @param addressOrName new owner address
      * @param overrides options
      */
-    transferOwnership(addressOrName: string | Promise<string>, overrides?: any): void;
+    transferOwnership(addressOrName: string | Promise<string>, overrides?: any): Promise<TransactionReceipt>;
     /**
      * Accept ownership by new owner
      * @param overrides options
@@ -228,6 +216,20 @@ export declare class FungibleToken {
      * @param overrides options
      */
     static unfreezeFungibleToken(symbol: string, signer: Signer, overrides?: any): Promise<FungibleTokenStatusTransaction>;
+    /**
+     * Approve fungible token ownership by provider
+     * @param symbol fungible token symbol
+     * @param signer signer wallet
+     * @param overrides options
+     */
+    static approveFungibleTokenOwnership(symbol: string, signer: Signer, overrides?: any): Promise<FungibleTokenStatusTransaction>;
+    /**
+     * Reject fungible token ownership by provider
+     * @param symbol fungible token symbol
+     * @param signer signer wallet
+     * @param overrides options
+     */
+    static rejectFungibleTokenOwnership(symbol: string, signer: Signer, overrides?: any): Promise<FungibleTokenStatusTransaction>;
     /**
      * Freeze fungible token account by provider
      * @param symbol fungible token symbol

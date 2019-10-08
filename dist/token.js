@@ -370,96 +370,46 @@ class FungibleToken {
         });
     }
     /**
-     * Freeze wallet token by owner
-     * @param addressOrName target address
-     * @param overrides options
-     */
-    freeze(addressOrName, overrides) {
-        if (!this.signer) {
-            errors.throwError('freeze fungible token require signer', errors.NOT_INITIALIZED, { arg: 'signer' });
-        }
-        if (!this.symbol) {
-            errors.throwError('not initialized', errors.NOT_INITIALIZED, { arg: 'symbol' });
-        }
-        return properties_1.resolveProperties({ signerAddress: this.signer.getAddress(), addressOrName: addressOrName }).then(({ signerAddress, addressOrName }) => {
-            if (!signerAddress) {
-                return errors.throwError('freeze fungible token require signer address', errors.MISSING_ARGUMENT, { required: 'signerAddress' });
-            }
-            return this.provider.resolveName(addressOrName).then((targetAddress) => {
-                let transaction = this.provider.getTransactionRequest("token", "token-freezeFungibleToken", {
-                    symbol: this.symbol,
-                    target: targetAddress,
-                    owner: signerAddress,
-                    memo: (overrides && overrides.memo) ? overrides.memo : ""
-                });
-                transaction.fee = (overrides && overrides.fee) ? overrides.fee : this.provider.getTransactionFee(undefined, undefined, { tx: transaction });
-                return this.signer.sendTransaction(transaction, overrides).then((response) => {
-                    if (overrides && overrides.sendOnly) {
-                        return response;
-                    }
-                    let confirmations = (overrides && overrides.confirmations) ? Number(overrides.confirmations) : null;
-                    return this.signer.provider.waitForTransaction(response.hash, confirmations).then((receipt) => {
-                        if (1 == receipt.status) {
-                            return receipt;
-                        }
-                        throw this.signer.provider.checkTransactionReceipt(receipt, errors.CALL_EXCEPTION, "freeze fungible token failed", {
-                            method: "token-freezeFungibleToken",
-                            receipt
-                        });
-                    });
-                });
-            });
-        });
-    }
-    /**
-     * Unfreeze wallet token by owner
-     * @param addressOrName target address
-     * @param overrides options
-     */
-    unfreeze(addressOrName, overrides) {
-        if (!this.signer) {
-            errors.throwError('unfreeze fungible token require signer', errors.NOT_INITIALIZED, { arg: 'signer' });
-        }
-        if (!this.symbol) {
-            errors.throwError('not initialized', errors.NOT_INITIALIZED, { arg: 'symbol' });
-        }
-        return properties_1.resolveProperties({ signerAddress: this.signer.getAddress(), addressOrName: addressOrName }).then(({ signerAddress, addressOrName }) => {
-            if (!signerAddress) {
-                return errors.throwError('unfreeze fungible token require signer address', errors.MISSING_ARGUMENT, { required: 'signerAddress' });
-            }
-            return this.provider.resolveName(addressOrName).then((targetAddress) => {
-                let transaction = this.provider.getTransactionRequest("token", "token-unfreezeFungibleToken", {
-                    symbol: this.symbol,
-                    target: targetAddress,
-                    owner: signerAddress,
-                    memo: (overrides && overrides.memo) ? overrides.memo : ""
-                });
-                transaction.fee = (overrides && overrides.fee) ? overrides.fee : this.provider.getTransactionFee(undefined, undefined, { tx: transaction });
-                return this.signer.sendTransaction(transaction, overrides).then((response) => {
-                    if (overrides && overrides.sendOnly) {
-                        return response;
-                    }
-                    let confirmations = (overrides && overrides.confirmations) ? Number(overrides.confirmations) : null;
-                    return this.signer.provider.waitForTransaction(response.hash, confirmations).then((receipt) => {
-                        if (1 == receipt.status) {
-                            return receipt;
-                        }
-                        throw this.signer.provider.checkTransactionReceipt(receipt, errors.CALL_EXCEPTION, "unfreeze fungible token failed", {
-                            method: "token-unfreezeFungibleToken",
-                            receipt
-                        });
-                    });
-                });
-            });
-        });
-    }
-    /**
      * Transfer token ownership
      * @param addressOrName new owner address
      * @param overrides options
      */
     transferOwnership(addressOrName, overrides) {
-        errors.throwError('not implemented', errors.NOT_IMPLEMENTED, { action: 'transferOwnership' });
+        if (!this.signer) {
+            errors.throwError('transfer fungible token ownership require signer', errors.NOT_INITIALIZED, { arg: 'signer' });
+        }
+        this.isUsable; // check token useability, otherwise throw error
+        return properties_1.resolveProperties({ signerAddress: this.signer.getAddress(), addressOrName: addressOrName }).then(({ signerAddress, addressOrName }) => {
+            if (!signerAddress) {
+                return errors.throwError('transfer fungible token ownership require signer address', errors.MISSING_ARGUMENT, { required: 'signerAddress' });
+            }
+            return this.provider.resolveName(addressOrName).then((toAddress) => {
+                let transaction = this.provider.getTransactionRequest("token", "token-transferFungibleTokenOwnership", {
+                    symbol: this.symbol,
+                    from: signerAddress,
+                    to: toAddress,
+                    memo: (overrides && overrides.memo) ? overrides.memo : ""
+                });
+                transaction.fee = (overrides && overrides.fee) ? overrides.fee : this.provider.getTransactionFee(undefined, undefined, { tx: transaction });
+                return this.signer.sendTransaction(transaction, overrides).then((response) => {
+                    if (overrides && overrides.sendOnly) {
+                        return response;
+                    }
+                    let confirmations = (overrides && overrides.confirmations) ? Number(overrides.confirmations) : null;
+                    return this.signer.provider.waitForTransaction(response.hash, confirmations).then((receipt) => {
+                        if (1 == receipt.status) {
+                            return this.getState(null, overrides).then(() => {
+                                return receipt;
+                            });
+                        }
+                        throw this.signer.provider.checkTransactionReceipt(receipt, errors.CALL_EXCEPTION, "transfer fungible token ownership failed", {
+                            method: "token-transferFungibleTokenOwnership",
+                            receipt
+                        });
+                    });
+                });
+            });
+        });
     }
     /**
      * Accept ownership by new owner
@@ -474,7 +424,7 @@ class FungibleToken {
             if (!signerAddress) {
                 return errors.throwError('accept fungible token ownership require signer address', errors.MISSING_ARGUMENT, { required: 'signerAddress' });
             }
-            let transaction = this.provider.getTransactionRequest("token", "token-acceptOwnership", {
+            let transaction = this.provider.getTransactionRequest("token", "token-acceptFungibleTokenOwnership", {
                 symbol: this.symbol,
                 from: signerAddress,
                 memo: (overrides && overrides.memo) ? overrides.memo : ""
@@ -487,10 +437,12 @@ class FungibleToken {
                 let confirmations = (overrides && overrides.confirmations) ? Number(overrides.confirmations) : null;
                 return this.signer.provider.waitForTransaction(response.hash, confirmations).then((receipt) => {
                     if (1 == receipt.status) {
-                        return receipt;
+                        return this.getState(null, overrides).then(() => {
+                            return receipt;
+                        });
                     }
                     throw this.signer.provider.checkTransactionReceipt(receipt, errors.CALL_EXCEPTION, "accept fungible token ownership failed", {
-                        method: "token-acceptOwnership",
+                        method: "token-acceptFungibleTokenOwnership",
                         response: response,
                         receipt
                     });
@@ -772,6 +724,24 @@ class FungibleToken {
         return setFungibleTokenStatus(symbol, "UNFREEZE", signer, overrides);
     }
     /**
+     * Approve fungible token ownership by provider
+     * @param symbol fungible token symbol
+     * @param signer signer wallet
+     * @param overrides options
+     */
+    static approveFungibleTokenOwnership(symbol, signer, overrides) {
+        return setFungibleTokenStatus(symbol, "APPROVE_TRANFER_TOKEN_OWNERSHIP", signer, overrides);
+    }
+    /**
+     * Reject fungible token ownership by provider
+     * @param symbol fungible token symbol
+     * @param signer signer wallet
+     * @param overrides options
+     */
+    static rejectFungibleTokenOwnership(symbol, signer, overrides) {
+        return setFungibleTokenStatus(symbol, "REJECT_TRANFER_TOKEN_OWNERSHIP", signer, overrides);
+    }
+    /**
      * Freeze fungible token account by provider
      * @param symbol fungible token symbol
      * @param signer signer wallet
@@ -821,6 +791,8 @@ function setFungibleTokenStatus(symbol, status, signer, overrides) {
         case "REJECT":
         case "FREEZE":
         case "UNFREEZE":
+        case "APPROVE_TRANFER_TOKEN_OWNERSHIP":
+        case "REJECT_TRANFER_TOKEN_OWNERSHIP":
             break;
         default:
             errors.throwError('invalid fungible token status', errors.UNEXPECTED_ARGUMENT, { arg: 'status', value: status });

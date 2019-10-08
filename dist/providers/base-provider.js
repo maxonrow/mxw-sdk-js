@@ -63,6 +63,7 @@ function checkTokenState(data) {
         TotalSupply: misc_1.checkBigNumber,
         MaxSupply: misc_1.checkBigNumber,
         Owner: misc_1.checkString,
+        NewOwner: misc_1.checkString,
         Metadata: misc_1.checkString
     }, data), (key) => {
         switch (key) {
@@ -71,6 +72,7 @@ function checkTokenState(data) {
             case "Symbol": return "symbol";
             case "Decimals": return "decimals";
             case "Owner": return "owner";
+            case "NewOwner": return "newOwner";
             case "Metadata": return "metadata";
             case "TotalSupply": return "totalSupply";
             case "MaxSupply": return "maxSupply";
