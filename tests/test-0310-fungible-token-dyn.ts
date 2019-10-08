@@ -31,7 +31,7 @@ let defaultOverrides = {
     }
 }
 
-describe('Suite: FungibleToken - Fixed Supply', function () {
+describe('Suite: FungibleToken - Dynamic Supply', function () {
     this.slow(slowThreshold); // define the threshold for slow indicator
 
     if (silent) { silent = nodeProvider.trace.silent; }
@@ -73,18 +73,18 @@ describe('Suite: FungibleToken - Fixed Supply', function () {
     });
 });
 
-[false, true].forEach((burnable) => {
-    describe('Suite: FungibleToken - Fixed Supply ' + (burnable ? "(Burnable)" : "(Not Burnable)"), function () {
+[true, false].forEach((unlimited) => {
+    describe('Suite: FungibleToken - Dynamic Supply ' + (unlimited ? "(Unlimited)" : "(Limited)"), function () {
         this.slow(slowThreshold); // define the threshold for slow indicator
 
         it("Create", function () {
-            let symbol = "FIX" + hexlify(randomBytes(4)).substring(2);
+            let symbol = "DYN" + hexlify(randomBytes(4)).substring(2);
             fungibleTokenProperties = {
                 name: "MY " + symbol,
                 symbol: symbol,
                 decimals: 18,
-                fixedSupply: true,
-                maxSupply: bigNumberify("100000000000000000000000000"),
+                fixedSupply: false,
+                maxSupply: unlimited ? bigNumberify("0") : bigNumberify("100000000000000000000000000"),
                 fee: {
                     to: nodeProvider.fungibleToken.feeCollector,
                     value: bigNumberify("1")
@@ -120,7 +120,7 @@ describe('Suite: FungibleToken - Fixed Supply', function () {
                     { action: FungibleTokenActions.transferOwnership, feeName: "default" },
                     { action: FungibleTokenActions.acceptOwnership, feeName: "default" }
                 ],
-                burnable
+                burnable: true
             };
             return performFungibleTokenStatus(fungibleTokenProperties.symbol, token.FungibleToken.approveFungibleToken, overrides).then((receipt) => {
                 expect(receipt).is.not.exist;
@@ -132,17 +132,14 @@ describe('Suite: FungibleToken - Fixed Supply', function () {
         it("Approve", function () {
             let overrides = {
                 tokenFees: [
+                    { action: FungibleTokenActions.mint, feeName: "default" },
+                    { action: FungibleTokenActions.burn, feeName: "default" },
                     { action: FungibleTokenActions.transfer, feeName: "default" },
                     { action: FungibleTokenActions.transferOwnership, feeName: "default" },
                     { action: FungibleTokenActions.acceptOwnership, feeName: "default" }
                 ],
-                burnable
+                burnable: true
             };
-            if (burnable) {
-                overrides.tokenFees.push({
-                    action: FungibleTokenActions.burn, feeName: "default"
-                });
-            }
             return performFungibleTokenStatus(fungibleTokenProperties.symbol, token.FungibleToken.approveFungibleToken, overrides).then((receipt) => {
                 if (!silent) console.log(indent, "RECEIPT:", JSON.stringify(receipt));
             });
@@ -151,17 +148,14 @@ describe('Suite: FungibleToken - Fixed Supply', function () {
         it("Approve - checkDuplication", function () {
             let overrides = {
                 tokenFees: [
+                    { action: FungibleTokenActions.mint, feeName: "default" },
+                    { action: FungibleTokenActions.burn, feeName: "default" },
                     { action: FungibleTokenActions.transfer, feeName: "default" },
                     { action: FungibleTokenActions.transferOwnership, feeName: "default" },
                     { action: FungibleTokenActions.acceptOwnership, feeName: "default" }
                 ],
-                burnable
+                burnable: true
             };
-            if (burnable) {
-                overrides.tokenFees.push({
-                    action: FungibleTokenActions.burn, feeName: "default"
-                });
-            }
             return performFungibleTokenStatus(fungibleTokenProperties.symbol, token.FungibleToken.approveFungibleToken, overrides).then((receipt) => {
                 expect(receipt).is.not.exist;
             }).catch(error => {
@@ -182,57 +176,131 @@ describe('Suite: FungibleToken - Fixed Supply', function () {
             });
         });
 
-        it("Transfer", function () {
-            return issuerFungibleToken.getBalance().then((balance) => {
-                balance = balance.div(2);
-                return wallet.provider.getTransactionFee("token", "token-transferFungibleToken", {
-                    symbol: fungibleTokenProperties.symbol,
-                    from: issuer.address,
-                    to: wallet.address,
-                    value: balance,
-                    memo: "Hello blockchain"
-                }).then((fee) => {
-                    return issuerFungibleToken.transfer(wallet.address, balance, { fee }).then((receipt) => {
-                        expect(receipt.status).to.equal(1);
-                    }).then(() => {
-                        // Check sender balance
-                        return issuerFungibleToken.getBalance().then((newBalance) => {
-                            expect(balance.toString()).to.equal(newBalance.toString());
-                        });
-                    }).then(() => {
-                        // Check receiver balance
-                        return fungibleToken.getBalance().then((newBalance) => {
-                            expect(balance.toString()).to.equal(newBalance.toString());
-                        });
-                    });
+        it("Mint - challenge non-owner", function () {
+            let value = bigNumberify("100000000000000000000000000");
+            return fungibleToken.mint(wallet.address, value).then((receipt) => {
+                expect(receipt).is.not.exist;
+            }).catch(error => {
+                expect(error.code).to.equal(errors.NOT_ALLOWED);
+            });
+        });
+
+        it("Mint - challenge fake owner", function () {
+            let value = bigNumberify("100000000000000000000000000");
+            return fungibleToken.mint(wallet.address, value).then((receipt) => {
+                expect(receipt).is.not.exist;
+            }).catch(error => {
+                expect(error.code).to.equal(errors.NOT_ALLOWED);
+            });
+        });
+
+        it("Mint - zero", function () {
+            let value = bigNumberify("0");
+            return issuerFungibleToken.mint(wallet.address, value).then((receipt) => {
+                if (!silent) console.log(indent, "RECEIPT:", JSON.stringify(receipt));
+                expect(receipt.status).to.equal(1);
+            }).then(() => {
+                return refresh(fungibleTokenProperties.symbol);
+            });
+        });
+
+        it("Mint", function () {
+            let value = unlimited ? bigNumberify("100000000000000000000000000") : issuerFungibleToken.state.maxSupply;
+            return issuerFungibleToken.mint(issuer.address, value).then((receipt) => {
+                if (!silent) console.log(indent, "RECEIPT:", JSON.stringify(receipt));
+                expect(receipt.status).to.equal(1);
+            }).then(() => {
+                return refresh(fungibleTokenProperties.symbol);
+            });
+        });
+
+        if (!unlimited) {
+            it("Mint - challenge max supply", function () {
+                let value = bigNumberify("1");
+                return issuerFungibleToken.mint(wallet.address, value).then((receipt) => {
+                    expect(receipt).is.not.exist;
+                }).catch(error => {
+                    expect(error.code).to.equal(errors.NOT_ALLOWED);
                 });
+            });
+        }
+
+        it("Balance - total supply", function () {
+            return issuerFungibleToken.getBalance().then((balance) => {
+                if (!silent) console.log(indent, "Owner balance:", mxw.utils.formatUnits(balance, issuerFungibleToken.state.decimals));
+                expect(balance.toString()).to.equal(issuerFungibleToken.state.totalSupply.toString());
             });
         });
 
         it("Transfer - self transfer", function () {
             return issuerFungibleToken.getBalance().then((balance) => {
                 return issuerFungibleToken.transfer(issuer.address, balance).then((receipt) => {
+                    if (!silent) console.log(indent, "RECEIPT:", JSON.stringify(receipt));
                     expect(receipt.status).to.equal(1);
                 }).then(() => {
                     return issuerFungibleToken.getBalance().then((newBalance) => {
-                        expect(balance.toString()).to.equal(newBalance.toString());
+                        expect(newBalance.toString()).to.equal(balance.toString());
                     });
                 });
             });
         });
 
-        it("Burn" + (burnable ? "" : " - challenge non-burnable token"), function () {
+        it("Transfer", function () {
             return issuerFungibleToken.getBalance().then((balance) => {
-                return issuerFungibleToken.burn(balance).then((receipt) => {
-                    if (!burnable) {
-                        expect(receipt).is.not.exist;
-                    }
-                    else {
+                return wallet.provider.getTransactionFee("token", "token-transferFungibleToken", {
+                    symbol: fungibleToken.symbol,
+                    from: issuer.address,
+                    to: wallet.address,
+                    value: balance,
+                    memo: "Hello blockchain"
+                }).then((fee) => {
+                    return issuerFungibleToken.transfer(wallet.address, balance, { fee }).then((receipt) => {
+                        if (!silent) console.log(indent, "RECEIPT:", JSON.stringify(receipt));
                         expect(receipt.status).to.equal(1);
-                    }
+                    });
+                }).then(() => {
+                    return issuerFungibleToken.getBalance().then((issuerBalance) => {
+                        expect(issuerBalance.toString()).to.equal("0");
+                    });
+                }).then(() => {
+                    return fungibleToken.getBalance().then((receiverBalance) => {
+                        expect(receiverBalance.toString()).to.equal(balance.toString());
+                    });
                 });
-            }).catch(error => {
-                expect(error.code).to.equal(errors.NOT_ALLOWED);
+            });
+        });
+
+        it("Burn - zero", function () {
+            return fungibleToken.burn(bigNumberify("0")).then((receipt) => {
+                expect(receipt.status).to.equal(1);
+            });
+        });
+
+        it("Burn - challenge limit", function () {
+            return fungibleToken.getBalance().then((balance) => {
+                balance = balance.add(1);
+                return fungibleToken.burn(balance).then((receipt) => {
+                    expect(receipt).is.not.exist;
+                }).catch(error => {
+                    expect(error.code).to.equal(errors.INSUFFICIENT_FUNDS);
+                });
+            });
+        });
+
+        it("Burn - partial", function () {
+            return fungibleToken.getBalance().then((balance) => {
+                balance = balance.div(2);
+                return fungibleToken.burn(balance).then((receipt) => {
+                    expect(receipt.status).to.equal(1);
+                });
+            });
+        });
+
+        it("Burn", function () {
+            return fungibleToken.getBalance().then((balance) => {
+                return fungibleToken.burn(balance).then((receipt) => {
+                    expect(receipt.status).to.equal(1);
+                });
             });
         });
 
@@ -250,9 +318,30 @@ describe('Suite: FungibleToken - Fixed Supply', function () {
             });
         });
 
+        it("Mint - challenge frozen token", function () {
+            let value = bigNumberify("100000000000000000000000000");
+            return Promise.resolve().then(() => {
+                return issuerFungibleToken.mint(wallet.address, value).then((receipt) => {
+                    expect(receipt).is.not.exist;
+                });
+            }).catch(error => {
+                expect(error.code).to.equal(errors.NOT_ALLOWED);
+            });
+        });
+
         it("Transfer - challenge frozen token", function () {
             return fungibleToken.getBalance().then((balance) => {
                 return fungibleToken.transfer(issuer.address, balance).then((receipt) => {
+                    expect(receipt).is.not.exist;
+                });
+            }).catch(error => {
+                expect(error.code).to.equal(errors.NOT_ALLOWED);
+            });
+        });
+
+        it("Burn - challenge frozen token", function () {
+            return fungibleToken.getBalance().then((balance) => {
+                return fungibleToken.burn(balance).then((receipt) => {
                     expect(receipt).is.not.exist;
                 });
             }).catch(error => {
@@ -274,11 +363,28 @@ describe('Suite: FungibleToken - Fixed Supply', function () {
             });
         });
 
+        it("Mint - after unfreeze token", function () {
+            let value = bigNumberify("100000000000000000000000000");
+            return issuerFungibleToken.mint(issuer.address, value).then((receipt) => {
+                if (!silent) console.log(indent, "Mint RECEIPT:", JSON.stringify(receipt));
+                expect(receipt.status).to.equal(1);
+            });
+        });
+
         it("Transfer - after unfreeze token", function () {
+            return issuerFungibleToken.getBalance().then((balance) => {
+                balance = balance.div(2);
+                return issuerFungibleToken.transfer(wallet.address, balance).then((receipt) => {
+                    if (!silent) console.log(indent, "RECEIPT:", JSON.stringify(receipt));
+                    expect(receipt.status).to.equal(1);
+                });
+            });
+        });
+
+        it("Burn - after unfreeze token", function () {
             return fungibleToken.getBalance().then((balance) => {
                 balance = balance.div(2);
-                return fungibleToken.transfer(issuer.address, balance).then((receipt) => {
-                    expect(receipt).to.exist;
+                return fungibleToken.burn(balance).then((receipt) => {
                     if (!silent) console.log(indent, "RECEIPT:", JSON.stringify(receipt));
                     expect(receipt.status).to.equal(1);
                 });
@@ -299,9 +405,38 @@ describe('Suite: FungibleToken - Fixed Supply', function () {
             });
         });
 
-        it("Transfer - challenge frozen account", function () {
+        it("Mint - challenge frozen account", function () {
+            let value = bigNumberify("100000000000000000000000000");
+            return issuerFungibleToken.mint(wallet.address, value).then((receipt) => {
+                expect(receipt).is.not.exist;
+            }).catch(error => {
+                expect(error.code).to.equal(errors.NOT_ALLOWED);
+            });
+        });
+
+        it("Transfer - challenge frozen sender account", function () {
+            return issuerFungibleToken.getBalance().then((balance) => {
+                return issuerFungibleToken.transfer(wallet.address, balance).then((receipt) => {
+                    expect(receipt).is.not.exist;
+                }).catch(error => {
+                    expect(error.code).to.equal(errors.NOT_ALLOWED);
+                });
+            });
+        });
+
+        it("Transfer - challenge frozen receiver account", function () {
             return fungibleToken.getBalance().then((balance) => {
                 return fungibleToken.transfer(issuer.address, balance).then((receipt) => {
+                    expect(receipt).is.not.exist;
+                }).catch(error => {
+                    expect(error.code).to.equal(errors.NOT_ALLOWED);
+                });
+            });
+        });
+
+        it("Burn - challenge frozen account", function () {
+            return fungibleToken.getBalance().then((balance) => {
+                return fungibleToken.burn(balance).then((receipt) => {
                     expect(receipt).is.not.exist;
                 }).catch(error => {
                     expect(error.code).to.equal(errors.NOT_ALLOWED);
@@ -323,10 +458,26 @@ describe('Suite: FungibleToken - Fixed Supply', function () {
             });
         });
 
+        it("Mint - after unfreeze account", function () {
+            let value = bigNumberify("10");
+            return issuerFungibleToken.mint(issuer.address, value).then((receipt) => {
+                if (!silent) console.log(indent, "RECEIPT:", JSON.stringify(receipt));
+                expect(receipt.status).to.equal(1);
+            });
+        });
+
         it("Transfer - after unfreeze account", function () {
-            return fungibleToken.getBalance().then((balance) => {
-                balance = balance.div(2);
-                return fungibleToken.transfer(issuer.address, balance).then((receipt) => {
+            return issuerFungibleToken.getBalance().then((balance) => {
+                return issuerFungibleToken.transfer(issuer.address, balance).then((receipt) => {
+                    if (!silent) console.log(indent, "RECEIPT:", JSON.stringify(receipt));
+                    expect(receipt.status).to.equal(1);
+                });
+            });
+        });
+
+        it("Burn - after unfreeze account", function () {
+            return issuerFungibleToken.getBalance().then((balance) => {
+                return issuerFungibleToken.burn(balance).then((receipt) => {
                     if (!silent) console.log(indent, "RECEIPT:", JSON.stringify(receipt));
                     expect(receipt.status).to.equal(1);
                 });
@@ -407,63 +558,63 @@ describe('Suite: FungibleToken - Fixed Supply', function () {
             });
         });
     });
+
+    describe('Suite: FungibleToken - Dynamic Supply ' + (unlimited ? "(Unlimited - Reject)" : "(Limited - Reject)"), function () {
+        this.slow(slowThreshold); // define the threshold for slow indicator
+
+        it("Create", function () {
+            let symbol = "DYN" + hexlify(randomBytes(4)).substring(2);
+            fungibleTokenProperties = {
+                name: "MY " + symbol,
+                symbol: symbol,
+                decimals: 18,
+                fixedSupply: false,
+                maxSupply: bigNumberify("0"),
+                fee: {
+                    to: nodeProvider.fungibleToken.feeCollector,
+                    value: bigNumberify("1")
+                },
+                metadata: ""
+            };
+
+            return token.FungibleToken.create(fungibleTokenProperties, wallet, defaultOverrides).then((token) => {
+                expect(token).to.exist;
+                fungibleToken = token as token.FungibleToken;
+            });
+        });
+
+        it("Reject", function () {
+            let overrides = {
+                notRefresh: true
+            };
+            return performFungibleTokenStatus(fungibleTokenProperties.symbol, token.FungibleToken.rejectFungibleToken, overrides).then((receipt) => {
+                if (!silent) console.log(indent, "RECEIPT:", JSON.stringify(receipt));
+            });
+        });
+
+        it("Reject - checkDuplication", function () {
+            let overrides = {
+                notRefresh: true
+            };
+            return performFungibleTokenStatus(fungibleTokenProperties.symbol, token.FungibleToken.rejectFungibleToken, overrides).then((receipt) => {
+                expect(receipt).is.not.exist;
+            }).catch(error => {
+                expect(error.code).to.equal(errors.NOT_FOUND);
+            });
+        });
+
+        it("Status", function () {
+            let symbol = fungibleToken.symbol;
+            return token.FungibleToken.fromSymbol(symbol, wallet).then((token) => {
+                expect(token).is.not.exist;
+            }).catch(error => {
+                expect(error.code).to.equal(errors.NOT_FOUND);
+            });
+        });
+    });
 });
 
-describe('Suite: FungibleToken - Fixed Supply (Reject)', function () {
-    this.slow(slowThreshold); // define the threshold for slow indicator
-
-    it("Create", function () {
-        let symbol = "FIX" + hexlify(randomBytes(4)).substring(2);
-        fungibleTokenProperties = {
-            name: "MY " + symbol,
-            symbol: symbol,
-            decimals: 18,
-            fixedSupply: true,
-            maxSupply: bigNumberify("100000000000000000000000000"),
-            fee: {
-                to: nodeProvider.fungibleToken.feeCollector,
-                value: bigNumberify("1")
-            },
-            metadata: ""
-        };
-
-        return token.FungibleToken.create(fungibleTokenProperties, wallet, defaultOverrides).then((token) => {
-            expect(token).to.exist;
-            fungibleToken = token as token.FungibleToken;
-        });
-    });
-
-    it("Reject", function () {
-        let overrides = {
-            notRefresh: true
-        };
-        return performFungibleTokenStatus(fungibleTokenProperties.symbol, token.FungibleToken.rejectFungibleToken, overrides).then((receipt) => {
-            if (!silent) console.log(indent, "RECEIPT:", JSON.stringify(receipt));
-        });
-    });
-
-    it("Reject - checkDuplication", function () {
-        let overrides = {
-            notRefresh: true
-        };
-        return performFungibleTokenStatus(fungibleTokenProperties.symbol, token.FungibleToken.rejectFungibleToken, overrides).then((receipt) => {
-            expect(receipt).is.not.exist;
-        }).catch(error => {
-            expect(error.code).to.equal(errors.NOT_FOUND);
-        });
-    });
-
-    it("Status", function () {
-        let symbol = fungibleToken.symbol;
-        return token.FungibleToken.fromSymbol(symbol, wallet).then((token) => {
-            expect(token).is.not.exist;
-        }).catch(error => {
-            expect(error.code).to.equal(errors.NOT_FOUND);
-        });
-    });
-});
-
-describe('Suite: FungibleToken', function () {
+describe('Suite: FungibleToken - Dynamic Supply', function () {
     this.slow(slowThreshold); // define the threshold for slow indicator
 
     it("Clean up", function () {

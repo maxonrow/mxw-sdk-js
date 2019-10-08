@@ -86,10 +86,6 @@ describe('Suite: KYC', function () {
             if (!silent) console.log(indent, "Wallet:", wallet.address, "-", wallet.mnemonic);
         }
     });
-});
-
-describe('Suite: KYC Wallet', async function () {
-    this.slow(slowThreshold); // define the threshold for slow indicator
 
     it("Sign kyc address", function () {
         let promises = [];
@@ -117,12 +113,8 @@ describe('Suite: KYC Wallet', async function () {
             expect(kycList.length).to.equal(wallets.length);
         });
     });
-});
 
-describe('Suite: KYC Provider', async function () {
-    this.slow(slowThreshold); // define the threshold for slow indicator
-
-    it("Sign kyc data", function () {
+    it("Provider sign kyc data", function () {
         return auth.Kyc.create(provider).then(async (kyc) => {
             for (let kycData of kycList) {
                 let kycTransaction = {
@@ -140,12 +132,8 @@ describe('Suite: KYC Provider', async function () {
             }
         });
     });
-});
 
-describe('Suite: KYC Issuer', async function () {
-    this.slow(slowThreshold); // define the threshold for slow indicator
-
-    it("Sign kyc data", function () {
+    it("Issuer sign kyc data", function () {
         return auth.Kyc.create(issuer).then(async (kyc) => {
             for (const [index, kycTransaction] of kycTransactions.entries()) {
                 kycTransactions[index] = await kyc.signTransaction(kycTransaction);
@@ -174,10 +162,6 @@ describe('Suite: KYC Issuer', async function () {
             }
         }
     });
-});
-
-describe('Suite: KYC Middleware', async function () {
-    this.slow(slowThreshold); // define the threshold for slow indicator
 
     it("Whitelist", function () {
         return auth.Kyc.create(middleware).then(async (kyc) => {
@@ -228,10 +212,6 @@ describe('Suite: KYC Middleware', async function () {
             expect(kycAddress).to.equal(kycAddresses[index++]);
         }
     });
-});
-
-describe('Suite: KYC Revocation', async function () {
-    this.slow(slowThreshold); // define the threshold for slow indicator
 
     it("Revocation", async function () {
         for (let wallet of wallets) {
@@ -257,12 +237,8 @@ describe('Suite: KYC Revocation', async function () {
             expect(whitelisted).to.equal(false);
         }
     });
-});
-
-describe('Suite: KYC', function () {
-    this.slow(slowThreshold); // define the threshold for slow indicator
 
     it("Clean up", function () {
-        providerConnection.removeAllListeners("rpc");
+        providerConnection.removeAllListeners();
     });
 });

@@ -102,7 +102,7 @@ describe('Suite: Wallet', function () {
     });
 
     it("Create from mnemonic", function () {
-        wallet1 = mxw.Wallet.fromMnemonic(nodeProvider.kyc.middleware);
+        wallet1 = mxw.Wallet.fromMnemonic(nodeProvider.kyc.issuer);
         expect(wallet1).to.exist;
         if (!silent) console.log(indent, "Wallet:", JSON.stringify(wallet1));
 
@@ -347,7 +347,7 @@ describe('Suite: Wallet', function () {
     });
 
     it("Clean up RPC listener", function () {
-        providerConnection.removeAllListeners("rpc");
+        providerConnection.removeAllListeners();
     });
 
     it("Encrypt wallet with multi-language", function () {

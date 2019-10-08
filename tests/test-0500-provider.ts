@@ -149,6 +149,6 @@ describe('Suite: Provider', function () {
     });
 
     it("Clean up", function () {
-        provider.removeAllListeners("rpc");
+        provider.removeAllListeners();
     });
 });

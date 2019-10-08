@@ -28,11 +28,11 @@ describe('Suite: Crypto', function () {
         if (!silent) console.log(indent, "Wallet1:", JSON.stringify(wallet1));
 
         let wallet2 = mxw.Wallet.fromMnemonic(nodeProvider.kyc.issuer);
-        expect(wallet1).to.exist;
-        if (!silent) console.log(indent, "Wallet2:", JSON.stringify(wallet1));
+        expect(wallet2).to.exist;
+        if (!silent) console.log(indent, "Wallet2:", JSON.stringify(wallet2));
 
-        let secret1With2 = wallet1.computeSharedSecret(wallet1.publicKey);
-        let secret2With1 = wallet2.computeSharedSecret(wallet2.publicKey);
+        let secret1With2 = wallet1.computeSharedSecret(wallet2.publicKey);
+        let secret2With1 = wallet2.computeSharedSecret(wallet1.publicKey);
 
         if (!silent) console.log(indent, "Shared secret wallet 1 with 2:", secret1With2);
         if (!silent) console.log(indent, "Shared secret wallet 2 with 1:", secret2With1);

@@ -50,22 +50,23 @@ describe('Suite: Alias', async function () {
             });
 
         // We need to use KYCed wallet to create fungible token
-        wallet = mxw.Wallet.fromMnemonic(nodeProvider.kyc.issuer)
-            .connect(providerConnection);
+        wallet = mxw.Wallet.fromMnemonic(nodeProvider.kyc.issuer).connect(providerConnection);
         expect(wallet).to.exist;
-        if (!silent) console.log(indent, "Wallet:", JSON.stringify(wallet));
+        if (!silent) console.log(indent, "Wallet:", JSON.stringify({ address: wallet.address, mnemonic: wallet.mnemonic }));
 
         provider = mxw.Wallet.fromMnemonic(nodeProvider.alias.provider).connect(providerConnection);
         expect(provider).to.exist;
-        if (!silent) console.log(indent, "Provider:", JSON.stringify(provider));
+        if (!silent) console.log(indent, "Provider:", JSON.stringify({ address: provider.address, mnemonic: provider.mnemonic }));
 
         issuer = mxw.Wallet.fromMnemonic(nodeProvider.alias.issuer).connect(providerConnection);
         expect(issuer).to.exist;
-        if (!silent) console.log(indent, "Issuer:", JSON.stringify(issuer));
+        if (!silent) console.log(indent, "Issuer:", JSON.stringify({ address: issuer.address, mnemonic: issuer.mnemonic }));
 
         middleware = mxw.Wallet.fromMnemonic(nodeProvider.alias.middleware).connect(providerConnection);
         expect(middleware).to.exist;
-        if (!silent) console.log(indent, "Middleware:", JSON.stringify(middleware));
+        if (!silent) console.log(indent, "Middleware:", JSON.stringify({ address: middleware.address, mnemonic: middleware.mnemonic }));
+
+        if (!silent) console.log(indent, "Fee collector:", JSON.stringify({ address: nodeProvider.alias.feeCollector }));
     });
 });
 
@@ -87,8 +88,7 @@ describe('Suite: Alias - Approve', function () {
         name = hexlify(randomBytes(4)).substring(2);
 
         return wallet.createAlias(name, appFee, defaultOverrides).then((receipt) => {
-            expect(receipt).to.exist;
-            if (!silent) console.log(indent, "Alias.create RECEIPT:", JSON.stringify(receipt));
+            if (!silent) console.log(indent, "RECEIPT:", JSON.stringify(receipt));
             expect(receipt.status).to.equal(1);
         });
     });
@@ -99,8 +99,7 @@ describe('Suite: Alias - Approve', function () {
             value: bigNumberify("100000000")
         };
         return wallet.createAlias(name, appFee, defaultOverrides).then((receipt) => {
-            expect(receipt).to.exist;
-            expect(receipt.status).to.equal(0);
+            expect(receipt).is.not.exist;
         }).catch(error => {
             if (errors.EXISTS != error.code && errors.NOT_ALLOWED != error.code) {
                 throw error;
@@ -110,7 +109,7 @@ describe('Suite: Alias - Approve', function () {
 
     it("Resolve expected no result", function () {
         return wallet.provider.resolveName(name).then((address) => {
-            expect(address).to.not.exist;
+            expect(address).is.not.exist;
         }).catch(error => {
             if (errors.INVALID_ADDRESS != error.code) {
                 throw error;
@@ -125,30 +124,14 @@ describe('Suite: Alias - Approve', function () {
     });
 
     it("Approve", function () {
-        return provider.getTransactionCount().then(async (nonce) => {
-            return nameService.Alias.approveAlias(name, provider).then((transaction) => {
-                expect(transaction).to.exist;
-                if (!silent) console.log(indent, "Provider signed transaction:", JSON.stringify(transaction));
-                return nameService.Alias.signAliasStatusTransaction(transaction, issuer);
-            }).then((transaction) => {
-                if (!silent) console.log(indent, "Issuer signed transaction:", JSON.stringify(transaction));
-                return nameService.Alias.sendAliasStatusTransaction(transaction, middleware, defaultOverrides);
-            }).then((receipt) => {
-                expect(receipt).to.exist;
-                if (!silent) console.log(indent, "approveAlias RECEIPT:", JSON.stringify(receipt));
-                expect(receipt.status).to.equal(1);
-            });
+        return performAliasStatus(name, nameService.Alias.approveAlias, defaultOverrides).then((receipt) => {
+            if (!silent) console.log(indent, "RECEIPT:", JSON.stringify(receipt));
         });
     });
 
     it("Approve - checkDuplication", function () {
-        return nameService.Alias.approveAlias(name, provider).then((transaction) => {
-            return nameService.Alias.signAliasStatusTransaction(transaction, issuer);
-        }).then((transaction) => {
-            return nameService.Alias.sendAliasStatusTransaction(transaction, middleware, defaultOverrides);
-        }).then((receipt) => {
-            expect(receipt).to.exist;
-            expect(receipt.status).to.equal(0);
+        return performAliasStatus(name, nameService.Alias.approveAlias, defaultOverrides).then((receipt) => {
+            expect(receipt).is.not.exist;
         }).catch(error => {
             expect(error.code).to.equal(errors.NOT_FOUND);
         });
@@ -171,6 +154,30 @@ describe('Suite: Alias - Approve', function () {
     it("Application should not exists", function () {
         return wallet.getPendingAlias().then((state) => {
             expect(state).to.equal(null);
+        });
+    });
+
+    it("Revoke", function () {
+        return performAliasStatus(name, nameService.Alias.revokeAlias, defaultOverrides).then((receipt) => {
+            if (!silent) console.log(indent, "RECEIPT:", JSON.stringify(receipt));
+        });
+    });
+
+    it("Revoke - checkDuplication", function () {
+        return performAliasStatus(name, nameService.Alias.revokeAlias, defaultOverrides).then((receipt) => {
+            expect(receipt).is.not.exist;
+        }).catch(error => {
+            expect(error.code).to.equal(errors.NOT_FOUND);
+        });
+    });
+
+    it("Resolve expected no result", function () {
+        return wallet.provider.resolveName(name).then((address) => {
+            expect(address).is.not.exist;
+        }).catch(error => {
+            if (errors.INVALID_ADDRESS != error.code) {
+                throw error;
+            }
         });
     });
 });
@@ -231,54 +238,32 @@ describe('Suite: Alias - Reject', function () {
     });
 
     it("Reject", function () {
-        return nameService.Alias.rejectAlias(name, provider).then((transaction) => {
-            expect(transaction).to.exist;
-            if (!silent) console.log(indent, "Provider signed transaction:", JSON.stringify(transaction));
-            return nameService.Alias.signAliasStatusTransaction(transaction, issuer);
-        }).then((transaction) => {
-            if (!silent) console.log(indent, "Issuer signed transaction:", JSON.stringify(transaction));
-            return nameService.Alias.sendAliasStatusTransaction(transaction, middleware, defaultOverrides);
-        }).then((receipt) => {
-            expect(receipt).to.exist;
-            if (!silent) console.log(indent, "approveAlias RECEIPT:", JSON.stringify(receipt));
-            expect(receipt.status).to.equal(1);
+        return performAliasStatus(name, nameService.Alias.rejectAlias, defaultOverrides).then((receipt) => {
+            if (!silent) console.log(indent, "RECEIPT:", JSON.stringify(receipt));
         });
     });
 
     it("Reject - checkDuplication", function () {
-        return nameService.Alias.rejectAlias(name, provider).then((transaction) => {
-            return nameService.Alias.signAliasStatusTransaction(transaction, issuer);
-        }).then((transaction) => {
-            return nameService.Alias.sendAliasStatusTransaction(transaction, middleware, defaultOverrides);
-        }).then((receipt) => {
-            expect(receipt).to.exist;
-            expect(receipt.status).to.equal(0);
+        return performAliasStatus(name, nameService.Alias.rejectAlias, defaultOverrides).then((receipt) => {
+            expect(receipt).is.not.exist;
         }).catch(error => {
             expect(error.code).to.equal(errors.NOT_FOUND);
-        });
-    });
-
-    it("Resolve with alias", function () {
-        return wallet.provider.resolveName(name).then((address) => {
-            expect(address).to.equal(wallet.address);
-            if (!silent) console.log(indent, name, "=>", address);
-        }).catch(error => {
-            expect(error.code).to.equal(errors.INVALID_ADDRESS);
-        });
-    });
-
-    it("Lookup address", function () {
-        return wallet.provider.lookupAddress(wallet.address).then((alias) => {
-            expect(alias).to.exist;
-            if (!silent) console.log(indent, wallet.address, "=>", alias);
-        }).catch(error => {
-            expect(error.code).to.equal(errors.NOT_ALLOWED);
         });
     });
 
     it("Application should not exists", function () {
         return wallet.getPendingAlias().then((state) => {
             expect(state).to.equal(null);
+        });
+    });
+
+    it("Resolve expected no result", function () {
+        return wallet.provider.resolveName(name).then((address) => {
+            expect(address).to.not.exist;
+        }).catch(error => {
+            if (errors.INVALID_ADDRESS != error.code) {
+                throw error;
+            }
         });
     });
 });
@@ -290,3 +275,14 @@ describe('Suite: Alias', function () {
         providerConnection.removeAllListeners();
     });
 });
+
+function performAliasStatus(name: string, perform: any, overrides?: any) {
+    return perform(name, provider, overrides).then((transaction) => {
+        return nameService.Alias.signAliasStatusTransaction(transaction, issuer);
+    }).then((transaction) => {
+        return nameService.Alias.sendAliasStatusTransaction(transaction, middleware).then((receipt) => {
+            expect(receipt.status).to.equal(1);
+            return receipt;
+        });
+    });
+}
