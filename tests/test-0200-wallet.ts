@@ -174,7 +174,7 @@ describe('Suite: Wallet', function () {
     });
 
     it("Transfer", function () {
-        let value = mxw.utils.parseMxw("100000");
+        let value = mxw.utils.parseMxw("100");
         let overrides = {
             logSignaturePayload: defaultOverrides.logSignaturePayload,
             logSignedTransaction: defaultOverrides.logSignedTransaction,
@@ -195,7 +195,7 @@ describe('Suite: Wallet', function () {
     });
 
     it("AirDrop transfer with zero fee", function () {
-        let value = mxw.utils.parseMxw("100000");
+        let value = mxw.utils.parseMxw("100");
         let overrides = {
             logSignaturePayload: defaultOverrides.logSignaturePayload,
             logSignedTransaction: defaultOverrides.logSignedTransaction,
@@ -277,7 +277,7 @@ describe('Suite: Wallet', function () {
     });
 
     it("Sign transaction", function () {
-        let value = mxw.utils.parseMxw("100000");
+        let value = mxw.utils.parseMxw("100");
 
         return walletAirDrop.provider.getTransactionFee("bank", "bank-send", {
             from: wallet.address,
@@ -299,7 +299,7 @@ describe('Suite: Wallet', function () {
     });
 
     it("Sign transaction with anonymous attributes", function () {
-        let value = mxw.utils.parseMxw("100000");
+        let value = mxw.utils.parseMxw("100");
         let overrides = {
             logSignaturePayload: defaultOverrides.logSignaturePayload,
             logSignedTransaction: defaultOverrides.logSignedTransaction,
