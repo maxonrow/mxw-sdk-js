@@ -132,7 +132,7 @@ describe('Suite: FungibleToken - Fixed Supply', function () {
         it("Approve", function () {
             let overrides = {
                 tokenFees: [
-                    { action: FungibleTokenActions.transfer, feeName: "default" },
+                    { action: FungibleTokenActions.transfer, feeName: "transfer" },
                     { action: FungibleTokenActions.transferOwnership, feeName: "default" },
                     { action: FungibleTokenActions.acceptOwnership, feeName: "default" }
                 ],
@@ -140,7 +140,7 @@ describe('Suite: FungibleToken - Fixed Supply', function () {
             };
             if (burnable) {
                 overrides.tokenFees.push({
-                    action: FungibleTokenActions.burn, feeName: "default"
+                    action: FungibleTokenActions.burn, feeName: "transfer"
                 });
             }
             return performFungibleTokenStatus(fungibleTokenProperties.symbol, token.FungibleToken.approveFungibleToken, overrides).then((receipt) => {

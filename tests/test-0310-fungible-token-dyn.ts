@@ -132,9 +132,9 @@ describe('Suite: FungibleToken - Dynamic Supply', function () {
         it("Approve", function () {
             let overrides = {
                 tokenFees: [
-                    { action: FungibleTokenActions.mint, feeName: "default" },
-                    { action: FungibleTokenActions.burn, feeName: "default" },
-                    { action: FungibleTokenActions.transfer, feeName: "default" },
+                    { action: FungibleTokenActions.mint, feeName: "transfer" },
+                    { action: FungibleTokenActions.burn, feeName: "transfer" },
+                    { action: FungibleTokenActions.transfer, feeName: "transfer" },
                     { action: FungibleTokenActions.transferOwnership, feeName: "default" },
                     { action: FungibleTokenActions.acceptOwnership, feeName: "default" }
                 ],
