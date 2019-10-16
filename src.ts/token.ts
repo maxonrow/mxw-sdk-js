@@ -268,6 +268,7 @@ export class FungibleToken {
         }
         return this.getState(null, { ...overrides, queryOnly: true }).then((state) => {
             if (!this.signer) {
+                this._state = state;
                 return this;
             }
             return this.getAccountState(null, { ...overrides, queryOnly: true }).then((accountState) => {
