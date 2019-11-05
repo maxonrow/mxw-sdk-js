@@ -23,8 +23,6 @@ export enum FungibleTokenActions {
     transfer = "transfer",
     mint = "mint",
     burn = "burn",
-    freeze = "freeze",
-    unfreeze = "unfreeze",
     transferOwnership = "transferOwnership",
     acceptOwnership = "acceptOwnership",
 };
