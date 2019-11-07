@@ -1273,6 +1273,7 @@ export class BaseProvider extends Provider {
         setTimeout(() => {
             if (value && !this._poller) {
                 this._poller = setInterval(this._doPoll.bind(this), this.pollingInterval);
+                this._doPoll();
 
             } else if (!value && this._poller) {
                 clearInterval(this._poller);
