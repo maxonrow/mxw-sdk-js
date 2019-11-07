@@ -20,8 +20,6 @@ var FungibleTokenActions;
     FungibleTokenActions["transfer"] = "transfer";
     FungibleTokenActions["mint"] = "mint";
     FungibleTokenActions["burn"] = "burn";
-    FungibleTokenActions["freeze"] = "freeze";
-    FungibleTokenActions["unfreeze"] = "unfreeze";
     FungibleTokenActions["transferOwnership"] = "transferOwnership";
     FungibleTokenActions["acceptOwnership"] = "acceptOwnership";
 })(FungibleTokenActions = exports.FungibleTokenActions || (exports.FungibleTokenActions = {}));

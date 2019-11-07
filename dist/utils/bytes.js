@@ -12,6 +12,8 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const errors = __importStar(require("../errors"));
+///////////////////////////////
+// Imported Types
 const base64_1 = require("./base64");
 ///////////////////////////////
 function isHexable(value) {

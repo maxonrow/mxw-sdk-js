@@ -8,7 +8,6 @@ import * as errors from '../errors';
 ///////////////////////////////
 // Imported Types
 
-import { Arrayish } from './bytes';
 import { decode as base64Decode } from './base64';
 
 ///////////////////////////////
