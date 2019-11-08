@@ -1080,6 +1080,7 @@ class BaseProvider extends abstract_provider_1.Provider {
         setTimeout(() => {
             if (value && !this._poller) {
                 this._poller = setInterval(this._doPoll.bind(this), this.pollingInterval);
+                this._doPoll();
             }
             else if (!value && this._poller) {
                 clearInterval(this._poller);
