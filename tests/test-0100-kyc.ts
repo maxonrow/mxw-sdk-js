@@ -223,7 +223,7 @@ describe('Suite: KYC', function () {
     it("KYC bind wallets relationship", async function () {
         for (let wallet of wallets) {
             let kycAddress = await wallet.provider.getKycAddress(wallet.address);
-            let receipt = await auth.Kyc.bind(middleware.address, kycAddress, wallet);
+            let receipt = await auth.Kyc.bind(wallet.address, kycAddress, middleware);
             expect(receipt).to.exist;
             if (!silent) console.log(indent, "kycBind.receipt:", JSON.stringify(receipt));
             expect(receipt.status).to.equal(1);
@@ -233,7 +233,7 @@ describe('Suite: KYC', function () {
     it("KYC unbind wallets relationship", async function () {
         for (let wallet of wallets) {
             let kycAddress = await wallet.provider.getKycAddress(wallet.address);
-            let receipt = await auth.Kyc.unbind(middleware.address, kycAddress, wallet);
+            let receipt = await auth.Kyc.unbind(wallet.address, kycAddress, middleware);
             expect(receipt).to.exist;
             if (!silent) console.log(indent, "kycUnbind.receipt:", JSON.stringify(receipt));
             expect(receipt.status).to.equal(1);
