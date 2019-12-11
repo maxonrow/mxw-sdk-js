@@ -87,13 +87,13 @@ export declare class FungibleToken {
     private _state;
     private _accountState;
     constructor(symbol: string, signerOrProvider: Signer | Provider);
-    readonly state: TokenState;
-    readonly accountState: TokenAccountState;
-    readonly isApproved: boolean;
-    readonly isFrozen: boolean;
-    readonly isUsable: boolean;
-    readonly isMintable: boolean;
-    readonly isBurnable: boolean;
+    get state(): TokenState;
+    get accountState(): TokenAccountState;
+    get isApproved(): boolean;
+    get isFrozen(): boolean;
+    get isUsable(): boolean;
+    get isMintable(): boolean;
+    get isBurnable(): boolean;
     refresh(overrides?: any): Promise<this>;
     /**
      * Query token state

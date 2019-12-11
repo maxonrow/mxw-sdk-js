@@ -69,11 +69,13 @@ export declare class BaseProvider extends Provider {
     removeListener(eventName: EventType, listener: Listener): Provider;
     private _doPoll;
     resetEventsBlock(blockNumber: number): void;
-    readonly network: Network;
+    get network(): Network;
     getNetwork(): Promise<Network>;
-    readonly blockNumber: number;
-    polling: boolean;
-    pollingInterval: number;
+    get blockNumber(): number;
+    get polling(): boolean;
+    set polling(value: boolean);
+    get pollingInterval(): number;
+    set pollingInterval(value: number);
     _getFastBlockNumber(): Promise<number>;
     _setFastBlockNumber(blockNumber: number): void;
     waitForTransaction(transactionHash: string, confirmations?: number): Promise<TransactionReceipt>;
