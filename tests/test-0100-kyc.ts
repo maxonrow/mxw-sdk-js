@@ -4,7 +4,8 @@ import { describe, it } from 'mocha';
 import { expect } from 'chai';
 import { mxw, utils, auth, Wallet, errors } from '../src.ts/index';
 import { nodeProvider } from "./env";
-import { computeAddress } from '../src.ts/utils';
+import { computeAddress, sha256, toUtf8Bytes } from '../src.ts/utils';
+import { sortObject } from '../src.ts/utils/misc';
 
 let indent = "     ";
 let silent = true;
@@ -92,13 +93,19 @@ describe('Suite: KYC', function () {
 
         for (let wallet of wallets) {
             promises.push(auth.Kyc.create(wallet).then((kyc) => {
+                let seed = sha256(toUtf8Bytes(JSON.stringify(sortObject({
+                    juridical: ["", ""].sort(),
+                    stakeholders: ["", ""].sort(),
+                    seed: utils.getHash(utils.randomBytes(32))
+                }))));
+
                 let kycAddress = kyc.getKycAddress({
                     country: "MY",
                     idType: "NIC",
                     id: wallet.address,
                     idExpiry: 20200101,
                     dob: 19800101,
-                    seed: utils.getHash(utils.randomBytes(32))
+                    seed
                 });
 
                 return kyc.sign(kycAddress).then((data) => {
@@ -210,6 +217,26 @@ describe('Suite: KYC', function () {
             let kycAddress = await wallet.provider.getKycAddress(wallet.address);
             if (!silent) console.log(indent, "Address:", wallet.address, "-", kycAddress);
             expect(kycAddress).to.equal(kycAddresses[index++]);
+        }
+    });
+
+    it("KYC bind wallets relationship", async function () {
+        for (let wallet of wallets) {
+            let kycAddress = await wallet.provider.getKycAddress(wallet.address);
+            let receipt = await auth.Kyc.bind(middleware.address, kycAddress, wallet);
+            expect(receipt).to.exist;
+            if (!silent) console.log(indent, "kycBind.receipt:", JSON.stringify(receipt));
+            expect(receipt.status).to.equal(1);
+        }
+    });
+
+    it("KYC unbind wallets relationship", async function () {
+        for (let wallet of wallets) {
+            let kycAddress = await wallet.provider.getKycAddress(wallet.address);
+            let receipt = await auth.Kyc.unbind(middleware.address, kycAddress, wallet);
+            expect(receipt).to.exist;
+            if (!silent) console.log(indent, "kycUnbind.receipt:", JSON.stringify(receipt));
+            expect(receipt.status).to.equal(1);
         }
     });
 
