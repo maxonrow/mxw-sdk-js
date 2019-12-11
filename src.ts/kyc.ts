@@ -455,10 +455,8 @@ export class Kyc {
 
     /**
      * Create relationship between wallets
-     * @param transaction transaction object
-     * @param overrides options
      */
-    static bind(to: string, kycAddress: string, signer: Signer, overrides?: any): Promise<TransactionResponse | TransactionReceipt> {
+    static bind(addressOrName: string | Promise<string>, kycAddress: string, signer: Signer, overrides?: any): Promise<TransactionResponse | TransactionReceipt> {
         if (!Signer.isSigner(signer)) {
             errors.throwError('send kyc bind transaction require signer', errors.MISSING_ARGUMENT, { arg: 'signer' });
         }
@@ -466,37 +464,43 @@ export class Kyc {
             errors.throwError('send kyc bind transaction require provider', errors.MISSING_ARGUMENT, { arg: 'provider' });
         }
 
+        if (addressOrName instanceof Promise) {
+            return addressOrName.then((address) => {
+                return this.bind(address, kycAddress, signer, overrides);
+            });
+        }
+
         let params: {
-            to: string,
             kycAddress: string
         } = checkFormat({
-            to: checkString,
             kycAddress: checkString
-        }, { to, kycAddress });
+        }, { kycAddress });
 
-        return resolveProperties({ signerAddress: signer.getAddress() }).then(({ signerAddress }) => {
-            let tx = signer.provider.getTransactionRequest("kyc", "kyc-bind", {
-                from: signerAddress,
-                to: params.to,
-                kycAddress: params.kycAddress,
-                memo: (overrides && overrides.memo) ? overrides.memo : "",
-            });
-            tx.fee = signer.provider.getTransactionFee(undefined, undefined, { tx });
+        return signer.provider.resolveName(addressOrName).then((address) => {
+            return resolveProperties({ signerAddress: signer.getAddress() }).then(({ signerAddress }) => {
+                let tx = signer.provider.getTransactionRequest("kyc", "kyc-bind", {
+                    from: signerAddress,
+                    to: address,
+                    kycAddress: params.kycAddress,
+                    memo: (overrides && overrides.memo) ? overrides.memo : "",
+                });
+                tx.fee = signer.provider.getTransactionFee(undefined, undefined, { tx });
 
-            return signer.sendTransaction(tx, overrides).then((response) => {
-                if (overrides && overrides.sendOnly) {
-                    return response;
-                }
-                let confirmations = (overrides && overrides.confirmations) ? Number(overrides.confirmations) : null;
-
-                return signer.provider.waitForTransaction(response.hash, confirmations).then((receipt) => {
-                    if (1 == receipt.status) {
-                        return receipt;
+                return signer.sendTransaction(tx, overrides).then((response) => {
+                    if (overrides && overrides.sendOnly) {
+                        return response;
                     }
-                    return errors.throwError("kyc bind failed", errors.CALL_EXCEPTION, {
-                        method: "kyc/bind",
-                        response: response,
-                        receipt: receipt
+                    let confirmations = (overrides && overrides.confirmations) ? Number(overrides.confirmations) : null;
+
+                    return signer.provider.waitForTransaction(response.hash, confirmations).then((receipt) => {
+                        if (1 == receipt.status) {
+                            return receipt;
+                        }
+                        return errors.throwError("kyc bind failed", errors.CALL_EXCEPTION, {
+                            method: "kyc/bind",
+                            response: response,
+                            receipt: receipt
+                        });
                     });
                 });
             });
@@ -505,10 +509,8 @@ export class Kyc {
 
     /**
      * Remove relationship between wallets
-     * @param transaction transaction object
-     * @param overrides options
      */
-    static unbind(to: string, kycAddress: string, signer: Signer, overrides?: any): Promise<TransactionResponse | TransactionReceipt> {
+    static unbind(addressOrName: string | Promise<string>, kycAddress: string, signer: Signer, overrides?: any): Promise<TransactionResponse | TransactionReceipt> {
         if (!Signer.isSigner(signer)) {
             errors.throwError('send kyc unbind transaction require signer', errors.MISSING_ARGUMENT, { arg: 'signer' });
         }
@@ -516,37 +518,43 @@ export class Kyc {
             errors.throwError('send kyc unbind transaction require provider', errors.MISSING_ARGUMENT, { arg: 'provider' });
         }
 
+        if (addressOrName instanceof Promise) {
+            return addressOrName.then((address) => {
+                return this.unbind(address, kycAddress, signer, overrides);
+            });
+        }
+
         let params: {
-            to: string,
             kycAddress: string
         } = checkFormat({
-            to: checkString,
             kycAddress: checkString
-        }, { to, kycAddress });
+        }, { kycAddress });
 
-        return resolveProperties({ signerAddress: signer.getAddress() }).then(({ signerAddress }) => {
-            let tx = signer.provider.getTransactionRequest("kyc", "kyc-unbind", {
-                from: signerAddress,
-                to: params.to,
-                kycAddress: params.kycAddress,
-                memo: (overrides && overrides.memo) ? overrides.memo : "",
-            });
-            tx.fee = signer.provider.getTransactionFee(undefined, undefined, { tx });
+        return signer.provider.resolveName(addressOrName).then((address) => {
+            return resolveProperties({ signerAddress: signer.getAddress() }).then(({ signerAddress }) => {
+                let tx = signer.provider.getTransactionRequest("kyc", "kyc-unbind", {
+                    from: signerAddress,
+                    to: address,
+                    kycAddress: params.kycAddress,
+                    memo: (overrides && overrides.memo) ? overrides.memo : "",
+                });
+                tx.fee = signer.provider.getTransactionFee(undefined, undefined, { tx });
 
-            return signer.sendTransaction(tx, overrides).then((response) => {
-                if (overrides && overrides.sendOnly) {
-                    return response;
-                }
-                let confirmations = (overrides && overrides.confirmations) ? Number(overrides.confirmations) : null;
-
-                return signer.provider.waitForTransaction(response.hash, confirmations).then((receipt) => {
-                    if (1 == receipt.status) {
-                        return receipt;
+                return signer.sendTransaction(tx, overrides).then((response) => {
+                    if (overrides && overrides.sendOnly) {
+                        return response;
                     }
-                    return errors.throwError("kyc unbind failed", errors.CALL_EXCEPTION, {
-                        method: "kyc/unbind",
-                        response: response,
-                        receipt: receipt
+                    let confirmations = (overrides && overrides.confirmations) ? Number(overrides.confirmations) : null;
+
+                    return signer.provider.waitForTransaction(response.hash, confirmations).then((receipt) => {
+                        if (1 == receipt.status) {
+                            return receipt;
+                        }
+                        return errors.throwError("kyc unbind failed", errors.CALL_EXCEPTION, {
+                            method: "kyc/unbind",
+                            response: response,
+                            receipt: receipt
+                        });
                     });
                 });
             });

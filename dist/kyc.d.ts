@@ -107,14 +107,10 @@ export declare class Kyc {
     static sendRevokeTransaction(transaction: KycRevokeTransaction, signer: Signer, overrides?: any): Promise<TransactionReceipt>;
     /**
      * Create relationship between wallets
-     * @param transaction transaction object
-     * @param overrides options
      */
-    static bind(to: string, kycAddress: string, signer: Signer, overrides?: any): Promise<TransactionResponse | TransactionReceipt>;
+    static bind(addressOrName: string | Promise<string>, kycAddress: string, signer: Signer, overrides?: any): Promise<TransactionResponse | TransactionReceipt>;
     /**
      * Remove relationship between wallets
-     * @param transaction transaction object
-     * @param overrides options
      */
-    static unbind(to: string, kycAddress: string, signer: Signer, overrides?: any): Promise<TransactionResponse | TransactionReceipt>;
+    static unbind(addressOrName: string | Promise<string>, kycAddress: string, signer: Signer, overrides?: any): Promise<TransactionResponse | TransactionReceipt>;
 }
