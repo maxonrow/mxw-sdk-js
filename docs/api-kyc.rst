@@ -125,6 +125,20 @@ Signing
     promise will reject with the error, with the additional property ``transactionHash``
     so that further processing may be done.
 
+:sup:`prototype` . bind ( addressOrName, kycAddress, signer ) |nbsp| `=> Promise<TransactionReceipt>`
+    Create relationship between wallets by sending *kycBind* transaction to the **entire** blockchain network and returns a
+    :ref:`Promise <promise>` that resolves to the :ref:`Transaction Receipt <transaction-receipt>`.
+    The transaction should be signed by KYC middleware.
+
+    The ``addressOrName`` can be set to target alias or wallet address. The ``kycAddress`` is the reference of relationship.
+
+:sup:`prototype` . unbind ( addressOrName, kycAddress, signer ) |nbsp| `=> Promise<TransactionReceipt>`
+    Remove relationship between wallets by sending *kycUnbind* transaction to the **entire** blockchain network and returns a
+    :ref:`Promise <promise>` that resolves to the :ref:`Transaction Receipt <transaction-receipt>`.
+    The transaction should be signed by KYC middleware.
+
+    The ``addressOrName`` can be set to target alias or wallet address. The ``kycAddress`` is the reference of relationship.
+
 Checking status
 ---------------
 
