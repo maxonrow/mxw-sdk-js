@@ -355,6 +355,74 @@ export function getTransactionRequest(route: string, transactionType: string, ov
             }
             break;
 
+        case "kyc/kyc-bind":
+            {
+                let params: {
+                    from: string,
+                    to: string,
+                    kycAddress: string,
+                    memo: string
+                } = checkFormat({
+                    from: checkAddress,
+                    to: checkAddress,
+                    kycAddress: checkString,
+                    memo: allowNullOrEmpty(checkString)
+                }, overrides);
+
+                transaction = {
+                    type: "cosmos-sdk/StdTx",
+                    value: {
+                        msg: [
+                            {
+                                type: "kyc/kycBind",
+                                value: {
+                                    from: params.from,
+                                    kycAddress: params.kycAddress,
+                                    to: params.to
+                                }
+                            }
+                        ],
+                        memo: params.memo ? params.memo : ""
+                    },
+                    fee: null
+                };
+            }
+            break;
+
+        case "kyc/kyc-unbind":
+            {
+                let params: {
+                    from: string,
+                    to: string,
+                    kycAddress: string,
+                    memo: string
+                } = checkFormat({
+                    from: checkAddress,
+                    to: checkAddress,
+                    kycAddress: checkString,
+                    memo: allowNullOrEmpty(checkString)
+                }, overrides);
+
+                transaction = {
+                    type: "cosmos-sdk/StdTx",
+                    value: {
+                        msg: [
+                            {
+                                type: "kyc/kycUnbind",
+                                value: {
+                                    from: params.from,
+                                    kycAddress: params.kycAddress,
+                                    to: params.to
+                                }
+                            }
+                        ],
+                        memo: params.memo ? params.memo : ""
+                    },
+                    fee: null
+                };
+            }
+            break;
+
         case "nameservice/nameservice-setAliasStatus":
             {
                 let params: {

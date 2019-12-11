@@ -252,6 +252,60 @@ function getTransactionRequest(route, transactionType, overrides) {
                 };
             }
             break;
+        case "kyc/kyc-bind":
+            {
+                let params = misc_1.checkFormat({
+                    from: misc_1.checkAddress,
+                    to: misc_1.checkAddress,
+                    kycAddress: misc_1.checkString,
+                    memo: misc_1.allowNullOrEmpty(misc_1.checkString)
+                }, overrides);
+                transaction = {
+                    type: "cosmos-sdk/StdTx",
+                    value: {
+                        msg: [
+                            {
+                                type: "kyc/kycBind",
+                                value: {
+                                    from: params.from,
+                                    kycAddress: params.kycAddress,
+                                    to: params.to
+                                }
+                            }
+                        ],
+                        memo: params.memo ? params.memo : ""
+                    },
+                    fee: null
+                };
+            }
+            break;
+        case "kyc/kyc-unbind":
+            {
+                let params = misc_1.checkFormat({
+                    from: misc_1.checkAddress,
+                    to: misc_1.checkAddress,
+                    kycAddress: misc_1.checkString,
+                    memo: misc_1.allowNullOrEmpty(misc_1.checkString)
+                }, overrides);
+                transaction = {
+                    type: "cosmos-sdk/StdTx",
+                    value: {
+                        msg: [
+                            {
+                                type: "kyc/kycUnbind",
+                                value: {
+                                    from: params.from,
+                                    kycAddress: params.kycAddress,
+                                    to: params.to
+                                }
+                            }
+                        ],
+                        memo: params.memo ? params.memo : ""
+                    },
+                    fee: null
+                };
+            }
+            break;
         case "nameservice/nameservice-setAliasStatus":
             {
                 let params = misc_1.checkFormat({
