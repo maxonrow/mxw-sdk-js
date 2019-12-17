@@ -95,7 +95,6 @@ describe('Suite: KYC', function () {
             promises.push(auth.Kyc.create(wallet).then((kyc) => {
                 let seed = sha256(toUtf8Bytes(JSON.stringify(sortObject({
                     juridical: ["", ""].sort(),
-                    stakeholders: ["", ""].sort(),
                     seed: utils.getHash(utils.randomBytes(32))
                 }))));
 
