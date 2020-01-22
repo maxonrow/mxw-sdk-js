@@ -32,7 +32,7 @@ export enum TokenStateFlags {
     mint = 0x0002,
     burn = 0x0004,
     frozen = 0x0008,
-    approved = 0x0010
+    approved = 0x0010,
 };
 
 export const DynamicSupplyFungibleTokenFlag = TokenStateFlags.fungible + TokenStateFlags.mint + TokenStateFlags.burn;

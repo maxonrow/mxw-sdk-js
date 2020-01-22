@@ -9,6 +9,7 @@ import { Wallet } from './wallet';
 import * as auth from './kyc';
 import { Kyc, KycKeyComponent, KycData, KycTransaction, KycRevoke, KycRevokeTransaction, KycSignature } from './kyc';
 import * as token from './token';
+import * as nonFungibleToken from './non-fungible-token';
 import * as nameService from './name-service';
 
 import * as utils from './utils';
@@ -50,6 +51,7 @@ export {
 
     auth,
     token,
+    nonFungibleToken,
     nameService,
     
     wordlists,
