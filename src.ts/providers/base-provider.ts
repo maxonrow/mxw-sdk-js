@@ -33,7 +33,7 @@ import {
     AccountState,
     AliasState,
     TokenState, TokenList, TokenAccountState,
-    TransactionReceipt, TransactionResponse, TransactionFee
+    TransactionReceipt, TransactionResponse, TransactionFee, MultiSigAccountState
 } from './abstract-provider';
 
 import { Transaction } from '../utils/transaction';
@@ -705,6 +705,28 @@ export class BaseProvider extends Provider {
                         blockTag: checkBlockTag(blockTag)
                     };
                     return this.perform('getAccountState', params).then((result) => {
+                        if (result) {
+                            result = camelize(checkFormat({
+                                type: checkString,
+                                value: checkAny
+                            }, result));
+                        }
+                        return result;
+                    });
+                });
+            });
+        });
+    }
+
+    getMultiSigAccountState(addressOrName: string | Promise<string>, blockTag?: BlockTag | Promise<BlockTag>): Promise<MultiSigAccountState> {
+        return this.ready.then(() => {
+            return resolveProperties({ addressOrName: addressOrName, blockTag: blockTag }).then(({ addressOrName, blockTag }) => {
+                return this.resolveName(addressOrName).then((address) => {
+                    let params = {
+                        address: address,
+                        blockTag: checkBlockTag(blockTag)
+                    };
+                    return this.perform('getMultiSigAccountState', params).then((result) => {
                         if (result) {
                             result = camelize(checkFormat({
                                 type: checkString,

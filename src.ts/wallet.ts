@@ -104,6 +104,10 @@ export class Wallet extends AbstractSigner {
         return Promise.resolve(this.compressedPublicKey);
     }
 
+    getNonce() {
+        return this.nonce;
+    }
+
     clearNonce() {
         this.nonce = undefined;
     }

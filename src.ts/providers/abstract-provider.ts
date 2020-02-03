@@ -76,6 +76,32 @@ export interface AccountState {
     }
 };
 
+export interface MultiSigAccountState {
+    type: string,
+    value: {
+        address: string,
+        coins: [
+            {
+                denom: string,
+                amount: BigNumberish,
+            }
+        ],
+        publicKey: {
+            type: string,
+            value: string
+        },
+        accountNumber: BigNumberish,
+        sequence: BigNumberish,
+        multisig: {
+            owner: string,
+            threshold: Number,
+            counter: BigNumberish,
+            signers: string[],
+            pendingTxs: any,
+        }
+    }
+};
+
 export interface Block {
     blockNumber: number,
     blockTime: string,
@@ -194,6 +220,8 @@ export abstract class Provider implements OnceBlockable {
     abstract getAccountState(addressOrName: string | Promise<string>, blockTag?: BlockTag | Promise<BlockTag>): Promise<AccountState>;
     abstract getAccountNumber(addressOrName: string | Promise<string>, blockTag?: BlockTag | Promise<BlockTag>): Promise<BigNumber>;
     abstract getBalance(addressOrName: string | Promise<string>, blockTag?: BlockTag | Promise<BlockTag>): Promise<BigNumber>;
+
+    abstract getMultiSigAccountState(addressOrName: string | Promise<string>, blockTag?: BlockTag | Promise<BlockTag>): Promise<MultiSigAccountState>;
 
     abstract getTransactionCount(addressOrName: string | Promise<string>, blockTag?: BlockTag | Promise<BlockTag>): Promise<BigNumber>;
 

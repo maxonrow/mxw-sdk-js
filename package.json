@@ -36,6 +36,7 @@
     "dist-test-alias": "npm run build && mocha --timeout 60000 -r ts-node/register tests/test-0400-alias.ts",
     "dist-test-utils": "npm run build && mocha --timeout 60000 -r ts-node/register tests/test-0600-utils.ts",
     "dist-test-crypto": "npm run build && mocha --timeout 60000 -r ts-node/register tests/test-0610-crypto.ts",
+    "dist-test-multisig": "npm run build && mocha --timeout 60000 -r ts-node/register tests/test-0700-multisig.ts",
     "dist-test-constants": "npm run build && mocha --timeout 60000 -r ts-node/register tests/test-0610-constants.ts",
     "dist-debug-provider": "npm run build && mocha --inspect-brk --timeout 3000000 -r ts-node/register tests/test-0500-provider.ts",
     "dist-debug-wallet": "npm run build && mocha --inspect-brk --timeout 3000000 -r ts-node/register tests/test-0200-wallet.ts",
@@ -46,6 +47,7 @@
     "dist-debug-alias": "npm run build && mocha --inspect-brk --timeout 3000000 -r ts-node/register tests/test-0400-alias.ts",
     "dist-debug-utils": "npm run build && mocha --inspect-brk --timeout 3000000 -r ts-node/register tests/test-0600-utils.ts",
     "dist-debug-crypto": "npm run build && mocha --inspect-brk --timeout 3000000 -r ts-node/register tests/test-0610-crypto.ts",
+    "dist-debug-multisig": "npm run build && mocha --inspect-brk --timeout 3000000 -r ts-node/register tests/test-0700-multisig.ts",
     "dist-debug-constants": "npm run build && mocha --inspect-brk --timeout 3000000 -r ts-node/register tests/test-0610-constants.ts"
   },
   "author": "Jean Soon <jeansoon@gmail.com>",

@@ -24,6 +24,7 @@ export abstract class Signer {
     abstract sign(transaction: TransactionRequest, overrides?: any): Promise<string>;
     abstract sendTransaction(transaction: TransactionRequest, overrides?: any): Promise<TransactionResponse>;
 
+    abstract getNonce(): BigNumber;
     abstract clearNonce(): void;
 
     constructor() {
