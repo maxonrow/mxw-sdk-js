@@ -111,7 +111,8 @@ function checkNonFungibleTokenState(data: any): NFTokenState {
         NewOwner: checkString,
         Metadata: checkString,
         TransferLimit: checkString,
-        MintLimit: checkString
+        MintLimit: checkString,
+        TotalSupply : checkString
     }, data), (key) => {
         switch (key) {
             case "Flags": return "flags";
@@ -122,6 +123,7 @@ function checkNonFungibleTokenState(data: any): NFTokenState {
             case "Metadata": return "metadata";
             case "TransferLimit": return "transferLimit";
             case "MintLimit" : return "mintLimit";
+            case "TotalSupply" : return "totalSupply"
             
         }
         return key;
@@ -129,15 +131,13 @@ function checkNonFungibleTokenState(data: any): NFTokenState {
 }
 
 function checkNonFungibleTokenItemState(data: any): NFTokenItemState {
-    return camelize(checkFormat({
-        Symbol: checkString,
-        ItemID: checkString,
+    return camelize(checkFormat({ 
+        ID: checkString,
         Metadata: arrayOf(checkString),
         Properties : arrayOf(checkString)
     }, data), (key) => {
         switch (key) {
-            case "Symbol": return "symbol";
-            case "ItemID": return "itemID";
+            case "ID": return "id";
             case "Metadata": return "metadata";
             case "Properties": return "properties";        
         }
@@ -732,6 +732,7 @@ export class BaseProvider extends Provider {
                 };
                 return this.perform('getNFTokenState', params).then((result) => {
                     let state: NFTokenState = result;
+                    
                     if (result) {
                         state = checkNonFungibleTokenState(result);
                     }
@@ -751,7 +752,7 @@ export class BaseProvider extends Provider {
                 };
                 return this.perform('getNFTokenItemState', params).then((result) => {
                     let state: NFTokenItemState = result;
-                    if (result) {
+                    if (false) {
                         state = checkNonFungibleTokenItemState(result);
                     }
                     return state;

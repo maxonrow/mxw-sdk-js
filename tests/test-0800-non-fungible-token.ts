@@ -28,8 +28,6 @@ let issuerNonFungibleToken: token.NonFungibleToken;
 
 let symbol = "NFT" + hexlify(randomBytes(4)).substring(2);
 let itemId =crypto.randomBytes(16).toString('hex');
-let endorser1: mxw.Wallet;
-let endorser2: mxw.Wallet;
 
 
 let defaultOverrides = {
@@ -108,62 +106,49 @@ describe('Suite: NonFungibleToken ', function () {
             });
         });
     
-        // it("Create - Check Duplication", function(){
-        //     return token.NonFungibleToken.create(nonFungibleTokenProperties, issuer).then((token) => {
-        //         expect(token).is.not.exist;
-        //     }).catch(error => {
-        //         expect(error.code).to.equal(errors.EXISTS);
-        //     });
-        // });
+        it("Create - Check Duplication", function(){
+            return token.NonFungibleToken.create(nonFungibleTokenProperties, issuer).then((token) => {
+                expect(token).is.not.exist;
+            }).catch(error => {
+                expect(error.code).to.equal(errors.EXISTS);
+            });
+        });
     
-        // it("Query", function () {
-        //     return refresh(nonFungibleTokenProperties.symbol).then(() => {
-        //         expect(nonFungibleToken).to.exist;
-        //         if (!silent) console.log(indent, "Created Token:", JSON.stringify(nonFungibleToken.state));
-        //     });
-        // });
-
-            endorser1 = mxw.Wallet.createRandom();
-            expect(endorser1).to.exist;
-            if (!silent) console.log(indent, "Endorser 1:", JSON.stringify(endorser1));
-
-            endorser2 = mxw.Wallet.createRandom();
-            expect(endorser2).to.exist;
-            if (!silent) console.log(indent, "Endorser 2:", JSON.stringify(endorser2));
+        it("Query", function () {
+            return refresh(nonFungibleTokenProperties.symbol).then(() => {
+                expect(nonFungibleToken).to.exist;
+                if (!silent) console.log(indent, "Created Token:", JSON.stringify(nonFungibleToken.state));
+            });
+        });
 
     
-        // it("Approve - challenge wrong fee setting", function () {
+        it("Approve - challenge wrong fee setting", function () {
 
-        //     endorser1 = mxw.Wallet.createRandom();
-        //     expect(endorser1).to.exist;
-        //     if (!silent) console.log(indent, "Endorser 1:", JSON.stringify(endorser1));
+            let overrides = {
+                tokenFees: [
+                    { action: NonFungibleTokenActions.transfer, feeName: "anything" },
+                    { action: NonFungibleTokenActions.transferOwnership, feeName: "default" },
+                    { action: NonFungibleTokenActions.acceptOwnership, feeName: "default" }
+                ],
+                endorserList:[
+                    wallet.address,
+                    
+                ],
+                mintLimit : 2,
+                transferLimit : 2,
+                burnable : true,
+                transferable : true,
+                modifiable: true
 
-        //     endorser2 = mxw.Wallet.createRandom();
-        //     expect(endorser2).to.exist;
-        //     if (!silent) console.log(indent, "Endorser 2:", JSON.stringify(endorser2));
-
-
-        //     let overrides = {
-        //         tokenFees: [
-        //             { action: NonFungibleTokenActions.transfer, feeName: "anything" },
-        //             { action: NonFungibleTokenActions.transferOwnership, feeName: "default" },
-        //             { action: NonFungibleTokenActions.acceptOwnership, feeName: "default" }
-        //         ],
-        //         endorserList:[
-        //             endorser1.address,
-        //             endorser2.address
-        //         ],
-        //         mintLimit : 2,
-        //         transferLimit : 2
                 
-        //     };
+            };
 
-        //     return performNonFungibleTokenStatus(nonFungibleTokenProperties.symbol, token.NonFungibleToken.approveNonFungibleToken, overrides).then((receipt) => {
-        //         expect(receipt).is.not.exist;
-        //     }).catch(error => {
-        //         expect(error.code).to.equal(errors.MISSING_FEES);
-        //     });
-        // });
+            return performNonFungibleTokenStatus(nonFungibleTokenProperties.symbol, token.NonFungibleToken.approveNonFungibleToken, overrides).then((receipt) => {
+                expect(receipt).is.not.exist;
+            }).catch(error => {
+                expect(error.code).to.equal(errors.MISSING_FEES);
+            });
+        });
     
     
         it("Approve", function () {
@@ -173,9 +158,12 @@ describe('Suite: NonFungibleToken ', function () {
                     { action: NonFungibleTokenActions.transferOwnership, feeName: "default" },
                     { action: NonFungibleTokenActions.acceptOwnership, feeName: "default" }
                 ],
-                endorserList: [],
+                endorserList: [wallet.address],
                 mintLimit : 2,
-                transferLimit : 2
+                transferLimit : 2,
+                burnable : true,
+                transferable : true,
+                modifiable: true
                 
             };
           
@@ -191,12 +179,12 @@ describe('Suite: NonFungibleToken ', function () {
                     { action: NonFungibleTokenActions.transferOwnership, feeName: "default" },
                     { action: NonFungibleTokenActions.acceptOwnership, feeName: "default" }
                 ],
-                endorserList:[
-                    // endorser1.address,
-                    // endorser2.address
-                ],
+                endorserList:[wallet.address],
                 mintLimit : 2,
-                transferLimit : 2
+                transferLimit : 2,
+                burnable : true,
+                transferable : true,
+                modifiable: true
             };
             
             return performNonFungibleTokenStatus(nonFungibleTokenProperties.symbol, token.NonFungibleToken.approveNonFungibleToken, overrides).then((receipt) => {
@@ -209,6 +197,8 @@ describe('Suite: NonFungibleToken ', function () {
         it("State", function () {
             return issuerNonFungibleToken.getState().then((state) => {
                 if (!silent) console.log(indent, "STATE:", JSON.stringify(state));
+
+                console.log(indent, "STATE:", JSON.stringify(state));
             });
         });
     
@@ -220,79 +210,78 @@ describe('Suite: NonFungibleToken ', function () {
                 metadata : ["str1","str2"]
             } as token.NonFungibleTokenItem;
     
-            return issuerNonFungibleToken.mint(itemReceiver.address, item).then((receipt) => {
+            return issuerNonFungibleToken.mint(provider.address, item).then((receipt) => {
                 expect(receipt.status).to.equal(1);
                
             });
         });
 
-        // it("Item State", function(){
-        //     issuerNonFungibleToken.getItemState(itemId).then((result)=>{
-        //         expect(result).to.exist;
-        //     })
+      
 
-        // });
+        it("Update item metadata", function(){
+             token.NonFungibleToken.updateItemMetadata(symbol, itemId, ["testing"], provider).then((receipt)=>{
+                expect(receipt.status).to.equal(1);
+                });
 
-        // it("Endorse", function(){
-           
-        //     endorser1.connect(providerConnection);
-        //     endorser2.connect(providerConnection);
+        });
 
-        //     token.NonFungibleToken.endorse(symbol,itemId,middleware).then((receipt)=>{
-        //         expect(receipt.status).to.equal(1);
-        //     });
+          it("Item State", function(){
+            issuerNonFungibleToken.getItemState(itemId).then((result)=>{
+                expect(result).to.exist;
+            })
 
-          
-        // });
-
-        // it("Freeze item", function(){
-        //     return performNonFungibleTokenItemStatus(nonFungibleTokenProperties.symbol, itemId, token.NonFungibleToken.freezeNonFungibleTokenItem, null).then((receipt) => {
-        //         if (!silent) console.log(indent, "RECEIPT:", JSON.stringify(receipt));
-        //     });
-        // });
-
-        // it("Unfreeze item", function(){
-        //     return performNonFungibleTokenItemStatus(nonFungibleTokenProperties.symbol, itemId, token.NonFungibleToken.unfreezeNonFungibleTokenItem, null).then((receipt) => {
-        //         if (!silent) console.log(indent, "RECEIPT:", JSON.stringify(receipt));
-        //     });
-        // });
-
-        // it("Transfer item", function(){
-        //     issuerNonFungibleToken.transfer(endorser1.address, itemId, symbol).then((receipt)=>{
-        //         expect(receipt.status).to.equal(1);
-        //     });
-
-        // });
-
-        // it("Transfer ownership", function () {
-        //     return issuerNonFungibleToken.transferOwnership(wallet.address).then((receipt) => {
-        //         if (!silent) console.log(indent, "RECEIPT:", JSON.stringify(receipt));
-        //         expect(receipt.status).to.equal(1);
-        //     });
-        // });
-
-        // it("Approve transfer ownership", function () {
-
-        //     let overrides = {
-        //         tokenFees: [
-        //             { action: NonFungibleTokenActions.transfer, feeName: "default" },
-        //             { action: NonFungibleTokenActions.transferOwnership, feeName: "default" },
-        //             { action: NonFungibleTokenActions.acceptOwnership, feeName: "default" }
-        //         ],
-        //         endorserList: [middleware.address],
-        //         mintLimit : 2,
-        //         transferLimit : 2
-                
-        //     };
-
-        //     return performNonFungibleTokenStatus(nonFungibleTokenProperties.symbol, token.NonFungibleToken.approveNonFungibleTokenOwnership, overrides).then((receipt) => {
-        //         if (!silent) console.log(indent, "RECEIPT:", JSON.stringify(receipt));
-        //     });
-        // });
-
-
+        });
        
 
+        it("Endorse", function(){
+            token.NonFungibleToken.endorse(symbol,itemId,wallet).then((receipt)=>{
+                expect(receipt.status).to.equal(1);
+            });
+
+        });
+
+        it("Freeze item", function(){
+            return performNonFungibleTokenItemStatus(nonFungibleTokenProperties.symbol, itemId, token.NonFungibleToken.freezeNonFungibleTokenItem, null).then((receipt) => {
+                if (!silent) console.log(indent, "RECEIPT:", JSON.stringify(receipt));
+            });
+        });
+
+        it("Unfreeze item", function(){
+            return performNonFungibleTokenItemStatus(nonFungibleTokenProperties.symbol, itemId, token.NonFungibleToken.unfreezeNonFungibleTokenItem, null).then((receipt) => {
+                if (!silent) console.log(indent, "RECEIPT:", JSON.stringify(receipt));
+            });
+        });
+
+
+         it("Transfer item", function(){
+            token.NonFungibleToken.transfer(itemReceiver.address, itemId, symbol, provider).then((receipt)=>{
+                expect(receipt.status).to.equal(1);
+            });
+        });
+
+        it("Transfer ownership", function () {
+            return issuerNonFungibleToken.transferOwnership(wallet.address).then((receipt) => {
+                if (!silent) console.log(indent, "RECEIPT:", JSON.stringify(receipt));
+                expect(receipt.status).to.equal(1);
+            });
+        });
+
+        it("Approve transfer ownership", function () {
+            let overrides = {
+                tokenFees: [
+                    { action: NonFungibleTokenActions.transfer, feeName: "default" },
+                    { action: NonFungibleTokenActions.transferOwnership, feeName: "default" },
+                    { action: NonFungibleTokenActions.acceptOwnership, feeName: "default" }
+                ],
+                endorserList: [middleware.address],
+                mintLimit : 2,
+                transferLimit : 2
+            };
+
+            return performNonFungibleTokenStatus(nonFungibleTokenProperties.symbol, token.NonFungibleToken.approveNonFungibleTokenOwnership, overrides).then((receipt) => {
+                if (!silent) console.log(indent, "RECEIPT:", JSON.stringify(receipt));
+            });
+        });
        
     });
 
@@ -315,23 +304,22 @@ function performNonFungibleTokenStatus(symbol: string, perform: any, overrides?:
     });
 }
 
-// function performNonFungibleTokenItemStatus(symbol:string, itemID:string, perform:any, overrides?:any){
-//     return perform(symbol, itemID, provider, overrides).then((transaction) => {
-//         return token.NonFungibleToken.signNonFungibleTokenItemStatusTransaction(transaction, issuer);
-//     }).then((transaction) => {
-//         return token.NonFungibleToken.sendNonFungibleTokenItemStatusTransaction(transaction, middleware).then((receipt) => {
-//             expect(receipt.status).to.equal(1);
+function performNonFungibleTokenItemStatus(symbol:string, itemID:string, perform:any, overrides?:any){
+    return perform(symbol, itemID, provider, overrides).then((transaction) => {
+        return token.NonFungibleToken.signNonFungibleTokenItemStatusTransaction(transaction, issuer);
+    }).then((transaction) => {
+        return token.NonFungibleToken.sendNonFungibleTokenItemStatusTransaction(transaction, middleware).then((receipt) => {
+            expect(receipt.status).to.equal(1);
 
-//             if (overrides && overrides.notRefresh) {
-//                 return receipt;
-//             }
-//             return refresh(symbol).then(() => {
-//                 return receipt;
-//             });
-//         });
-//     });
-
-// }
+            if (overrides && overrides.notRefresh) {
+                return receipt;
+            }
+            return refresh(symbol).then(() => {
+                return receipt;
+            });
+        });
+    });
+}
 
 function refresh(symbol: string) {
     return token.NonFungibleToken.fromSymbol(symbol, wallet).then((token) => {

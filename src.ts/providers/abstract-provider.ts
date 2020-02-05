@@ -60,14 +60,16 @@ export interface NFTokenState {
     metadata: string,
     mintLimit: string,
     transferLimit: string,
-    endorserList: string[]
+    endorserList: string[], 
+    totalSupply: number,
 }
 
 export interface NFTokenItemState {
-    symbol: string,
-    itemID: string,
+    id: string,
     properties: string[],
-    metadata: string[]
+    metadata: string[],
+    transferLimit : string,
+    frozen : boolean
 }
 
 

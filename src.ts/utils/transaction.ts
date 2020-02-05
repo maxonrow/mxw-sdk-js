@@ -1162,6 +1162,43 @@ export function getTransactionRequest(route: string, transactionType: string, ov
 
             }
             break;
+        case "nonFungible/updateItemMetadata" :
+            {
+                let params: {
+                    symbol: string,
+                    from: string,
+                    itemID: string,
+                    metadata: string
+                } = checkFormat({
+                    symbol: checkString,
+                    from: checkString,
+                    itemID: checkString,
+                    metadata: allowNullOrEmpty(arrayOf(checkString))
+                }, overrides);
+
+                transaction = {
+                    type: "cosmos-sdk/StdTx",
+                    value: {
+                        msg: [
+                            {
+                                type: "nonFungible/updateItemMetadata",
+                                value: {
+                                    symbol: params.symbol,
+                                    from: params.from,
+                                    itemID: params.itemID,
+                                    metadata : params.metadata
+                                }
+                            }
+                        ],
+                        memo:  ""
+                    },
+                    fee: null
+                };
+
+            }
+            break;
+
+
         default:
             errors.throwError("Not implemented: " + moduleName, errors.NOT_IMPLEMENTED, { route, transactionType, overrides });
     }
