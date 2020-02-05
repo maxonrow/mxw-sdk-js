@@ -110,8 +110,8 @@ function checkNonFungibleTokenState(data: any): NFTokenState {
         Owner: checkString,
         NewOwner: checkString,
         Metadata: checkString,
-        TransferLimit: checkString,
-        MintLimit: checkString,
+        TransferLimit: checkBigNumber,
+        MintLimit: checkBigNumber,
         TotalSupply : checkString
     }, data), (key) => {
         switch (key) {

@@ -58,10 +58,10 @@ export interface NFTokenState {
     owner: string,
     newOwner: string,
     metadata: string,
-    mintLimit: string,
-    transferLimit: string,
+    mintLimit: BigNumber,
+    transferLimit: BigNumber,
     endorserList: string[], 
-    totalSupply: number,
+    totalSupply: BigNumber,
 }
 
 export interface NFTokenItemState {
