@@ -42,8 +42,7 @@ export function sortObject(obj) {
         let sorted = (Array.isArray(obj)) ? [] : {};
 
         Object.keys(obj).sort().forEach(function (key) {
-            
-            if(obj[key] == null)
+            if (obj[key] == null)
                 sorted[key] = obj[key];
             else if ("object" == typeof obj[key] && 0 < Object.keys(obj[key]).length) {
                 sorted[key] = sortObject(obj[key]);
@@ -95,9 +94,9 @@ export function iterate(obj, modifier?: (key: string, value: any, type: string) 
                     }
                 }
             }
-            else if(null === data)
+            else if (null === data)
                 modified[key] = data;
-            else {}
+            else { }
         });
         return modified;
     }
