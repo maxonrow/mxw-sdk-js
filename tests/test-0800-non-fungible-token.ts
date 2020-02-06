@@ -210,10 +210,10 @@ describe('Suite: NonFungibleToken ', function () {
             metadata: ["str1", "str2"]
         } as token.NonFungibleTokenItem;
 
-        return issuerNonFungibleToken.mint(provider.address, item).then((receipt) => {
+        token.NonFungibleToken.mint(provider.address, item, issuer).then((receipt) => {
             expect(receipt.status).to.equal(1);
-
         });
+
     });
 
 

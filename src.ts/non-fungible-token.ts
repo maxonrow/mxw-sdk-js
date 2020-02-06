@@ -234,54 +234,54 @@ export class NonFungibleToken {
         });
     }
 
-    /**
-    * Mint NFT item by NFT owner
-    * @param toAddressOrName receiver address
-    * @param item item to mint
-    * @param overrides options
-    */
-    mint(toAddressOrName: string | Promise<string>, item: NonFungibleTokenItem, overrides?: any): Promise<TransactionResponse | TransactionReceipt> {
-        if (!this.signer) {
-            errors.throwError('mint fungible token require signer', errors.NOT_INITIALIZED, { arg: 'signer' });
-        }
+    // /**
+    // * Mint NFT item by NFT owner
+    // * @param toAddressOrName receiver address
+    // * @param item item to mint
+    // * @param overrides options
+    // */
+    // mint(toAddressOrName: string | Promise<string>, item: NonFungibleTokenItem, overrides?: any): Promise<TransactionResponse | TransactionReceipt> {
+    //     if (!this.signer) {
+    //         errors.throwError('mint fungible token require signer', errors.NOT_INITIALIZED, { arg: 'signer' });
+    //     }
 
-        return resolveProperties({ signerAddress: this.signer.getAddress(), toAddressOrName: toAddressOrName }).then(({ signerAddress, toAddressOrName }) => {
-            if (!signerAddress) {
-                return errors.throwError('mint fungible token require signer address', errors.MISSING_ARGUMENT, { arg: 'signerAddress' });
-            }
+    //     return resolveProperties({ signerAddress: this.signer.getAddress(), toAddressOrName: toAddressOrName }).then(({ signerAddress, toAddressOrName }) => {
+    //         if (!signerAddress) {
+    //             return errors.throwError('mint fungible token require signer address', errors.MISSING_ARGUMENT, { arg: 'signerAddress' });
+    //         }
 
-            return this.provider.resolveName(toAddressOrName).then((toAddress) => {
-                let transaction = this.provider.getTransactionRequest("nonFungible", "mintNonFungibleToken", {
-                    symbol: this.symbol,
-                    to: toAddress,
-                    itemID: item.itemID,
-                    owner: signerAddress,
-                    properties: item.properties,
-                    metadata: item.metadata,
-                    memo: (overrides && overrides.memo) ? overrides.memo : ""
-                });
-                transaction.fee = (overrides && overrides.fee) ? overrides.fee : this.provider.getTransactionFee(undefined, undefined, { tx: transaction });
+    //         return this.provider.resolveName(toAddressOrName).then((toAddress) => {
+    //             let transaction = this.provider.getTransactionRequest("nonFungible", "mintNonFungibleToken", {
+    //                 symbol: this.symbol,
+    //                 to: toAddress,
+    //                 itemID: item.itemID,
+    //                 owner: signerAddress,
+    //                 properties: item.properties,
+    //                 metadata: item.metadata,
+    //                 memo: (overrides && overrides.memo) ? overrides.memo : ""
+    //             });
+    //             transaction.fee = (overrides && overrides.fee) ? overrides.fee : this.provider.getTransactionFee(undefined, undefined, { tx: transaction });
 
 
-                return this.signer.sendTransaction(transaction, overrides).then((response) => {
-                    if (overrides && overrides.sendOnly) {
-                        return response;
-                    }
-                    let confirmations = (overrides && overrides.confirmations) ? Number(overrides.confirmations) : null;
+    //             return this.signer.sendTransaction(transaction, overrides).then((response) => {
+    //                 if (overrides && overrides.sendOnly) {
+    //                     return response;
+    //                 }
+    //                 let confirmations = (overrides && overrides.confirmations) ? Number(overrides.confirmations) : null;
 
-                    return this.signer.provider.waitForTransaction(response.hash, confirmations).then((receipt) => {
-                        if (1 == receipt.status) {
-                            return receipt;
-                        }
-                        throw this.signer.provider.checkTransactionReceipt(receipt, errors.CALL_EXCEPTION, "mint non fungible token failed", {
-                            method: "nonFungible-mintNonFungibleToken",
-                            receipt
-                        });
-                    });
-                });
-            });
-        });
-    }
+    //                 return this.signer.provider.waitForTransaction(response.hash, confirmations).then((receipt) => {
+    //                     if (1 == receipt.status) {
+    //                         return receipt;
+    //                     }
+    //                     throw this.signer.provider.checkTransactionReceipt(receipt, errors.CALL_EXCEPTION, "mint non fungible token failed", {
+    //                         method: "nonFungible-mintNonFungibleToken",
+    //                         receipt
+    //                     });
+    //                 });
+    //             });
+    //         });
+    //     });
+    // }
 
     /**
     * Transfer token ownership
@@ -640,6 +640,57 @@ export class NonFungibleToken {
         });
     }
 
+    /**
+   * Mint NFT item by NFT owner
+   * @param toAddressOrName receiver address
+   * @param item item to mint
+   * @param overrides options
+   */
+    static mint(toAddressOrName: string | Promise<string>, item: NonFungibleTokenItem, signer: Signer, overrides?: any): Promise<TransactionResponse | TransactionReceipt> {
+        if (!Signer.isSigner(signer)) {
+            errors.throwError('mint non fungible token item transaction require signer', errors.MISSING_ARGUMENT, { arg: 'signer' });
+        }
+        if (!signer.provider) {
+            errors.throwError('mint non fungible token item require provider', errors.MISSING_ARGUMENT, { arg: 'provider' });
+        }
+
+        return resolveProperties({ signerAddress: signer.getAddress(), toAddressOrName: toAddressOrName }).then(({ signerAddress, toAddressOrName }) => {
+            if (!signerAddress) {
+                return errors.throwError('mint fungible token require signer address', errors.MISSING_ARGUMENT, { arg: 'signerAddress' });
+            }
+
+            return signer.provider.resolveName(toAddressOrName).then((toAddress) => {
+                let transaction = signer.provider.getTransactionRequest("nonFungible", "mintNonFungibleToken", {
+                    symbol: item.symbol,
+                    to: toAddress,
+                    itemID: item.itemID,
+                    owner: signerAddress,
+                    properties: item.properties,
+                    metadata: item.metadata,
+                    memo: (overrides && overrides.memo) ? overrides.memo : ""
+                });
+                transaction.fee = (overrides && overrides.fee) ? overrides.fee : signer.provider.getTransactionFee(undefined, undefined, { tx: transaction });
+
+
+                return signer.sendTransaction(transaction, overrides).then((response) => {
+                    if (overrides && overrides.sendOnly) {
+                        return response;
+                    }
+                    let confirmations = (overrides && overrides.confirmations) ? Number(overrides.confirmations) : null;
+
+                    return signer.provider.waitForTransaction(response.hash, confirmations).then((receipt) => {
+                        if (1 == receipt.status) {
+                            return receipt;
+                        }
+                        throw signer.provider.checkTransactionReceipt(receipt, errors.CALL_EXCEPTION, "mint non fungible token failed", {
+                            method: "nonFungible-mintNonFungibleToken",
+                            receipt
+                        });
+                    });
+                });
+            });
+        });
+    }
     /**
     * Endorse token item by endorser
     * @param symbol token item symbol
