@@ -140,7 +140,6 @@ describe('Suite: NonFungibleToken ', function () {
             transferable: true,
             modifiable: true
 
-
         };
 
         return performNonFungibleTokenStatus(nonFungibleTokenProperties.symbol, token.NonFungibleToken.approveNonFungibleToken, overrides).then((receipt) => {
@@ -163,7 +162,8 @@ describe('Suite: NonFungibleToken ', function () {
             transferLimit: 2,
             burnable: true,
             transferable: true,
-            modifiable: true
+            modifiable: true,
+            pub: false   // not public
 
         };
 
@@ -184,7 +184,8 @@ describe('Suite: NonFungibleToken ', function () {
             transferLimit: 2,
             burnable: true,
             transferable: true,
-            modifiable: true
+            modifiable: true,
+            pub: true
         };
 
         return performNonFungibleTokenStatus(nonFungibleTokenProperties.symbol, token.NonFungibleToken.approveNonFungibleToken, overrides).then((receipt) => {
@@ -215,8 +216,6 @@ describe('Suite: NonFungibleToken ', function () {
         });
 
     });
-
-
 
     it("Update item metadata", function () {
         token.NonFungibleToken.updateItemMetadata(symbol, itemId, ["testing"], provider).then((receipt) => {
