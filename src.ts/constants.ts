@@ -30,7 +30,7 @@ const MaxUint256: BigNumber = bigNumberify('0xffffffffffffffffffffffffffffffffff
 
 export {
     ZeroFee,
-    
+
     AddressPrefix,
     ValOperatorAddressPrefix,
     KycAddressPrefix,

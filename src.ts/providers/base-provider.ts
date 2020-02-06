@@ -112,7 +112,7 @@ function checkNonFungibleTokenState(data: any): NFTokenState {
         Metadata: checkString,
         TransferLimit: checkBigNumber,
         MintLimit: checkBigNumber,
-        TotalSupply : checkString
+        TotalSupply: checkString
     }, data), (key) => {
         switch (key) {
             case "Flags": return "flags";
@@ -122,24 +122,24 @@ function checkNonFungibleTokenState(data: any): NFTokenState {
             case "NewOwner": return "newOwner";
             case "Metadata": return "metadata";
             case "TransferLimit": return "transferLimit";
-            case "MintLimit" : return "mintLimit";
-            case "TotalSupply" : return "totalSupply"
-            
+            case "MintLimit": return "mintLimit";
+            case "TotalSupply": return "totalSupply"
+
         }
         return key;
     });
 }
 
 function checkNonFungibleTokenItemState(data: any): NFTokenItemState {
-    return camelize(checkFormat({ 
+    return camelize(checkFormat({
         ID: checkString,
         Metadata: arrayOf(checkString),
-        Properties : arrayOf(checkString)
+        Properties: arrayOf(checkString)
     }, data), (key) => {
         switch (key) {
             case "ID": return "id";
             case "Metadata": return "metadata";
-            case "Properties": return "properties";        
+            case "Properties": return "properties";
         }
         return key;
     });
@@ -732,7 +732,7 @@ export class BaseProvider extends Provider {
                 };
                 return this.perform('getNFTokenState', params).then((result) => {
                     let state: NFTokenState = result;
-                    
+
                     if (result) {
                         state = checkNonFungibleTokenState(result);
                     }
@@ -742,7 +742,7 @@ export class BaseProvider extends Provider {
         });
     }
 
-    getNFTokenItemState(symbol: string | Promise<string>, itemID : string, blockTag?: BlockTag | Promise<BlockTag>): Promise<NFTokenItemState> {
+    getNFTokenItemState(symbol: string | Promise<string>, itemID: string, blockTag?: BlockTag | Promise<BlockTag>): Promise<NFTokenItemState> {
         return this.ready.then(() => {
             return resolveProperties({ symbol: symbol, itemID: itemID, blockTag: blockTag }).then(({ symbol, itemID, blockTag }) => {
                 let params = {
@@ -761,7 +761,7 @@ export class BaseProvider extends Provider {
         });
     }
 
-    
+
     getAliasState(address: string | Promise<string>, blockTag?: BlockTag | Promise<BlockTag>): Promise<AliasState> {
         return resolveProperties({ address, blockTag }).then(({ address, blockTag }) => {
             return this.ready.then(() => {
