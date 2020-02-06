@@ -42,7 +42,10 @@ export function sortObject(obj) {
         let sorted = (Array.isArray(obj)) ? [] : {};
 
         Object.keys(obj).sort().forEach(function (key) {
-            if ("object" == typeof obj[key] && 0 < Object.keys(obj[key]).length) {
+            
+            if(obj[key] == null)
+                sorted[key] = obj[key];
+            else if ("object" == typeof obj[key] && 0 < Object.keys(obj[key]).length) {
                 sorted[key] = sortObject(obj[key]);
             }
             else {
@@ -92,6 +95,9 @@ export function iterate(obj, modifier?: (key: string, value: any, type: string) 
                     }
                 }
             }
+            else if(null === data)
+                modified[key] = data;
+            else {}
         });
         return modified;
     }

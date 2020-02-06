@@ -302,6 +302,36 @@ export class JsonRpcProvider extends BaseProvider {
                     throw this.checkResponseLog(method, result, null);
                 });
 
+            case 'getNFTokenState':
+                return this.send('abci_query', ["/custom/nonFungible/token_data/" + params.symbol, "", params.blockTag, null]).then(result => {
+                    if (result && result.response) {
+                        if (result.response.value) {
+                            try {
+                                let value = base64Decode(result.response.value);
+                                return JSON.parse(toUtf8String(value));
+                            }
+                            catch (error) {
+                            }
+                        }
+                    }
+                    throw this.checkResponseLog(method, result, null);
+                });
+
+            case 'getNFTokenItemState':
+                return this.send('abci_query', ["/custom/nonFungible/item_data/" + params.symbol + "/" + params.itemID, "", params.blockTag, null]).then(result => {
+                    if (result && result.response) {
+                        if (result.response.value) {
+                            try {
+                                let value = base64Decode(result.response.value);
+                                return JSON.parse(toUtf8String(value));
+                            }
+                            catch (error) {
+                            }
+                        }
+                    }
+                    throw this.checkResponseLog(method, result, null);
+                });
+
             case 'resolveName':
                 return this.send('abci_query', ["/custom/nameservice/resolve/" + params.name, "", params.blockTag, null]).then(result => {
                     if (result && result.response) {
