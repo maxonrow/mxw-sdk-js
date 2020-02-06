@@ -8,6 +8,8 @@ import { nodeProvider } from "./env";
 import * as crypto from "crypto";
 import { NonFungibleTokenActions } from '../src.ts/non-fungible-token';
 
+
+
 let indent = "     ";
 let silent = true;
 let silentRpc = true;
@@ -88,6 +90,7 @@ describe('Suite: NonFungibleToken', function () {
 
 
 describe('Suite: NonFungibleToken ', function () {
+
     this.slow(slowThreshold); // define the threshold for slow indicator
     it("Create", function () {
         nonFungibleTokenProperties = {
@@ -138,7 +141,8 @@ describe('Suite: NonFungibleToken ', function () {
             transferLimit: 2,
             burnable: true,
             transferable: true,
-            modifiable: true
+            modifiable: true,
+            pub: false
 
         };
 
@@ -185,7 +189,7 @@ describe('Suite: NonFungibleToken ', function () {
             burnable: true,
             transferable: true,
             modifiable: true,
-            pub: true
+            pub: false
         };
 
         return performNonFungibleTokenStatus(nonFungibleTokenProperties.symbol, token.NonFungibleToken.approveNonFungibleToken, overrides).then((receipt) => {
@@ -198,8 +202,6 @@ describe('Suite: NonFungibleToken ', function () {
     it("State", function () {
         return issuerNonFungibleToken.getState().then((state) => {
             if (!silent) console.log(indent, "STATE:", JSON.stringify(state));
-
-            console.log(indent, "STATE:", JSON.stringify(state));
         });
     });
 
@@ -211,18 +213,13 @@ describe('Suite: NonFungibleToken ', function () {
             metadata: ["str1", "str2"]
         } as token.NonFungibleTokenItem;
 
-        token.NonFungibleToken.mint(provider.address, item, issuer).then((receipt) => {
+        token.NonFungibleToken.mint(wallet.address, item, issuer).then((receipt) => {
             expect(receipt.status).to.equal(1);
         });
 
     });
 
-    it("Update item metadata", function () {
-        token.NonFungibleToken.updateItemMetadata(symbol, itemId, ["testing"], provider).then((receipt) => {
-            expect(receipt.status).to.equal(1);
-        });
 
-    });
 
     it("Item State", function () {
         issuerNonFungibleToken.getItemState(itemId).then((result) => {
@@ -234,6 +231,13 @@ describe('Suite: NonFungibleToken ', function () {
 
     it("Endorse", function () {
         token.NonFungibleToken.endorse(symbol, itemId, wallet).then((receipt) => {
+            expect(receipt.status).to.equal(1);
+        });
+
+    });
+
+    it("Update item metadata", function () {
+        token.NonFungibleToken.updateItemMetadata(symbol, itemId, ["testing"], wallet).then((receipt) => {
             expect(receipt.status).to.equal(1);
         });
 
@@ -253,7 +257,7 @@ describe('Suite: NonFungibleToken ', function () {
 
 
     it("Transfer item", function () {
-        token.NonFungibleToken.transfer(itemReceiver.address, itemId, symbol, provider).then((receipt) => {
+        token.NonFungibleToken.transfer(itemReceiver.address, itemId, symbol, wallet).then((receipt) => {
             expect(receipt.status).to.equal(1);
         });
     });

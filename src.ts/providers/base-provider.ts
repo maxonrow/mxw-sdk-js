@@ -107,8 +107,8 @@ function checkNonFungibleTokenState(data: any): NFTokenState {
         Flags: checkNumber,
         Name: checkString,
         Symbol: checkString,
-        Owner: checkString,
-        NewOwner: checkString,
+        Owner: checkAddress,
+        NewOwner: checkAddress,
         Metadata: checkString,
         TransferLimit: checkBigNumber,
         MintLimit: checkBigNumber,
@@ -134,12 +134,18 @@ function checkNonFungibleTokenItemState(data: any): NFTokenItemState {
     return camelize(checkFormat({
         ID: checkString,
         Metadata: arrayOf(checkString),
-        Properties: arrayOf(checkString)
+        Properties: arrayOf(checkString),
+        Frozen: checkBoolean,
+        TransferLimit: checkBigNumber
+
     }, data), (key) => {
         switch (key) {
             case "ID": return "id";
             case "Metadata": return "metadata";
             case "Properties": return "properties";
+            case "Frozen": return "frozen";
+            case "TransferLimit": return "transferLimit";
+
         }
         return key;
     });
@@ -752,7 +758,7 @@ export class BaseProvider extends Provider {
                 };
                 return this.perform('getNFTokenItemState', params).then((result) => {
                     let state: NFTokenItemState = result;
-                    if (false) {
+                    if (result) {
                         state = checkNonFungibleTokenItemState(result);
                     }
                     return state;

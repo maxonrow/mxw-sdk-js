@@ -68,7 +68,7 @@ export interface NFTokenItemState {
     id: string,
     properties: string[],
     metadata: string[],
-    transferLimit: string,
+    transferLimit: BigNumber,
     frozen: boolean
 }
 

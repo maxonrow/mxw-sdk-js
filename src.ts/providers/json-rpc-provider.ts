@@ -323,7 +323,7 @@ export class JsonRpcProvider extends BaseProvider {
                         if (result.response.value) {
                             try {
                                 let value = base64Decode(result.response.value);
-                                return toUtf8String(value);
+                                return JSON.parse(toUtf8String(value));
                             }
                             catch (error) {
                             }
