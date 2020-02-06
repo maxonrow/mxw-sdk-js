@@ -878,7 +878,7 @@ export function getTransactionRequest(route: string, transactionType: string, ov
                     metadata: allowNullOrEmpty(checkString),
                     symbol: checkString,
                 }, overrides);
-                
+
                 transaction = {
                     type: "cosmos-sdk/StdTx",
                     value: {
@@ -901,7 +901,6 @@ export function getTransactionRequest(route: string, transactionType: string, ov
                     },
                     fee: null
                 };
-
             }
             break;
 
@@ -936,28 +935,26 @@ export function getTransactionRequest(route: string, transactionType: string, ov
                     },
                     fee: null
                 };
-
-                
             }
             break;
 
         case "nonFungible/mintNonFungibleToken":
             {
-                let params :{
-                    itemID : string
-                    symbol : string
-                    owner : string
-                    to : string
+                let params: {
+                    itemID: string
+                    symbol: string
+                    owner: string
+                    to: string
                     memo: string
-                    properties : string[]
-                    metadata : string[]
+                    properties: string[]
+                    metadata: string[]
                 } = checkFormat({
-                    itemID : checkString,
-                    symbol : checkString,
+                    itemID: checkString,
+                    symbol: checkString,
                     owner: checkAddress,
-                    to : checkAddress,
-                    metadata : arrayOf(checkString),
-                    properties : arrayOf(checkString),
+                    to: checkAddress,
+                    metadata: arrayOf(checkString),
+                    properties: arrayOf(checkString),
                     memo: allowNullOrEmpty(checkString),
                 }, overrides);
 
@@ -968,12 +965,12 @@ export function getTransactionRequest(route: string, transactionType: string, ov
                             {
                                 type: "nonFungible/mintNonFungibleToken",
                                 value: {
-                                    itemID : params.itemID,
+                                    itemID: params.itemID,
                                     symbol: params.symbol,
                                     owner: params.owner,
                                     to: params.to,
-                                    properties : params.properties,
-                                    metadata : params.metadata
+                                    properties: params.properties,
+                                    metadata: params.metadata
                                 }
                             }
                         ],
@@ -981,7 +978,6 @@ export function getTransactionRequest(route: string, transactionType: string, ov
                     },
                     fee: null
                 };
-
             }
             break;
 
@@ -997,7 +993,7 @@ export function getTransactionRequest(route: string, transactionType: string, ov
                     symbol: checkString,
                     from: checkString,
                     to: checkString,
-                    itemID : checkString,
+                    itemID: checkString,
                     memo: allowNullOrEmpty(checkString)
                 }, overrides);
 
@@ -1019,8 +1015,6 @@ export function getTransactionRequest(route: string, transactionType: string, ov
                     },
                     fee: null
                 };
-
-
             }
             break;
 
@@ -1055,8 +1049,6 @@ export function getTransactionRequest(route: string, transactionType: string, ov
                     },
                     fee: null
                 };
-    
-                
             }
             break;
 
@@ -1159,10 +1151,10 @@ export function getTransactionRequest(route: string, transactionType: string, ov
                     },
                     fee: null
                 };
-
             }
             break;
-        case "nonFungible/updateItemMetadata" :
+
+        case "nonFungible/updateItemMetadata":
             {
                 let params: {
                     symbol: string,
@@ -1186,18 +1178,16 @@ export function getTransactionRequest(route: string, transactionType: string, ov
                                     symbol: params.symbol,
                                     from: params.from,
                                     itemID: params.itemID,
-                                    metadata : params.metadata
+                                    metadata: params.metadata
                                 }
                             }
                         ],
-                        memo:  ""
+                        memo: ""
                     },
                     fee: null
                 };
-
             }
             break;
-
 
         default:
             errors.throwError("Not implemented: " + moduleName, errors.NOT_IMPLEMENTED, { route, transactionType, overrides });
