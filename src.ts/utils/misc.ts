@@ -42,8 +42,9 @@ export function sortObject(obj) {
         let sorted = (Array.isArray(obj)) ? [] : {};
 
         Object.keys(obj).sort().forEach(function (key) {
-            if (obj[key] == null)
+            if (null == obj[key]) {
                 sorted[key] = obj[key];
+            }
             else if ("object" == typeof obj[key] && 0 < Object.keys(obj[key]).length) {
                 sorted[key] = sortObject(obj[key]);
             }
