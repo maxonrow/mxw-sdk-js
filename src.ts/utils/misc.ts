@@ -181,7 +181,6 @@ export function arrayOf(check: CheckFormatFunc): CheckFormatFunc {
 
 export function checkHash(hash: any, requirePrefix?: boolean): string {
     if (typeof (hash) === 'string') {
-        // geth-etc does add a "0x" prefix on receipt.root
         if (!requirePrefix && hash.substring(0, 2) !== '0x') { hash = '0x' + hash; }
         if (hexDataLength(hash) === 32) {
             return hash.toLowerCase();
