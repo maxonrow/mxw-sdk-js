@@ -11,4 +11,4 @@ then
     git clone git@gitlab.com:mxw/mxw-sdk-js-secret.git
     cd ..
 fi;
-ln -s env/mxw-sdk-js-secret/env.ts env.ts
+cp -f env/mxw-sdk-js-secret/env.ts env.ts
