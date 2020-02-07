@@ -109,7 +109,8 @@ function checkNonFungibleTokenState(data: any): NFTokenState {
         Symbol: checkString,
         Owner: checkAddress,
         NewOwner: checkAddress,
-        Metadata: checkString,
+        Metadata: allowNullOrEmpty(arrayOf(checkString)),
+        Properties: allowNullOrEmpty(arrayOf(checkString)),
         TransferLimit: checkBigNumber,
         MintLimit: checkBigNumber,
         TotalSupply: checkString
@@ -121,6 +122,7 @@ function checkNonFungibleTokenState(data: any): NFTokenState {
             case "Owner": return "owner";
             case "NewOwner": return "newOwner";
             case "Metadata": return "metadata";
+            case "Properties": return "properties";
             case "TransferLimit": return "transferLimit";
             case "MintLimit": return "mintLimit";
             case "TotalSupply": return "totalSupply"
