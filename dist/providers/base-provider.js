@@ -80,6 +80,52 @@ function checkTokenState(data) {
         return key;
     });
 }
+function checkNonFungibleTokenState(data) {
+    return properties_1.camelize(misc_1.checkFormat({
+        Flags: misc_1.checkNumber,
+        Name: misc_1.checkString,
+        Symbol: misc_1.checkString,
+        Owner: misc_1.checkAddress,
+        NewOwner: misc_1.checkAddress,
+        Metadata: misc_1.allowNullOrEmpty(misc_1.arrayOf(misc_1.checkString)),
+        Properties: misc_1.allowNullOrEmpty(misc_1.arrayOf(misc_1.checkString)),
+        TransferLimit: misc_1.checkBigNumber,
+        MintLimit: misc_1.checkBigNumber,
+        TotalSupply: misc_1.checkString
+    }, data), (key) => {
+        switch (key) {
+            case "Flags": return "flags";
+            case "Name": return "name";
+            case "Symbol": return "symbol";
+            case "Owner": return "owner";
+            case "NewOwner": return "newOwner";
+            case "Metadata": return "metadata";
+            case "Properties": return "properties";
+            case "TransferLimit": return "transferLimit";
+            case "MintLimit": return "mintLimit";
+            case "TotalSupply": return "totalSupply";
+        }
+        return key;
+    });
+}
+function checkNonFungibleTokenItemState(data) {
+    return properties_1.camelize(misc_1.checkFormat({
+        ID: misc_1.checkString,
+        Metadata: misc_1.arrayOf(misc_1.checkString),
+        Properties: misc_1.arrayOf(misc_1.checkString),
+        Frozen: misc_1.checkBoolean,
+        TransferLimit: misc_1.checkBigNumber
+    }, data), (key) => {
+        switch (key) {
+            case "ID": return "id";
+            case "Metadata": return "metadata";
+            case "Properties": return "properties";
+            case "Frozen": return "frozen";
+            case "TransferLimit": return "transferLimit";
+        }
+        return key;
+    });
+}
 function checkTokenAccountState(data) {
     return properties_1.camelize(misc_1.checkFormat({
         Owner: misc_1.checkString,
@@ -538,6 +584,41 @@ class BaseProvider extends abstract_provider_1.Provider {
                         }
                         return result;
                     });
+                });
+            });
+        });
+    }
+    getNFTokenState(symbol, blockTag) {
+        return this.ready.then(() => {
+            return properties_1.resolveProperties({ symbol: symbol, blockTag: blockTag }).then(({ symbol, blockTag }) => {
+                let params = {
+                    symbol: symbol,
+                    blockTag: checkBlockTag(blockTag)
+                };
+                return this.perform('getNFTokenState', params).then((result) => {
+                    let state = result;
+                    if (result) {
+                        state = checkNonFungibleTokenState(result);
+                    }
+                    return state;
+                });
+            });
+        });
+    }
+    getNFTokenItemState(symbol, itemID, blockTag) {
+        return this.ready.then(() => {
+            return properties_1.resolveProperties({ symbol: symbol, itemID: itemID, blockTag: blockTag }).then(({ symbol, itemID, blockTag }) => {
+                let params = {
+                    symbol: symbol,
+                    itemID: itemID,
+                    blockTag: checkBlockTag(blockTag)
+                };
+                return this.perform('getNFTokenItemState', params).then((result) => {
+                    let state = result;
+                    if (result) {
+                        state = checkNonFungibleTokenItemState(result);
+                    }
+                    return state;
                 });
             });
         });

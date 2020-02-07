@@ -1,7 +1,7 @@
 import { BigNumber } from '../utils/bignumber';
 import { TransactionRequest } from '.';
 import { Provider, TransactionFeeSetting } from './abstract-provider';
-import { Block, BlockTag, EventType, Listener, AccountState, AliasState, TokenState, TokenList, TokenAccountState, TransactionReceipt, TransactionResponse, TransactionFee } from './abstract-provider';
+import { Block, BlockTag, EventType, Listener, AccountState, AliasState, TokenState, NFTokenState, NFTokenItemState, TokenList, TokenAccountState, TransactionReceipt, TransactionResponse, TransactionFee } from './abstract-provider';
 import { Transaction } from '../utils/transaction';
 import { Network, Networkish } from '../utils/networks';
 export declare class BaseProvider extends Provider {
@@ -36,6 +36,8 @@ export declare class BaseProvider extends Provider {
     getTokenState(symbol: string | Promise<string>, blockTag?: BlockTag | Promise<BlockTag>): Promise<TokenState>;
     getTokenList(blockTag?: BlockTag | Promise<BlockTag>): Promise<TokenList>;
     getTokenAccountState(symbol: string | Promise<string>, addressOrName: string | Promise<string>, blockTag?: BlockTag | Promise<BlockTag>): Promise<TokenAccountState>;
+    getNFTokenState(symbol: string | Promise<string>, blockTag?: BlockTag | Promise<BlockTag>): Promise<NFTokenState>;
+    getNFTokenItemState(symbol: string | Promise<string>, itemID: string, blockTag?: BlockTag | Promise<BlockTag>): Promise<NFTokenItemState>;
     getAliasState(address: string | Promise<string>, blockTag?: BlockTag | Promise<BlockTag>): Promise<AliasState>;
     getAccountState(addressOrName: string | Promise<string>, blockTag?: BlockTag | Promise<BlockTag>): Promise<AccountState>;
     getAccountNumber(addressOrName: string | Promise<string>, blockTag?: BlockTag | Promise<BlockTag>): Promise<BigNumber>;

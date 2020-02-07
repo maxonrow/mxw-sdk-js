@@ -44,7 +44,10 @@ function sortObject(obj) {
     if ("object" == typeof obj) {
         let sorted = (Array.isArray(obj)) ? [] : {};
         Object.keys(obj).sort().forEach(function (key) {
-            if ("object" == typeof obj[key] && 0 < Object.keys(obj[key]).length) {
+            if (null == obj[key]) {
+                sorted[key] = obj[key];
+            }
+            else if ("object" == typeof obj[key] && 0 < Object.keys(obj[key]).length) {
                 sorted[key] = sortObject(obj[key]);
             }
             else {
@@ -92,6 +95,9 @@ function iterate(obj, modifier) {
                     }
                 }
             }
+            else if (null === data)
+                modified[key] = data;
+            else { }
         });
         return modified;
     }
@@ -134,7 +140,13 @@ function checkFormat(format, object) {
             }
         }
         catch (error) {
-            errors.throwError(errors.INVALID_FORMAT, 'invalid format object key ' + key + ": " + error.message, {
+            if (undefined === object[key]) {
+                errors.throwError('missing object key ' + key, errors.MISSING_ARGUMENT, {
+                    key,
+                    object
+                });
+            }
+            errors.throwError('invalid format object key ' + key + ": " + (error.reason ? error.reason : error.message), errors.INVALID_FORMAT, {
                 value: object[key],
                 key,
                 object
@@ -153,6 +165,15 @@ function allowNull(check, nullValue) {
     });
 }
 exports.allowNull = allowNull;
+function notAllowNull(check) {
+    return (function (value) {
+        if (value == null) {
+            throw new Error('is null');
+        }
+        return check(value);
+    });
+}
+exports.notAllowNull = notAllowNull;
 function allowNullOrEmpty(check, nullValue) {
     return (function (value) {
         if (value == null || '' === value) {
@@ -162,6 +183,24 @@ function allowNullOrEmpty(check, nullValue) {
     });
 }
 exports.allowNullOrEmpty = allowNullOrEmpty;
+function notAllowNullOrEmpty(check) {
+    return (function (value) {
+        if (isUndefinedOrNullOrEmpty(value)) {
+            throw new Error('empty');
+        }
+        return check(value);
+    });
+}
+exports.notAllowNullOrEmpty = notAllowNullOrEmpty;
+function expectTypeOf(check, type) {
+    return (function (value) {
+        if (type !== typeof value) {
+            throw new Error("expected type " + type + ", but " + (typeof value));
+        }
+        return check(value);
+    });
+}
+exports.expectTypeOf = expectTypeOf;
 function arrayOf(check) {
     return (function (array) {
         if (!Array.isArray(array)) {
@@ -177,7 +216,6 @@ function arrayOf(check) {
 exports.arrayOf = arrayOf;
 function checkHash(hash, requirePrefix) {
     if (typeof (hash) === 'string') {
-        // geth-etc does add a "0x" prefix on receipt.root
         if (!requirePrefix && hash.substring(0, 2) !== '0x') {
             hash = '0x' + hash;
         }
@@ -192,10 +230,18 @@ function checkNumber(number) {
     return bignumber_1.bigNumberify(number).toNumber();
 }
 exports.checkNumber = checkNumber;
+function checkNumberString(number) {
+    return bignumber_1.bigNumberify(number).toNumber().toString();
+}
+exports.checkNumberString = checkNumberString;
 function checkBigNumber(number) {
     return bignumber_1.bigNumberify(number);
 }
 exports.checkBigNumber = checkBigNumber;
+function checkBigNumberString(value) {
+    return bignumber_1.bigNumberify(value).toString();
+}
+exports.checkBigNumberString = checkBigNumberString;
 function checkBoolean(value) {
     if (typeof (value) === 'boolean') {
         return value;

@@ -650,6 +650,294 @@ function getTransactionRequest(route, transactionType, overrides) {
                 };
             }
             break;
+        case "nonFungible/createNonFungibleToken":
+            {
+                let params = misc_1.checkFormat({
+                    appFeeTo: misc_1.checkString,
+                    appFeeValue: misc_1.checkBigNumber,
+                    name: misc_1.checkString,
+                    owner: misc_1.checkAddress,
+                    memo: misc_1.allowNullOrEmpty(misc_1.checkString),
+                    metadata: misc_1.allowNullOrEmpty(misc_1.arrayOf(misc_1.checkString)),
+                    properties: misc_1.allowNullOrEmpty(misc_1.arrayOf(misc_1.checkString)),
+                    symbol: misc_1.checkString,
+                }, overrides);
+                transaction = {
+                    type: "cosmos-sdk/StdTx",
+                    value: {
+                        msg: [
+                            {
+                                type: "nonFungible/createNonFungibleToken",
+                                value: {
+                                    fee: {
+                                        to: params.appFeeTo,
+                                        value: params.appFeeValue.toString()
+                                    },
+                                    metadata: params.metadata ? params.metadata : null,
+                                    properties: params.properties ? params.properties : null,
+                                    name: params.name,
+                                    owner: params.owner,
+                                    symbol: params.symbol,
+                                }
+                            }
+                        ],
+                        memo: params.memo ? params.memo : ""
+                    },
+                    fee: null
+                };
+            }
+            break;
+        case "nonFungible/setNonFungibleTokenStatus":
+            {
+                let params = misc_1.checkFormat({
+                    payload: misc_1.checkAny,
+                    signatures: misc_1.checkAny,
+                    owner: misc_1.checkAddress,
+                    memo: misc_1.allowNullOrEmpty(misc_1.checkString)
+                }, overrides);
+                transaction = {
+                    type: "cosmos-sdk/StdTx",
+                    value: {
+                        msg: [
+                            {
+                                type: "nonFungible/setNonFungibleTokenStatus",
+                                value: {
+                                    payload: params.payload,
+                                    signatures: params.signatures,
+                                    owner: params.owner
+                                }
+                            }
+                        ],
+                        memo: params.memo ? params.memo : ""
+                    },
+                    fee: null
+                };
+            }
+            break;
+        case "nonFungible/mintNonFungibleToken":
+            {
+                let params = misc_1.checkFormat({
+                    itemID: misc_1.checkString,
+                    symbol: misc_1.checkString,
+                    owner: misc_1.checkAddress,
+                    to: misc_1.checkAddress,
+                    metadata: misc_1.arrayOf(misc_1.checkString),
+                    properties: misc_1.arrayOf(misc_1.checkString),
+                    memo: misc_1.allowNullOrEmpty(misc_1.checkString),
+                }, overrides);
+                transaction = {
+                    type: "cosmos-sdk/StdTx",
+                    value: {
+                        msg: [
+                            {
+                                type: "nonFungible/mintNonFungibleToken",
+                                value: {
+                                    itemID: params.itemID,
+                                    symbol: params.symbol,
+                                    owner: params.owner,
+                                    to: params.to,
+                                    properties: params.properties,
+                                    metadata: params.metadata
+                                }
+                            }
+                        ],
+                        memo: params.memo ? params.memo : ""
+                    },
+                    fee: null
+                };
+            }
+            break;
+        case "nonFungible/transferNonFungibleToken":
+            {
+                let params = misc_1.checkFormat({
+                    symbol: misc_1.checkString,
+                    from: misc_1.checkString,
+                    to: misc_1.checkString,
+                    itemID: misc_1.checkString,
+                    memo: misc_1.allowNullOrEmpty(misc_1.checkString)
+                }, overrides);
+                transaction = {
+                    type: "cosmos-sdk/StdTx",
+                    value: {
+                        msg: [
+                            {
+                                type: "nonFungible/transferNonFungibleToken",
+                                value: {
+                                    symbol: params.symbol,
+                                    from: params.from,
+                                    to: params.to,
+                                    itemID: params.itemID
+                                }
+                            }
+                        ],
+                        memo: params.memo ? params.memo : ""
+                    },
+                    fee: null
+                };
+            }
+            break;
+        case "nonFungible/transferNonFungibleTokenOwnership":
+            {
+                let params = misc_1.checkFormat({
+                    symbol: misc_1.checkString,
+                    from: misc_1.checkString,
+                    to: misc_1.checkString,
+                    memo: misc_1.allowNullOrEmpty(misc_1.checkString)
+                }, overrides);
+                transaction = {
+                    type: "cosmos-sdk/StdTx",
+                    value: {
+                        msg: [
+                            {
+                                type: "nonFungible/transferNonFungibleTokenOwnership",
+                                value: {
+                                    symbol: params.symbol,
+                                    from: params.from,
+                                    to: params.to,
+                                }
+                            }
+                        ],
+                        memo: params.memo ? params.memo : ""
+                    },
+                    fee: null
+                };
+            }
+            break;
+        case "nonFungible/burnNonFungibleToken":
+            {
+                let params = misc_1.checkFormat({
+                    symbol: misc_1.checkString,
+                    from: misc_1.checkString,
+                    itemID: misc_1.checkString,
+                    memo: misc_1.allowNullOrEmpty(misc_1.checkString)
+                }, overrides);
+                transaction = {
+                    type: "cosmos-sdk/StdTx",
+                    value: {
+                        msg: [
+                            {
+                                type: "nonFungible/burnNonFungibleToken",
+                                value: {
+                                    symbol: params.symbol,
+                                    from: params.from,
+                                    itemID: params.itemID
+                                }
+                            }
+                        ],
+                        memo: params.memo ? params.memo : ""
+                    },
+                    fee: null
+                };
+            }
+            break;
+        case "nonFungible/endorsement":
+            {
+                let params = misc_1.checkFormat({
+                    symbol: misc_1.checkString,
+                    from: misc_1.checkString,
+                    itemID: misc_1.checkString,
+                    memo: misc_1.allowNullOrEmpty(misc_1.checkString)
+                }, overrides);
+                transaction = {
+                    type: "cosmos-sdk/StdTx",
+                    value: {
+                        msg: [
+                            {
+                                type: "nonFungible/endorsement",
+                                value: {
+                                    symbol: params.symbol,
+                                    from: params.from,
+                                    itemID: params.itemID
+                                }
+                            }
+                        ],
+                        memo: params.memo ? params.memo : ""
+                    },
+                    fee: null
+                };
+            }
+            break;
+        case "nonFungible/setNonFungibleItemStatus":
+            {
+                let params = misc_1.checkFormat({
+                    payload: misc_1.checkAny,
+                    signatures: misc_1.checkAny,
+                    owner: misc_1.checkAddress,
+                    memo: misc_1.allowNullOrEmpty(misc_1.checkString)
+                }, overrides);
+                transaction = {
+                    type: "cosmos-sdk/StdTx",
+                    value: {
+                        msg: [
+                            {
+                                type: "nonFungible/setNonFungibleItemStatus",
+                                value: {
+                                    payload: params.payload,
+                                    signatures: params.signatures,
+                                    owner: params.owner
+                                }
+                            }
+                        ],
+                        memo: params.memo ? params.memo : ""
+                    },
+                    fee: null
+                };
+            }
+            break;
+        case "nonFungible/updateItemMetadata":
+            {
+                let params = misc_1.checkFormat({
+                    symbol: misc_1.checkString,
+                    from: misc_1.checkString,
+                    itemID: misc_1.checkString,
+                    metadata: misc_1.allowNullOrEmpty(misc_1.arrayOf(misc_1.checkString)),
+                    memo: misc_1.allowNullOrEmpty(misc_1.checkString)
+                }, overrides);
+                transaction = {
+                    type: "cosmos-sdk/StdTx",
+                    value: {
+                        msg: [
+                            {
+                                type: "nonFungible/updateItemMetadata",
+                                value: {
+                                    symbol: params.symbol,
+                                    from: params.from,
+                                    itemID: params.itemID,
+                                    metadata: params.metadata
+                                }
+                            }
+                        ],
+                        memo: params.memo ? params.memo : ""
+                    },
+                    fee: null
+                };
+            }
+            break;
+        case "nonFungible/acceptNonFungibleTokenOwnership":
+            {
+                let params = misc_1.checkFormat({
+                    symbol: misc_1.checkString,
+                    from: misc_1.checkString,
+                    memo: misc_1.allowNullOrEmpty(misc_1.checkString)
+                }, overrides);
+                transaction = {
+                    type: "cosmos-sdk/StdTx",
+                    value: {
+                        msg: [
+                            {
+                                type: "nonFungible/acceptNonFungibleTokenOwnership",
+                                value: {
+                                    symbol: params.symbol,
+                                    from: params.from,
+                                }
+                            }
+                        ],
+                        memo: params.memo ? params.memo : ""
+                    },
+                    fee: null
+                };
+            }
+            break;
         default:
             errors.throwError("Not implemented: " + moduleName, errors.NOT_IMPLEMENTED, { route, transactionType, overrides });
     }
