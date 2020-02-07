@@ -285,7 +285,7 @@ export class NonFungibleToken {
      */
     static fromSymbol(symbol: string, signerOrProvider: Signer | Provider, overrides?: any) {
         let token = new NonFungibleToken(symbol, signerOrProvider);
-        return token.refresh().then(() => {
+        return token.refresh(overrides).then(() => {
             return token;
         });
     }
@@ -340,8 +340,7 @@ export class NonFungibleToken {
                 owner: nonFungibleToken.owner,
                 memo: (overrides && overrides.memo) ? overrides.memo : "",
                 metadata: nonFungibleToken.metadata || "",
-                symbol: nonFungibleToken.symbol,
-
+                symbol: nonFungibleToken.symbol
             });
             transaction.fee = signer.provider.getTransactionFee(undefined, undefined, { tx: transaction });
 
@@ -602,6 +601,8 @@ export class NonFungibleToken {
             errors.throwError('mint non fungible token item require provider', errors.MISSING_ARGUMENT, { arg: 'provider' });
         }
 
+        checkProperties(item, { symbol: true, itemID: true, properties: true, metadata: true });
+
         return resolveProperties({ signerAddress: signer.getAddress(), toAddressOrName: toAddressOrName }).then(({ signerAddress, toAddressOrName }) => {
             if (!signerAddress) {
                 return errors.throwError('mint fungible token require signer address', errors.MISSING_ARGUMENT, { arg: 'signerAddress' });
@@ -618,7 +619,6 @@ export class NonFungibleToken {
                     memo: (overrides && overrides.memo) ? overrides.memo : ""
                 });
                 transaction.fee = (overrides && overrides.fee) ? overrides.fee : signer.provider.getTransactionFee(undefined, undefined, { tx: transaction });
-
 
                 return signer.sendTransaction(transaction, overrides).then((response) => {
                     if (overrides && overrides.sendOnly) {
@@ -648,21 +648,23 @@ export class NonFungibleToken {
     */
     static endorse(symbol: string | Promise<string>, itemID: string | Promise<string>, signer: Signer, overrides?: any): Promise<TransactionResponse | TransactionReceipt> {
         if (!Signer.isSigner(signer)) {
-            errors.throwError('create non fungible token transaction require signer', errors.MISSING_ARGUMENT, { arg: 'signer' });
+            errors.throwError('endorse non fungible token item transaction require signer', errors.MISSING_ARGUMENT, { arg: 'signer' });
         }
         if (!signer.provider) {
-            errors.throwError('create revocation transaction require provider', errors.MISSING_ARGUMENT, { arg: 'signer' });
+            errors.throwError('endorse non fungible token item transaction require provider', errors.MISSING_ARGUMENT, { arg: 'provider' });
         }
 
-        return resolveProperties({ address: signer.getAddress() }).then(({ address }) => {
+        checkProperties({ symbol, itemID }, { symbol: true, itemID: true });
+
+        return resolveProperties({ address: signer.getAddress(), symbol, itemID }).then(({ address, symbol, itemID }) => {
             if (!address) {
                 return errors.throwError('endorse non fungible token item require signer address', errors.MISSING_ARGUMENT, { arg: 'signerAddress' });
             }
 
             let transaction = signer.provider.getTransactionRequest("nonFungible", "endorsement", {
-                symbol: symbol,
+                symbol,
                 from: address,
-                itemID: itemID,
+                itemID,
                 memo: (overrides && overrides.memo) ? overrides.memo : ""
             });
             transaction.fee = (overrides && overrides.fee) ? overrides.fee : signer.provider.getTransactionFee(undefined, undefined, { tx: transaction });
@@ -689,26 +691,31 @@ export class NonFungibleToken {
     /**
      * Transfer token item by wallet
      * @param toAddressOrName receiver address
-     * @param itemID NFT item id
      * @param symbol NFT symbol
+     * @param itemID NFT item id
      * @param overrides options
      */
-    static transfer(toAddressOrName: string | Promise<string>, itemID: string | Promise<string>, symbol: string | Promise<string>, signer: Signer, overrides?: any): Promise<TransactionResponse | TransactionReceipt> {
+    static transfer(toAddressOrName: string | Promise<string>, symbol: string | Promise<string>, itemID: string | Promise<string>, signer: Signer, overrides?: any): Promise<TransactionResponse | TransactionReceipt> {
         if (!Signer.isSigner(signer)) {
-            errors.throwError('create non fungible token transaction require signer', errors.MISSING_ARGUMENT, { arg: 'signer' });
+            errors.throwError('transfer non fungible token item transaction require signer', errors.MISSING_ARGUMENT, { arg: 'signer' });
+        }
+        if (!signer.provider) {
+            errors.throwError('transfer non fungible token item transaction require provider', errors.MISSING_ARGUMENT, { arg: 'provider' });
         }
 
-        return resolveProperties({ signerAddress: signer.getAddress(), toAddressOrName: toAddressOrName }).then(({ signerAddress, toAddressOrName }) => {
+        checkProperties({ symbol, itemID }, { symbol: true, itemID: true });
+
+        return resolveProperties({ signerAddress: signer.getAddress(), toAddressOrName, symbol, itemID }).then(({ signerAddress, toAddressOrName, symbol, itemID }) => {
             if (!signerAddress) {
                 return errors.throwError('transfer non fungible token item require signer address', errors.MISSING_ARGUMENT, { arg: 'signerAddress' });
             }
 
             return signer.provider.resolveName(toAddressOrName).then((toAddress) => {
                 let transaction = signer.provider.getTransactionRequest("nonFungible", "transferNonFungibleToken", {
-                    symbol: symbol,
+                    symbol,
                     from: signerAddress,
                     to: toAddress,
-                    itemID: itemID,
+                    itemID,
                     memo: (overrides && overrides.memo) ? overrides.memo : ""
                 });
                 transaction.fee = (overrides && overrides.fee) ? overrides.fee : signer.provider.getTransactionFee(undefined, undefined, { tx: transaction });
@@ -741,16 +748,18 @@ export class NonFungibleToken {
             errors.throwError('update NFT item metadata transaction require provider', errors.MISSING_ARGUMENT, { arg: 'provider' });
         }
 
-        return resolveProperties({ address: signer.getAddress() }).then(({ address }) => {
+        checkProperties({ symbol, itemID }, { symbol: true, itemID: true });
+
+        return resolveProperties({ address: signer.getAddress(), symbol, itemID }).then(({ address, symbol, itemID }) => {
             if (!address) {
                 return errors.throwError('endorse non fungible token item require signer address', errors.MISSING_ARGUMENT, { arg: 'signerAddress' });
             }
 
             let transaction = signer.provider.getTransactionRequest("nonFungible", "updateItemMetadata", {
-                symbol: symbol,
+                symbol,
                 from: address,
-                itemID: itemID,
-                metadata: metadata
+                itemID,
+                metadata
             });
             transaction.fee = (overrides && overrides.fee) ? overrides.fee : signer.provider.getTransactionFee(undefined, undefined, { tx: transaction });
 
@@ -810,14 +819,13 @@ function setNonFungibleTokenStatus(symbol: string, status: string, signer: Signe
     if (!Signer.isSigner(signer)) {
         errors.throwError('set non fungible token status transaction require signer', errors.MISSING_ARGUMENT, { arg: 'signer' });
     }
-    if (!symbol) {
-        errors.throwError('set non fungible token status transaction require symbol', errors.MISSING_ARGUMENT, { arg: 'symbol' });
-    }
+
+    checkProperties({ symbol, status }, { symbol: true, status: true });
 
     let tokenFees: NonFungibleTokenFee[];
-    let mintLimit, transferLimit;
-    let endorserList: any;
-    let burnable, transferable, modifiable, pub = false;
+    let mintLimit: string, transferLimit: string;
+    let endorserList: string[] = null;
+    let burnable: boolean, transferable: boolean, modifiable: boolean, pub: boolean;
 
     switch (status) {
         case "APPROVE":
