@@ -34,7 +34,7 @@ let  issuerNonFungibleToken: token.NonFungibleToken;
   
 let issuer ;   // assume a kyced wallet
 
-//* Create new non fungible token
+//* Operation 1 : Create new non fungible token
 let nonFungibleTokenProperties = {
 	name:  "Decentralised identifier ", // name
 	symbol:  "DID", // symbol
@@ -47,30 +47,34 @@ let nonFungibleTokenProperties = {
 };
 
 return  token.NonFungibleToken.create(nonFungibleTokenProperties, issuer, defaultOverrides).then((token) => {
-   if(token)  // do something
+   if(token){
+
+       //* Approve 
+        let  overrides = {
+            tokenFees: [
+                { action:  NonFungibleTokenActions.transfer, feeName:  "default" },
+                { action:  NonFungibleTokenActions.transferOwnership, feeName:  "default" },
+                { action:  NonFungibleTokenActions.acceptOwnership, feeName:  "default" }
+            ],
+            endorserList: [],
+            mintLimit:  1,
+            transferLimit:  0,
+            burnable:  false,
+            transferable:  false,
+            modifiable:  true,
+            pub:  true  // not public
+        };
+
+        return  performNonFungibleTokenStatus(nonFungibleTokenProperties.symbol,token.NonFungibleToken.approveNonFungibleToken, overrides).then((receipt) => {
+            console.log(receipt);  //do something
+        });
+
+   }
 });
 
-//* Approve 
-let  overrides = {
-	tokenFees: [
-		{ action:  NonFungibleTokenActions.transfer, feeName:  "default" },
-		{ action:  NonFungibleTokenActions.transferOwnership, feeName:  "default" },
-		{ action:  NonFungibleTokenActions.acceptOwnership, feeName:  "default" }
-	],
-	endorserList: [],
-	mintLimit:  1,
-	transferLimit:  0,
-	burnable:  false,
-	transferable:  false,
-	modifiable:  true,
-	pub:  true  // not public
-};
 
-return  performNonFungibleTokenStatus(nonFungibleTokenProperties.symbol,token.NonFungibleToken.approveNonFungibleToken, overrides).then((receipt) => {
-	//do something
-});
 
-//* Mint NFT Item to own-self
+//* Operation 2 : Mint NFT Item to own-self
 let  nftItemMinted : NonFungibleTokenItem;
 
 let  item = {
@@ -83,21 +87,23 @@ let  item = {
 let  minterNFT = new  NonFungibleToken("DID", issuer);
 
 return  minterNFT.mint(issuer.address, item).then((receipt) => {
-   // do something
+   console.log(receipt); //do something
 });
 
-//* Perform NFT Item operations
+
+//* Operation 3 : Perform NFT Item  related operations : update metadata, endorse, etc ...
 return  NonFungibleTokenItem.fromSymbol("DID", "did:example:123456#oidc", issuer).then((nftItem) => {
 	nftItemMinted = nftItem;
-	console.log(nftItemMinted.parent.state); // check item's parent information
+    console.log(nftItemMinted.parent.state); // check item's parent information
+    //* Update the Metadata
+    let  newMetadata = ["updated metadata"];
+
+        return  nftItemMinted.updateMetadata(newMetadata).then((receipt) => {
+	        console.log(receipt); //do something
+        });
 })
 
-//* Update the Metadata
-let  newMetadata = ["updated metadata"];
 
-  return  nftItemMinted.updateMetadata(newMetadata).then((receipt) => {
-	// do something
-  });
 
 ```
 
