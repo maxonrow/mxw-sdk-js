@@ -6,6 +6,7 @@ import { expect } from 'chai';
 import { mxw, nonFungibleToken as token } from '../src.ts/index';
 import { bigNumberify, hexlify, randomBytes } from '../src.ts/utils';
 import { nodeProvider } from "./env";
+
 import * as crypto from "crypto";
 import { NonFungibleTokenActions, NonFungibleToken } from '../src.ts/non-fungible-token';
 import { NonFungibleTokenItem } from '../src.ts/non-fungible-token-item';
@@ -32,6 +33,8 @@ let nonFungibleToken: token.NonFungibleToken;
 
 let symbol = "NFT" + hexlify(randomBytes(4)).substring(2);
 let itemId = crypto.randomBytes(16).toString('hex');
+//let symbol = 'DID';
+//let itemId = 'did:example:123456#oidc';
 let nftItemMinted : NonFungibleTokenItem;
 
 let defaultOverrides = {
@@ -96,7 +99,7 @@ describe('Suite: NonFungibleToken ', function () {
     this.slow(slowThreshold); // define the threshold for slow indicator
     it("Create NFT using issuer wallet", function () {
         nonFungibleTokenProperties = {
-            name: "MY " + symbol,
+            name: "MY" + symbol,
             symbol: symbol,
             fee: {
                 to: nodeProvider.nonFungibleToken.feeCollector,
@@ -173,6 +176,13 @@ describe('Suite: NonFungibleToken ', function () {
 
     it("Transfer item", function(){
         return nftItemMinted.transfer(wallet.address).then((receipt) => {
+            expect(receipt.status).to.equal(1);
+        })
+
+    });
+
+    it("Update item metadata", function(){
+        return nftItemMinted.updateMetadata(null).then((receipt) => {
             expect(receipt.status).to.equal(1);
         })
 
