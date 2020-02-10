@@ -227,7 +227,7 @@ export class NonFungibleTokenItem {
     * @param metadata metadata to update
     * @param overrides options
     */
-    updateMetadata(metadata: string[], overrides?: any): Promise<TransactionResponse | TransactionReceipt> {
+    updateMetadata(metadata: string, overrides?: any): Promise<TransactionResponse | TransactionReceipt> {
 
         if (!this.signer) {
             errors.throwError('update non fungible token item metadata require signer', errors.NOT_INITIALIZED, { arg: 'signer' });

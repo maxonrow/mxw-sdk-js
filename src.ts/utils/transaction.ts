@@ -1169,7 +1169,7 @@ export function getTransactionRequest(route: string, transactionType: string, ov
                     symbol: checkString,
                     from: checkString,
                     itemID: checkString,
-                    metadata: allowNullOrEmpty(arrayOf(checkString)),
+                    metadata: allowNullOrEmpty(checkString),
                     memo: allowNullOrEmpty(checkString)
                 }, overrides);
 
