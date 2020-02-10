@@ -867,8 +867,8 @@ export function getTransactionRequest(route: string, transactionType: string, ov
                     name: string,
                     owner: string,
                     memo: string,
-                    metadata: string[],
-                    properties: string[],
+                    metadata: string,
+                    properties: string,
                     symbol: string,
                 } = checkFormat({
                     appFeeTo: checkString,
@@ -876,8 +876,8 @@ export function getTransactionRequest(route: string, transactionType: string, ov
                     name: checkString,
                     owner: checkAddress,
                     memo: allowNullOrEmpty(checkString),
-                    metadata: allowNullOrEmpty(arrayOf(checkString)),
-                    properties: allowNullOrEmpty(arrayOf(checkString)),
+                    metadata: allowNullOrEmpty(checkString),
+                    properties: allowNullOrEmpty(checkString),
                     symbol: checkString,
                 }, overrides);
 
@@ -949,15 +949,15 @@ export function getTransactionRequest(route: string, transactionType: string, ov
                     owner: string
                     to: string
                     memo: string
-                    properties: string[]
-                    metadata: string[]
+                    properties: string
+                    metadata: string
                 } = checkFormat({
                     itemID: checkString,
                     symbol: checkString,
                     owner: checkAddress,
                     to: checkAddress,
-                    metadata: arrayOf(checkString),
-                    properties: arrayOf(checkString),
+                    metadata: allowNullOrEmpty(checkString),
+                    properties: allowNullOrEmpty(checkString),
                     memo: allowNullOrEmpty(checkString),
                 }, overrides);
 
@@ -972,8 +972,8 @@ export function getTransactionRequest(route: string, transactionType: string, ov
                                     symbol: params.symbol,
                                     owner: params.owner,
                                     to: params.to,
-                                    properties: params.properties,
-                                    metadata: params.metadata
+                                    properties: params.properties? params.properties : null,
+                                    metadata: params.metadata? params.metadata : null
                                 }
                             }
                         ],

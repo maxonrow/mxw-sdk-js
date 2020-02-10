@@ -102,8 +102,8 @@ describe('Suite: NonFungibleToken ', function () {
                 to: nodeProvider.nonFungibleToken.feeCollector,
                 value: bigNumberify("1")
             },
-            metadata: ["Wallet able to manage their own metadata"],
-            properties:["Decentralised identifier"]
+            metadata: "Wallet able to manage their own metadata",
+            properties:"Decentralised identifier"
         };
 
         return token.NonFungibleToken.create(nonFungibleTokenProperties, issuer, defaultOverrides).then((token) => {
@@ -148,8 +148,8 @@ describe('Suite: NonFungibleToken ', function () {
         let item = {
             symbol: symbol,
             itemID: itemId,
-            properties: ["prop1"],
-            metadata: ["str1", "str2"]
+            properties: "prop",
+            metadata: "metadata"
         } as token.NonFungibleTokenItem;
 
         let minterNFT = new NonFungibleToken(symbol, issuer);

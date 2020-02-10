@@ -42,8 +42,8 @@ export interface NonFungibleTokenProperties {
         to: string,
         value: BigNumber
     },
-    metadata?: string[],
-    properties?: string[],
+    metadata?: string,
+    properties?: string,
     owner?: string,
 }
 
@@ -55,8 +55,8 @@ export interface NonFungibleTokenFee {
 export interface NonFungibleTokenItem {
     symbol: string,
     itemID: string,
-    properties: string[],
-    metadata: string[]
+    properties?: string,
+    metadata?: string
 }
 
 export interface NonFungibleTokenSignature {
@@ -354,8 +354,8 @@ export class NonFungibleToken {
                 name: checkString,
                 symbol: checkString,
                 owner: allowNull(checkAddress),
-                metadata: allowNullOrEmpty(arrayOf(checkString)),
-                properties: allowNullOrEmpty(arrayOf(checkString)),
+                metadata: allowNullOrEmpty(checkString),
+                properties: allowNullOrEmpty(checkString),
                 fee: {
                     to: checkAddress,
                     value: checkBigNumber
@@ -420,8 +420,8 @@ export class NonFungibleToken {
                     to: toAddress,
                     itemID: item.itemID,
                     owner: signerAddress,
-                    properties: item.properties,
-                    metadata: item.metadata,
+                    properties: item.properties || "",
+                    metadata: item.metadata || "",
                     memo: (overrides && overrides.memo) ? overrides.memo : ""
                 });
                 transaction.fee = (overrides && overrides.fee) ? overrides.fee : this.signer.provider.getTransactionFee(undefined, undefined, { tx: transaction });
@@ -760,7 +760,7 @@ function setNonFungibleTokenStatus(symbol: string, status: string, signer: Signe
             mintLimit = "";
             transferLimit = "";
             endorserList = null;
-            
+
             break;
 
         case "REJECT":
