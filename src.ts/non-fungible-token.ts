@@ -1,7 +1,7 @@
 'use strict';
 
 import { defineReadOnly, resolveProperties, checkProperties } from './utils/properties';
-import { sortObject, checkFormat, arrayOf, checkAddress, checkString, checkBigNumber, allowNullOrEmpty, allowNull, iterate, isUndefinedOrNullOrEmpty, checkAny, checkBoolean, checkBigNumberString } from './utils/misc';
+import { sortObject, checkFormat, arrayOf, checkAddress, checkString, checkBigNumber, allowNullOrEmpty, iterate, isUndefinedOrNullOrEmpty, checkAny, checkBoolean, checkBigNumberString } from './utils/misc';
 import { encode as base64Encode } from './utils/base64';
 import * as errors from './errors';
 
@@ -42,9 +42,8 @@ export interface NonFungibleTokenProperties {
         to: string,
         value: BigNumber
     },
-    metadata?: string[],
-    properties?: string[],
-    owner?: string,
+    metadata?: string,
+    properties?: string,
 }
 
 export interface NonFungibleTokenFee {
@@ -55,8 +54,8 @@ export interface NonFungibleTokenFee {
 export interface NonFungibleTokenItem {
     symbol: string,
     itemID: string,
-    properties: string[],
-    metadata: string[]
+    properties?: string,
+    metadata?: string
 }
 
 export interface NonFungibleTokenSignature {
@@ -338,7 +337,6 @@ export class NonFungibleToken {
             name: true,
             symbol: true,
             fee: true, // Application fee
-            owner: false, // Optional
             metadata: false, // Optional
             properties: false  //Optional
         }, true);
@@ -348,14 +346,12 @@ export class NonFungibleToken {
             if (!address) {
                 errors.throwError('create non fungible token transaction require signer address', errors.MISSING_ARGUMENT, { required: 'signer' });
             }
-            tokenProperties.owner = address; // Set signer address as owner
 
             let nonFungibleToken: NonFungibleTokenProperties = checkFormat({
                 name: checkString,
                 symbol: checkString,
-                owner: allowNull(checkAddress),
-                metadata: allowNullOrEmpty(arrayOf(checkString)),
-                properties: allowNullOrEmpty(arrayOf(checkString)),
+                metadata: allowNullOrEmpty(checkString),
+                properties: allowNullOrEmpty(checkString),
                 fee: {
                     to: checkAddress,
                     value: checkBigNumber
@@ -369,7 +365,7 @@ export class NonFungibleToken {
                 appFeeTo: nonFungibleToken.fee.to,
                 appFeeValue: nonFungibleToken.fee.value.toString(),
                 name: nonFungibleToken.name,
-                owner: nonFungibleToken.owner,
+                owner: address,
                 memo: (overrides && overrides.memo) ? overrides.memo : "",
                 metadata: nonFungibleToken.metadata || "",
                 properties: nonFungibleToken.properties || "",
@@ -420,8 +416,8 @@ export class NonFungibleToken {
                     to: toAddress,
                     itemID: item.itemID,
                     owner: signerAddress,
-                    properties: item.properties,
-                    metadata: item.metadata,
+                    properties: item.properties || "",
+                    metadata: item.metadata || "",
                     memo: (overrides && overrides.memo) ? overrides.memo : ""
                 });
                 transaction.fee = (overrides && overrides.fee) ? overrides.fee : this.signer.provider.getTransactionFee(undefined, undefined, { tx: transaction });
@@ -760,7 +756,7 @@ function setNonFungibleTokenStatus(symbol: string, status: string, signer: Signe
             mintLimit = "";
             transferLimit = "";
             endorserList = null;
-            
+
             break;
 
         case "REJECT":

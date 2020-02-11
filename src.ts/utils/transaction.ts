@@ -17,7 +17,7 @@ import { BigNumberish } from './bignumber';
 
 import { Provider, TransactionFee, TransactionRequest } from '../providers/abstract-provider';
 import { sha256 } from './sha2';
-import { sortObject, iterate, checkFormat, checkAddress, checkBigNumber, allowNullOrEmpty, checkString, checkAny, checkNumber, checkBoolean, arrayOf } from './misc';
+import { sortObject, iterate, checkFormat, checkAddress, checkBigNumber, allowNullOrEmpty, checkString, checkAny, checkNumber, checkBoolean } from './misc';
 import { smallestUnitName } from './units';
 
 ///////////////////////////////
@@ -867,8 +867,8 @@ export function getTransactionRequest(route: string, transactionType: string, ov
                     name: string,
                     owner: string,
                     memo: string,
-                    metadata: string[],
-                    properties: string[],
+                    metadata: string,
+                    properties: string,
                     symbol: string,
                 } = checkFormat({
                     appFeeTo: checkString,
@@ -876,8 +876,8 @@ export function getTransactionRequest(route: string, transactionType: string, ov
                     name: checkString,
                     owner: checkAddress,
                     memo: allowNullOrEmpty(checkString),
-                    metadata: allowNullOrEmpty(arrayOf(checkString)),
-                    properties: allowNullOrEmpty(arrayOf(checkString)),
+                    metadata: allowNullOrEmpty(checkString),
+                    properties: allowNullOrEmpty(checkString),
                     symbol: checkString,
                 }, overrides);
 
@@ -892,8 +892,8 @@ export function getTransactionRequest(route: string, transactionType: string, ov
                                         to: params.appFeeTo,
                                         value: params.appFeeValue.toString()
                                     },
-                                    metadata: params.metadata ? params.metadata : null,
-                                    properties: params.properties? params.properties : null,
+                                    metadata: params.metadata ? params.metadata : "",
+                                    properties: params.properties? params.properties : "",
                                     name: params.name,
                                     owner: params.owner,
                                     symbol: params.symbol,
@@ -949,15 +949,15 @@ export function getTransactionRequest(route: string, transactionType: string, ov
                     owner: string
                     to: string
                     memo: string
-                    properties: string[]
-                    metadata: string[]
+                    properties: string
+                    metadata: string
                 } = checkFormat({
                     itemID: checkString,
                     symbol: checkString,
                     owner: checkAddress,
                     to: checkAddress,
-                    metadata: arrayOf(checkString),
-                    properties: arrayOf(checkString),
+                    metadata: allowNullOrEmpty(checkString),
+                    properties: allowNullOrEmpty(checkString),
                     memo: allowNullOrEmpty(checkString),
                 }, overrides);
 
@@ -972,8 +972,8 @@ export function getTransactionRequest(route: string, transactionType: string, ov
                                     symbol: params.symbol,
                                     owner: params.owner,
                                     to: params.to,
-                                    properties: params.properties,
-                                    metadata: params.metadata
+                                    properties: params.properties? params.properties : "",
+                                    metadata: params.metadata? params.metadata : ""
                                 }
                             }
                         ],
@@ -1169,7 +1169,7 @@ export function getTransactionRequest(route: string, transactionType: string, ov
                     symbol: checkString,
                     from: checkString,
                     itemID: checkString,
-                    metadata: allowNullOrEmpty(arrayOf(checkString)),
+                    metadata: allowNullOrEmpty(checkString),
                     memo: allowNullOrEmpty(checkString)
                 }, overrides);
 
@@ -1183,7 +1183,7 @@ export function getTransactionRequest(route: string, transactionType: string, ov
                                     symbol: params.symbol,
                                     from: params.from,
                                     itemID: params.itemID,
-                                    metadata: params.metadata
+                                    metadata: params.metadata ? params.metadata : ""
                                 }
                             }
                         ],
