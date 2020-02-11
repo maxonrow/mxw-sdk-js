@@ -1,7 +1,7 @@
 'use strict';
 
 import { defineReadOnly, resolveProperties, checkProperties } from './utils/properties';
-import { sortObject, checkFormat, arrayOf, checkAddress, checkString, checkBigNumber, allowNullOrEmpty, allowNull, iterate, isUndefinedOrNullOrEmpty, checkAny, checkBoolean, checkBigNumberString } from './utils/misc';
+import { sortObject, checkFormat, arrayOf, checkAddress, checkString, checkBigNumber, allowNullOrEmpty, iterate, isUndefinedOrNullOrEmpty, checkAny, checkBoolean, checkBigNumberString } from './utils/misc';
 import { encode as base64Encode } from './utils/base64';
 import * as errors from './errors';
 
@@ -44,7 +44,6 @@ export interface NonFungibleTokenProperties {
     },
     metadata?: string,
     properties?: string,
-    owner?: string,
 }
 
 export interface NonFungibleTokenFee {
@@ -338,7 +337,6 @@ export class NonFungibleToken {
             name: true,
             symbol: true,
             fee: true, // Application fee
-            owner: false, // Optional
             metadata: false, // Optional
             properties: false  //Optional
         }, true);
@@ -348,12 +346,10 @@ export class NonFungibleToken {
             if (!address) {
                 errors.throwError('create non fungible token transaction require signer address', errors.MISSING_ARGUMENT, { required: 'signer' });
             }
-            tokenProperties.owner = tokenProperties.owner ?? address; // Set signer address as owner
 
             let nonFungibleToken: NonFungibleTokenProperties = checkFormat({
                 name: checkString,
                 symbol: checkString,
-                owner: checkAddress,
                 metadata: allowNullOrEmpty(checkString),
                 properties: allowNullOrEmpty(checkString),
                 fee: {
@@ -369,7 +365,7 @@ export class NonFungibleToken {
                 appFeeTo: nonFungibleToken.fee.to,
                 appFeeValue: nonFungibleToken.fee.value.toString(),
                 name: nonFungibleToken.name,
-                owner: nonFungibleToken.owner,
+                owner: address,
                 memo: (overrides && overrides.memo) ? overrides.memo : "",
                 metadata: nonFungibleToken.metadata || "",
                 properties: nonFungibleToken.properties || "",
