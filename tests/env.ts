@@ -37,7 +37,8 @@ interface Node {
         provider: string,
         issuer: string,
         middleware: string,
-        feeCollector: string
+        feeCollector: string,
+        itemReceiver: string
     }
 };
 
@@ -74,7 +75,8 @@ const localnet: Node = {
         provider: "",
         issuer: "",
         middleware: "",
-        feeCollector: ""
+        feeCollector: "",
+        itemReceiver: ""
     }
 };
 
@@ -111,7 +113,8 @@ const testnet: Node = {
         provider: "",
         issuer: "",
         middleware: "",
-        feeCollector: ""
+        feeCollector: "",
+        itemReceiver: ""
     }
 };
 
