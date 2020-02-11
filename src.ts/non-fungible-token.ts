@@ -348,7 +348,7 @@ export class NonFungibleToken {
             if (!address) {
                 errors.throwError('create non fungible token transaction require signer address', errors.MISSING_ARGUMENT, { required: 'signer' });
             }
-            tokenProperties.owner = address; // Set signer address as owner
+            tokenProperties.owner = tokenProperties.owner ?? address; // Set signer address as owner
 
             let nonFungibleToken: NonFungibleTokenProperties = checkFormat({
                 name: checkString,
