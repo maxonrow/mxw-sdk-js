@@ -353,7 +353,7 @@ export class NonFungibleToken {
             let nonFungibleToken: NonFungibleTokenProperties = checkFormat({
                 name: checkString,
                 symbol: checkString,
-                owner: allowNull(checkAddress),
+                owner: checkAddress,
                 metadata: allowNullOrEmpty(checkString),
                 properties: allowNullOrEmpty(checkString),
                 fee: {
