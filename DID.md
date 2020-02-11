@@ -42,8 +42,8 @@ let nonFungibleTokenProperties = {
 		to:  feeCollector,  //feeCollector wallet address
 		value:  bigNumberify("1")
 	},
-	metadata: ["Wallet able to manage their own metadata"],
-	properties:["Decentralised identifier"]
+	metadata: "Wallet able to manage their own metadata",
+	properties:"Decentralised identifier"
 };
 
 return  token.NonFungibleToken.create(nonFungibleTokenProperties, issuer, defaultOverrides).then((token) => {
@@ -80,8 +80,8 @@ let  nftItemMinted : NonFungibleTokenItem;
 let  item = {
 	symbol:  "DID",
 	itemID:  'did:example:123456#oidc',
-	properties: ["prop1"],
-	metadata: ["str1", "str2"]
+	properties: "properties",
+	metadata: "str1"
 } as  token.NonFungibleTokenItem;
 
 let  minterNFT = new  NonFungibleToken("DID", issuer);
@@ -96,7 +96,7 @@ return  NonFungibleTokenItem.fromSymbol("DID", "did:example:123456#oidc", issuer
 	nftItemMinted = nftItem;
     console.log(nftItemMinted.parent.state); // check item's parent information
     //* Update the Metadata
-    let  newMetadata = ["updated metadata"];
+    let  newMetadata = "updated metadata";
 
         return  nftItemMinted.updateMetadata(newMetadata).then((receipt) => {
 	        console.log(receipt); //do something

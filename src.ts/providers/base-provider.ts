@@ -109,8 +109,8 @@ function checkNonFungibleTokenState(data: any): NFTokenState {
         Symbol: checkString,
         Owner: checkAddress,
         NewOwner: checkAddress,
-        Metadata: allowNullOrEmpty(arrayOf(checkString)),
-        Properties: allowNullOrEmpty(arrayOf(checkString)),
+        Metadata: allowNullOrEmpty(checkString),
+        Properties: allowNullOrEmpty(checkString),
         TransferLimit: checkBigNumber,
         MintLimit: checkBigNumber,
         TotalSupply: checkString
@@ -135,8 +135,8 @@ function checkNonFungibleTokenState(data: any): NFTokenState {
 function checkNonFungibleTokenItemState(data: any): NFTokenItemState {
     return camelize(checkFormat({
         ID: checkString,
-        Metadata: arrayOf(checkString),
-        Properties: arrayOf(checkString),
+        Metadata: allowNullOrEmpty(checkString),
+        Properties: allowNullOrEmpty(checkString),
         Frozen: checkBoolean,
         TransferLimit: checkBigNumber
 
