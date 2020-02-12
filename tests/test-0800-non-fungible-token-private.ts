@@ -10,8 +10,6 @@ import * as crypto from "crypto";
 import { NonFungibleTokenActions, NonFungibleToken } from '../src.ts/non-fungible-token';
 import { NonFungibleTokenItem } from '../src.ts/non-fungible-token-item';
 
-
-
 let indent = "     ";
 let silent = true;
 let silentRpc = true;
@@ -29,12 +27,6 @@ let itemReceiver: mxw.Wallet;
 let nonFungibleTokenProperties: token.NonFungibleTokenProperties;
 let nonFungibleToken: token.NonFungibleToken;
 let issuerNonFungibleToken: token.NonFungibleToken;
-
-//let symbol = "NFT" + hexlify(randomBytes(4)).substring(2);
-// let itemId = crypto.randomBytes(16).toString('hex');
-//let symbol = 'DID';
-//let itemId = 'did:example:123456#oidc';
-let nftItemMinted: NonFungibleTokenItem;
 
 let defaultOverrides = {
     logSignaturePayload: function (payload) {
@@ -229,6 +221,74 @@ describe('Suite: NonFungibleToken - private', function () {
                 });
             });
 
+            it("Transfer ownership - non-owner", function () {
+                return nonFungibleToken.transferOwnership(issuer.address).then((receipt) => {
+                    expect(receipt).is.not.exist;
+                }).catch(error => {
+                    expect(error.code).to.equal(errors.NOT_ALLOWED);
+                });
+            });
+    
+            it("Transfer ownership", function () {
+                return issuerNonFungibleToken.transferOwnership(wallet.address).then((receipt) => {
+                    if (!silent) console.log(indent, "RECEIPT:", JSON.stringify(receipt));
+                    expect(receipt.status).to.equal(1);
+                });
+            });
+
+            it("Transfer ownership - checkDuplication", function () {
+                return issuerNonFungibleToken.transferOwnership(wallet.address).then((receipt) => {
+                    expect(receipt).is.not.exist;
+                }).catch(error => {
+                    expect(error.code).to.equal(errors.NOT_ALLOWED);
+                });
+            });
+    
+            it("Accept ownership - challenge non-approval", function () {
+                return nonFungibleToken.acceptOwnership().then((receipt) => {
+                    expect(receipt).is.not.exist;
+                }).catch(error => {
+                    expect(error.code).to.equal(errors.NOT_ALLOWED);
+                });
+            });
+    
+            it("Approve transfer ownership", function () {
+                return performNonFungibleTokenStatus(nonFungibleTokenProperties.symbol, token.NonFungibleToken.approveNonFungibleTokenOwnership).then((receipt) => {
+                    if (!silent) console.log(indent, "RECEIPT:", JSON.stringify(receipt));
+                });
+            });
+    
+            it("Approve transfer ownership - checkDuplication", function () {
+                return performNonFungibleTokenStatus(nonFungibleTokenProperties.symbol, token.NonFungibleToken.approveNonFungibleTokenOwnership).then((receipt) => {
+                    expect(receipt).is.not.exist;
+                }).catch(error => {
+                    expect(error.code).to.equal(errors.EXISTS);
+                });
+            });
+    
+            it("Accept ownership - challenge non owner", function () {
+                return issuerNonFungibleToken.acceptOwnership().then((receipt) => {
+                    expect(receipt).is.not.exist;
+                }).catch(error => {
+                    expect(error.code).to.equal(errors.NOT_ALLOWED);
+                });
+            });
+    
+            it("Accept ownership", function () {
+                return nonFungibleToken.acceptOwnership().then((receipt) => {
+                    if (!silent) console.log(indent, "RECEIPT:", JSON.stringify(receipt));
+                    expect(receipt.status).to.equal(1);
+                });
+            });
+    
+            it("Accept ownership - checkDuplication", function () {
+                return nonFungibleToken.acceptOwnership().then((receipt) => {
+                    expect(receipt).is.not.exist;
+                }).catch(error => {
+                    expect(error.code).to.equal(errors.NOT_ALLOWED);
+                });
+            });
+
             // let issuer be a nftMinter
             let nftMinter = new NonFungibleToken(symbol, issuer);
             // random item id
@@ -255,7 +315,7 @@ describe('Suite: NonFungibleToken - private', function () {
                     mintedNFTItem = nftItem;
                     expect(mintedNFTItem.parent.symbol).to.equal(symbol);
 
-                    if (!silent) console.log(nftItemMinted.parent.state);
+                    if (!silent) console.log(mintedNFTItem.parent.state);
                 })
 
             });
@@ -263,6 +323,11 @@ describe('Suite: NonFungibleToken - private', function () {
             it("Transfer NFT Item", function(){
                 return mintedNFTItem.transfer(wallet.address).then((receipt) => {
                     if(transferable)  expect(receipt.status).to.equal(1);
+                }).then(()=>{
+                    return mintedNFTItem.getState().then((itemState) => {
+                        expect(itemState.transferLimit).to.equal(0);
+                    })
+
                 })
                 .catch(error => {
                     expect(error.code).to.equal(errors.NOT_ALLOWED);
@@ -270,108 +335,25 @@ describe('Suite: NonFungibleToken - private', function () {
             });
 
             it("Update NFT Item metadata", function(){
-                return nftItemMinted.updateMetadata(null).then((receipt) => {
+                return mintedNFTItem.updateMetadata("abcd").then((receipt) => {
                     expect(receipt.status).to.equal(1);
+                }).then(()=>{
+                    return mintedNFTItem.getState().then((itemState) => {
+                        expect(itemState.metadata).to.equal("abcd");
+
+                    });
                 })
-            })
+            });
+
+            // freeze item
+            // transfer, update metadata
+            // unfreeze item
+            // endorse item
 
         });
     });
 });
 
-describe('Suite: NonFungibleToken ', function () {
-
-    this.slow(slowThreshold); // define the threshold for slow indicator
-    it("Create NFT using issuer wallet", function () {
-        nonFungibleTokenProperties = {
-            name: "MY" + symbol,
-            symbol: symbol,
-            fee: {
-                to: nodeProvider.nonFungibleToken.feeCollector,
-                value: bigNumberify("1")
-            },
-            metadata: "Wallet able to manage their own metadata",
-            properties: "Decentralised identifier"
-        };
-
-        return token.NonFungibleToken.create(nonFungibleTokenProperties, issuer, defaultOverrides).then((token) => {
-            expect(token).to.exist;
-        });
-    });
-
-    it("Approve", function () {
-        let overrides = {
-            tokenFees: [
-                { action: NonFungibleTokenActions.transfer, feeName: "default" },
-                { action: NonFungibleTokenActions.transferOwnership, feeName: "default" },
-                { action: NonFungibleTokenActions.acceptOwnership, feeName: "default" }
-            ],
-            endorserList: [],
-            mintLimit: 1,
-            transferLimit: 0,
-            burnable: false,
-            transferable: false,
-            modifiable: true,
-            pub: true   // public
-
-        };
-
-        return performNonFungibleTokenStatus(nonFungibleTokenProperties.symbol, token.NonFungibleToken.approveNonFungibleToken, overrides).then((receipt) => {
-            if (!silent) console.log(indent, "RECEIPT:", JSON.stringify(receipt));
-        });
-    });
-
-    it("Query Non fungible token state", function () {
-        return refresh(nonFungibleTokenProperties.symbol).then(() => {
-            expect(nonFungibleToken).to.exist;
-            if (!silent) console.log(indent, "Created Token:", JSON.stringify(nonFungibleToken.state));
-        });
-    });
-
-
-
-    // Mint NFT Item
-    it("Mint", function () {
-
-        let item = {
-            symbol: symbol,
-            itemID: itemId,
-            properties: "prop",
-            metadata: "metadata"
-        } as token.NonFungibleTokenItem;
-
-        let minterNFT = new NonFungibleToken(symbol, issuer);
-
-        return minterNFT.mint(issuer.address, item).then((receipt) => {
-            expect(receipt.status).to.equal(1);
-        });
-
-    });
-
-
-    it("Get item parents", function () {
-        return NonFungibleTokenItem.fromSymbol(symbol, itemId, issuer).then((nftItem) => {
-            expect(nftItem.parent).exist;
-            nftItemMinted = nftItem;
-            if (!silent) console.log(nftItemMinted.parent.state);
-        })
-
-
-    });
-
-    it("Transfer item", function () {
-        return nftItemMinted.transfer(wallet.address).then((receipt) => {
-            expect(receipt.status).to.equal(1);
-        })
-
-    });
-
-    it("Update item metadata", function () {
-        return nftItemMinted.updateMetadata(null).then((receipt) => {
-            expect(receipt.status).to.equal(1);
-        })
-
-    });
 
 
 
@@ -620,7 +602,7 @@ function refresh(symbol: string) {
     }).then(() => {
         return token.NonFungibleToken.fromSymbol(symbol, issuer).then((token) => {
             expect(token).to.exist;
-            //issuerNonFungibleToken = token;
+            issuerNonFungibleToken = token;
         });
     });
 }
