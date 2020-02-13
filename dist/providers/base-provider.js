@@ -87,8 +87,8 @@ function checkNonFungibleTokenState(data) {
         Symbol: misc_1.checkString,
         Owner: misc_1.checkAddress,
         NewOwner: misc_1.checkAddress,
-        Metadata: misc_1.allowNullOrEmpty(misc_1.arrayOf(misc_1.checkString)),
-        Properties: misc_1.allowNullOrEmpty(misc_1.arrayOf(misc_1.checkString)),
+        Metadata: misc_1.allowNullOrEmpty(misc_1.checkString),
+        Properties: misc_1.allowNullOrEmpty(misc_1.checkString),
         TransferLimit: misc_1.checkBigNumber,
         MintLimit: misc_1.checkBigNumber,
         TotalSupply: misc_1.checkString
@@ -111,8 +111,8 @@ function checkNonFungibleTokenState(data) {
 function checkNonFungibleTokenItemState(data) {
     return properties_1.camelize(misc_1.checkFormat({
         ID: misc_1.checkString,
-        Metadata: misc_1.arrayOf(misc_1.checkString),
-        Properties: misc_1.arrayOf(misc_1.checkString),
+        Metadata: misc_1.allowNullOrEmpty(misc_1.checkString),
+        Properties: misc_1.allowNullOrEmpty(misc_1.checkString),
         Frozen: misc_1.checkBoolean,
         TransferLimit: misc_1.checkBigNumber
     }, data), (key) => {

@@ -228,7 +228,6 @@ class NonFungibleToken {
             name: true,
             symbol: true,
             fee: true,
-            owner: false,
             metadata: false,
             properties: false //Optional
         }, true);
@@ -237,13 +236,11 @@ class NonFungibleToken {
             if (!address) {
                 errors.throwError('create non fungible token transaction require signer address', errors.MISSING_ARGUMENT, { required: 'signer' });
             }
-            tokenProperties.owner = address; // Set signer address as owner
             let nonFungibleToken = misc_1.checkFormat({
                 name: misc_1.checkString,
                 symbol: misc_1.checkString,
-                owner: misc_1.allowNull(misc_1.checkAddress),
-                metadata: misc_1.allowNullOrEmpty(misc_1.arrayOf(misc_1.checkString)),
-                properties: misc_1.allowNullOrEmpty(misc_1.arrayOf(misc_1.checkString)),
+                metadata: misc_1.allowNullOrEmpty(misc_1.checkString),
+                properties: misc_1.allowNullOrEmpty(misc_1.checkString),
                 fee: {
                     to: misc_1.checkAddress,
                     value: misc_1.checkBigNumber
@@ -256,7 +253,7 @@ class NonFungibleToken {
                 appFeeTo: nonFungibleToken.fee.to,
                 appFeeValue: nonFungibleToken.fee.value.toString(),
                 name: nonFungibleToken.name,
-                owner: nonFungibleToken.owner,
+                owner: address,
                 memo: (overrides && overrides.memo) ? overrides.memo : "",
                 metadata: nonFungibleToken.metadata || "",
                 properties: nonFungibleToken.properties || "",
@@ -301,8 +298,8 @@ class NonFungibleToken {
                     to: toAddress,
                     itemID: item.itemID,
                     owner: signerAddress,
-                    properties: item.properties,
-                    metadata: item.metadata,
+                    properties: item.properties || "",
+                    metadata: item.metadata || "",
                     memo: (overrides && overrides.memo) ? overrides.memo : ""
                 });
                 transaction.fee = (overrides && overrides.fee) ? overrides.fee : this.signer.provider.getTransactionFee(undefined, undefined, { tx: transaction });
