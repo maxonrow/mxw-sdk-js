@@ -11,7 +11,6 @@ Using the SDK
    api-kyc
    api-tokens
    api-nft
-   api-nfti
    api-name-service
    api-utils
    

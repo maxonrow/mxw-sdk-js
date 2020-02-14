@@ -86,3 +86,16 @@ Prototype
 .. note:: Only non-fungible token middleware is allowed to sign ``unfreeze`` transaction.
 
 
+-----
+
+Item
+----
+:sup:`prototype` . getParent() |nbsp| `=> Non-fungible Token<NonFungibleToken>`
+    *Get parent* of the item. 
+
+
+:sup:`prototype` . endorse( ) |nbsp| `=> Promise<TransactionReceipt>`
+    Perform endorsement by endorser
+
+:sup:`prototype` . updateMetadata(metadata) |nbsp| `=> Promise<TransactionReceipt>`
+    Update the *metadata of non-fungible token item* to the network and returns a :ref:`Promise <promise>`
