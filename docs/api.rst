@@ -1,7 +1,7 @@
 .. _api:
 
-Application Programming Interface (API)
-***************************************
+Using the SDK
+*************
 
 .. toctree::
    :maxdepth: 2
@@ -10,8 +10,11 @@ Application Programming Interface (API)
    api-providers
    api-kyc
    api-tokens
+   api-nft
+   api-nfti
    api-name-service
    api-utils
+   
 
 -----
 

@@ -31,11 +31,13 @@ Features
    :maxdepth: 4
    :caption: Developer Documentation
 
+   introduction
    getting-started
    api
    cookbook
    notes
    testnet
+   toolkits
 
 -----
 

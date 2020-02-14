@@ -37,7 +37,7 @@ new :sup:`Wallet` ( privateKey [ , provider ] )
 :sup:`Wallet` . fromEncryptedJson ( json, password [ , progressCallback ] ) |nbsp| `=> Wallet`
     Decrypt an encrypted Secret Storage `JSON Wallet`_ (from created using *prototype.encrypt* )
 
-:sup:`Wallet` . fromMnemonic ( mnemonic [ , path :sup:`= "m/44'/118'/0'/0/0"` [ , wordlist ] ] ) |nbsp| `=> Wallet`
+:sup:`Wallet` . fromMnemonic ( mnemonic [ , path :sup:`= "m/44'/376'/0'/0/0"` [ , wordlist ] ] ) |nbsp| `=> Wallet`
     Generate a `BIP-039`_ + `BIP-044`_ wallet from *mnemonic* deriving *path* using
     the *wordlist*. The default language is English (en).
 

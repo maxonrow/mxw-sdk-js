@@ -1,16 +1,21 @@
 Getting Started
 ***************
 
-The mxw-sdk-js library is a compact and complete JavaScript library for Maxonrow blockchain.
+| nani nani nani? nani ga okorimashita? zen zen wakaranai
+| The mxw-sdk-js library is a compact and complete JavaScript library for Maxonrow blockchain.
 
 -----
 
+Setup
+=====
+How to setup environment & create project
+
 Installing in Node.js
-=====================
+---------------------
 
 Install the mxw-sdk-js library from your project directory::
 
-    /home/jeansoon/my-project> npm install --save mxw-sdk-js
+   $ npm install --save mxw-sdk-js
 
 Importing
 ---------
@@ -28,43 +33,39 @@ Importing
 .. code-block:: javascript
     :caption: *JavaScript (ES6) / TypeScript*
 
+
     import { mxw } from 'mxw-sdk-js';
 
 
------
 
 Including in React Native
-=========================
+-------------------------
 
 .. code-block:: javascript
     :caption: *JavaScript (ES6) / TypeScript*
 
     import { mxw } from 'mxw-sdk-js';
 
------
 
 Including in React
-==================
+------------------
 
 .. code-block:: javascript
     :caption: *JavaScript (ES6) / TypeScript*
 
     import { mxw } from 'mxw-sdk-js';
-
------
 
 Including in Vue.js
-===================
+-------------------
 
 .. code-block:: javascript
     :caption: *JavaScript (ES6) / TypeScript*
 
     import { mxw } from 'mxw-sdk-js';
 
------
 
 Including in Web Applications
-=============================
+-----------------------------
 
 For security purposes, it is usually best to place a **copy** of `this script`_ on
 the application's server, but for a quick prototype using the Maxonrow CDN (content
@@ -81,5 +82,20 @@ distribution network) should suffice.
 
 -----
 
+Connect to Maxonrow blockchain
+==============================
+| TBH
+| Connecting 99.9%........
+| And fatal error
+
+Creating first SDK call
+=======================
+| Somebody call 911?
+
+Handling Errors(???)
+====================
+| 404
+
 .. _npm is installed: https://nodejs.org/en/
 .. _this script: https://cdn.ethers.io/scripts/ethers-v4.min.js
+

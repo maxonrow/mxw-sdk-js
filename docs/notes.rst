@@ -1,5 +1,5 @@
-Notes
-*****
+Guidances
+*********
 
 A few quick notes about some of the less obvious aspects of interacting with
 Maxonrow in JavaScript.
