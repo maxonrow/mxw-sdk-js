@@ -23,13 +23,13 @@ running your own local blockchain node, it is recommended that you use the ``get
 method.
 
 :sup:`mxw` . getDefaultProvider( [ network :sup:`= "homestead"` ] ) |nbsp| `=> Provider`
+    This creates a FallbackProvider backed by multiple backends.
+    
     This is the **recommended** method of connecting to the blockchain network if you are
     not running your own blockchain node.
 
-    This creates a FallbackProvider backed by multiple backends.
-
 .. code-block:: javascript
-    :caption: *get a standard network provider*
+    :caption: *get a standard network provider* 
 
     let provider = mxw.getDefaultProvider("homestead");
 
@@ -97,7 +97,7 @@ new :sup:`mxw . providers` . JsonRpcProvider( [ urlOrInfo :sup:`= "http://localh
 Properties
 ==========
 
-All properties are immutable unless otherwise specified, and will reflect their
+Not all properties are mutable unless otherwise specified, and will reflect their
 default values if left unspecified.
 
 .. _provider:
@@ -130,7 +130,7 @@ Provider
 Network
 =======
 
-A network repsents various properties of a network, such as mainnet (i.e. "homestead"),
+A network represents various properties of a network, such as mainnet (i.e. "homestead"),
 testnet or private networks.
 
 :sup:`prototype` . getNetwork ( ) |nbsp| `=> Promise<Network>`

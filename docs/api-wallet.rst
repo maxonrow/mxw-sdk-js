@@ -44,6 +44,7 @@ new :sup:`Wallet` ( privateKey [ , provider ] )
     Generate a `BIP-039`_ + `BIP-044`_ wallet from *mnemonic* deriving *path* using
     the *wordlist*. The default language is English (en).
 
+
     The current supported wordlists are:
 
     ===================== ===========================
@@ -67,11 +68,11 @@ new :sup:`Wallet` ( privateKey [ , provider ] )
 .. code-block:: javascript
     :caption: *load wallet using private key*
 
-    let privateKey = "0xca250aeca008d36b4b4ff83709343c9e4c4ea461e5aa5fa51d57a0fe11eb045e";
+    let privateKey = "0x0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef";
     let wallet = new mxw.Wallet(privateKey);
 
     // Connect a wallet to mainnet
-    let provider = mxw.getDefaultProvider();
+    let provider = mxw.getDefaultProvider("testnet");
     let walletWithProvider = new mxw.Wallet(privateKey, provider);
 
 
@@ -215,7 +216,7 @@ Signing
     :caption: *signing transactions*
 
     let privateKey = "0xca250aeca008d36b4b4ff83709343c9e4c4ea461e5aa5fa51d57a0fe11eb045e";
-    let provider = mxw.getDefaultProvider();
+    let provider = mxw.getDefaultProvider("testnet");
     let wallet = new mxw.Wallet(privateKey, provider);
 
     console.log(wallet.address);
@@ -372,9 +373,9 @@ These operations require the wallet have a provider attached to it.
     :caption: *query the network*
 
     // We require a provider to query the network
-    let provider = mxw.getDefaultProvider();
+    let provider = mxw.getDefaultProvider("testnet");
 
-    let privateKey = "0xca250aeca008d36b4b4ff83709343c9e4c4ea461e5aa5fa51d57a0fe11eb045e";
+    let privateKey = "0x0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef";
     let wallet = new mxw.Wallet(privateKey, provider);
 
     wallet.getBalance().then((balance) => {
@@ -390,9 +391,9 @@ These operations require the wallet have a provider attached to it.
     :caption: *transfer mxw*
 
     // We require a provider to send transactions
-    let provider = mxw.getDefaultProvider();
+    let provider = mxw.getDefaultProvider("testnet");
 
-    let privateKey = "0xca250aeca008d36b4b4ff83709343c9e4c4ea461e5aa5fa51d57a0fe11eb045e";
+    let privateKey = "0x0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef";
     let wallet = new mxw.Wallet(privateKey, provider);
 
     let to = "mxw1j4yh2gfumy8d327n0uvztg9075fjzd59vxf9ae";

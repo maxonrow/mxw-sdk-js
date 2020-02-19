@@ -1,7 +1,6 @@
 Getting Started
 ***************
 
-| nani nani nani? nani ga okorimashita? zen zen wakaranai
 | The mxw-sdk-js library is a compact and complete JavaScript library for Maxonrow blockchain.
 
 -----
@@ -36,8 +35,6 @@ Importing
 
     import { mxw } from 'mxw-sdk-js';
 
-
-
 Including in React Native
 -------------------------
 
@@ -45,7 +42,6 @@ Including in React Native
     :caption: *JavaScript (ES6) / TypeScript*
 
     import { mxw } from 'mxw-sdk-js';
-
 
 Including in React
 ------------------
@@ -62,7 +58,6 @@ Including in Vue.js
     :caption: *JavaScript (ES6) / TypeScript*
 
     import { mxw } from 'mxw-sdk-js';
-
 
 Including in Web Applications
 -----------------------------
