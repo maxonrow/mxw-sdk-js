@@ -1,4 +1,7 @@
 .. |nbsp| unicode:: U+00A0 .. non-breaking space
+.. container:: hatnote hatnote-gray
+
+    Testing
 
 .. _api-wallet:
 
@@ -46,7 +49,8 @@ new :sup:`Wallet` ( privateKey [ , provider ] )
     ===================== ===========================
     Language              node.js                    
     ===================== ===========================
-    English (US)          ``wordlists.en``           
+    English (US)          ``wordlists.en``   
+    France                ``worldlist.fr``        
     Italian               ``wordlists.it``           
     Japanese              ``wordlists.ja``           
     Korean                ``wordlists.ko``           
@@ -61,7 +65,7 @@ new :sup:`Wallet` ( privateKey [ , provider ] )
 
 
 .. code-block:: javascript
-    :caption: *load a private key*
+    :caption: *load wallet using private key*
 
     let privateKey = "0xca250aeca008d36b4b4ff83709343c9e4c4ea461e5aa5fa51d57a0fe11eb045e";
     let wallet = new mxw.Wallet(privateKey);
@@ -129,7 +133,7 @@ new :sup:`Wallet` ( privateKey [ , provider ] )
 
 
 .. code-block:: javascript
-    :caption: *load a mnemonic phrase*
+    :caption: *load a wallet using mnemonic phrase*
 
     let mnemonic = "legal grain canyon open antenna flame destroy nature fall pistol mushroom stay";
     let mnemonicWallet = mxw.Wallet.fromMnemonic(mnemonic);

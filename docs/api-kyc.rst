@@ -5,7 +5,7 @@
 KYC
 ***
 
-Know Your Customer (KYC) is required before any operation in Maxonrow blockchain.
+Know Your Customer (KYC) is **required** before any operation in Maxonrow blockchain.
 
 
 Creating Instances
@@ -83,7 +83,7 @@ Signing
     :ref:`Promise <promise>` that resolves to the :ref:`Transaction Receipt <transaction-receipt>`.
     The transaction should be signed by KYC middleware.
 
-    If an error occurs after the netowrk **may have** received the transaction, the
+    If an error occurs after the network **may have** received the transaction, the
     promise will reject with the error, with the additional property ``transactionHash``
     so that further processing may be done.
 
@@ -121,7 +121,7 @@ Signing
     :ref:`Promise <promise>` that resolves to the :ref:`Transaction Receipt <transaction-receipt>`.
     The transaction should be signed by KYC middleware.
 
-    If an error occurs after the netowrk **may have** received the transaction, the
+    If an error occurs after the network **may have** received the transaction, the
     promise will reject with the error, with the additional property ``transactionHash``
     so that further processing may be done.
 

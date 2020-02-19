@@ -29,6 +29,25 @@ Creating Instances
     Query non-fungible token by symbol from network and returns a :ref:`Promise <promise>` that 
     resolves to a NonFungibleToken instance.
 
+.. code-block:: javascript
+    ::caption:: Create NonFungibleToken
+
+    let nonFungibleTokenProperties: token.NonFungibleTokenProperties;
+        nonFungibleTokenProperties = {
+            name: "MY " + symbol,
+            symbol: symbol,
+            fee: {
+                to: nodeProvider.nonFungibleToken.feeCollector,
+                value: bigNumberify("1")
+            },
+            metadata: ["Wallet able to manage their own metadata"],
+            properties:["Decentralised identifier"]
+        };
+
+        return token.NonFungibleToken.create(nonFungibleTokenProperties, issuer, defaultOverrides).then((token) => {
+            expect(token).to.exist;
+        });
+
 -----
 
 Prototype
@@ -55,12 +74,40 @@ Prototype
     Sends the *transfer non-fungible token* to another person and returns a :ref:`Promise <promise>` that resolves to a
     :ref:`Transaction Receipt <transaction-receipt>`.
 
+.. code-block:: javascript
+    :caption: transfer item ownership
+
+        let provider = mxw.getDefaultProvider("testnet");
+        let privateKey = "0x0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef";
+        let wallet = new mxw.Wallet(privateKey, provider);
+
+        return nftItemMinted.transfer(wallet.address).then((receipt) => {
+            console.log(receipt.status);
+        })
+
 
 :sup:`prototype` . mint ( addressOrName, NonFungibleTokenItem) |nbsp| `=> Promise<TransactionReceipt>`
     Sends the *mint non-fungible token transaction* to the network and returns a :ref:`Promise <promise>` that resolves to a
     :ref:`Transaction Receipt <transaction-receipt>`.
 
     The ``addressOrName`` can be set to recipient alias or wallet address. 
+
+.. code-block:: javascript
+    :caption: *mint a non-fungible token item*
+
+        let issuer : mxw.Wallet;
+        let item = {
+            symbol: symbol,
+            itemID: itemId,
+            properties: ["prop1"],
+            metadata: ["str1", "str2"]
+        } as token.NonFungibleTokenItem;
+
+        let minterNFT = new NonFungibleToken(symbol, issuer);
+
+        return minterNFT.mint(issuer.address, item).then((receipt) => {
+            console.log(receipt.status).to.equal(1);
+        });
 
 :sup:`prototype` . burn ( value ) |nbsp| `=> Promise<TransactionReceipt>`
     Sends the *burn non-fungible token transaction* to the network and returns a :ref:`Promise <promise>` that resolves to a
@@ -93,6 +140,21 @@ Item
 :sup:`prototype` . getParent() |nbsp| `=> Non-fungible Token<NonFungibleToken>`
     *Get parent* of the item. 
 
+.. code-block:: javascript
+    :caption: Get item parents
+    
+        let issuer : mxw.Wallet;
+        let item = {
+            symbol: symbol,
+            itemID: itemId,
+            properties: ["prop1"],
+            metadata: ["str1", "str2"]
+        } as token.NonFungibleTokenItem;
+
+        return NonFungibleTokenItem.fromSymbol(symbol, itemId, issuer).then((nftItem) => {
+            let nftItemMinted = nftItem;
+            console.log(nftItemMinted);
+        })
 
 :sup:`prototype` . endorse( ) |nbsp| `=> Promise<TransactionReceipt>`
     Perform endorsement by endorser
