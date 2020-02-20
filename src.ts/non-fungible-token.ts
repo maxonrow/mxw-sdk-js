@@ -266,7 +266,7 @@ export class NonFungibleToken {
             errors.throwError('accept fungible token ownership require signer', errors.NOT_INITIALIZED, { arg: 'signer' });
         }
 
-         this.isUsable; // check token useability, otherwise throw error
+        this.isUsable; // check token useability, otherwise throw error
 
         return resolveProperties({ signerAddress: this.signer.getAddress() }).then(({ signerAddress }) => {
             if (!signerAddress) {
@@ -791,13 +791,13 @@ function setNonFungibleTokenStatus(symbol: string, status: string, signer: Signe
 
         case "APPROVE_TRANFER_TOKEN_OWNERSHIP":
         case "REJECT_TRANFER_TOKEN_OWNERSHIP":
+        case "REJECT":
             mintLimit = "0";
             transferLimit = "0";
             endorserList = null;
 
             break;
 
-        case "REJECT":
         case "FREEZE":
         case "UNFREEZE":
             break;

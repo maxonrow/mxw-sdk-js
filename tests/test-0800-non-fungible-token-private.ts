@@ -350,6 +350,15 @@ describe('Suite: NonFungibleToken - private', function () {
                 });
             });
 
+            it("Transfer NFT Item - check duplicate", function () {
+                return mintedNFTItem.transfer(wallet.address).then((receipt) => {
+                     expect(receipt).is.not.exist
+                }).catch(error => {
+                    if(transferable) expect(error.code).to.equal(errors.UNEXPECTED_RESULT);
+                    else expect(error.code).to.equal(errors.NOT_ALLOWED);
+                });
+            });
+
             it("Update NFT Item metadata - non owner", function () {
                 return mintedNFTItem.updateMetadata("abcd").then((receipt) => {
                     if (transferable) expect(receipt).is.not.exist;

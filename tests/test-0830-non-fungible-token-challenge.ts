@@ -225,8 +225,10 @@ describe('Suite: NonFungibleToken - challenge', function () {
         } as token.NonFungibleTokenItem;
 
         return nftMinter.mint(wallet.address, itemProp).then((receipt) => {
-            expect(receipt.status).to.equal(1);
-        });
+            expect(receipt).to.not.exist;
+        }).catch(err =>{
+            expect(err.code).to.equal(errors.UNEXPECTED_RESULT);
+        })
     });
 
     let mintedNFTItem: NonFungibleTokenItem;
@@ -268,9 +270,138 @@ describe('Suite: NonFungibleToken - challenge', function () {
         return mintedNFTItem.transfer(provider.address).then((receipt) => {
             expect(receipt).to.not.exist;
         }).catch(err => {
-            expect(err.code).to.equal(errors.CALL_EXCEPTION);
+            expect(err.code).to.equal(errors.UNEXPECTED_RESULT);
         })
     });
+});
+
+describe('Suite: NonFungibleToken - reject', function () {
+    let symbol = "NFT" + hexlify(randomBytes(4)).substring(2);
+    it("Create", function () {
+        nonFungibleTokenProperties = {
+            name: "MY" + symbol,
+            symbol: symbol,
+            fee: {
+                to: nodeProvider.nonFungibleToken.feeCollector,
+                value: bigNumberify("1")
+            },
+            metadata: "Wallet able to manage their own metadata",
+            properties: "Decentralised identifier"
+        };
+
+        return token.NonFungibleToken.create(nonFungibleTokenProperties, issuer, defaultOverrides).then((token) => {
+            expect(token).to.exist;
+            issuerNonFungibleToken = token as token.NonFungibleToken;
+        });
+    });
+
+    it("Reject", function () {
+        let overrides = {
+            notRefresh: true
+        };
+        return performNonFungibleTokenStatus(nonFungibleTokenProperties.symbol, token.NonFungibleToken.rejectNonFungibleToken, overrides).then((receipt) => {
+            if (!silent) console.log(indent, "RECEIPT:", JSON.stringify(receipt));
+        });
+    });
+
+    it("Status", function () {
+        let symbol = nonFungibleTokenProperties.symbol;
+        return token.NonFungibleToken.fromSymbol(symbol, issuer).then((token) => {
+            expect(token).is.not.exist;
+        }).catch(error => {
+            expect(error.code).to.equal(errors.NOT_FOUND);
+        });
+    });
+
+});
+
+describe('Suite: NonFungibleToken - reject transfer ownership', function (){
+
+    this.slow(slowThreshold); // define the threshold for slow indicator
+            let symbol = "NFT" + hexlify(randomBytes(4)).substring(2);
+            it("Create", function () {
+                nonFungibleTokenProperties = {
+                    name: "MY" + symbol,
+                    symbol: symbol,
+                    fee: {
+                        to: nodeProvider.nonFungibleToken.feeCollector,
+                        value: bigNumberify("1")
+                    },
+                    metadata: "metadata",
+                    properties: "properties"
+                };
+
+                return token.NonFungibleToken.create(nonFungibleTokenProperties, issuer, defaultOverrides).then((token) => {
+                    expect(token).to.exist;
+                    issuerNonFungibleToken = token as token.NonFungibleToken;
+                });
+            });
+
+            it("Query", function () {
+                return refresh(nonFungibleTokenProperties.symbol).then(() => {
+                    expect(nonFungibleToken).to.exist;
+                    if (!silent) console.log(indent, "Created Token:", JSON.stringify(nonFungibleToken.state));
+                });
+            });
+
+            it("Approve", function () {
+                let overrides = {
+                    tokenFees: [
+                        { action: NonFungibleTokenActions.transfer, feeName: "default" },
+                        { action: NonFungibleTokenActions.transferOwnership, feeName: "default" },
+                        { action: NonFungibleTokenActions.acceptOwnership, feeName: "default" }
+                    ],
+                    endorserList: [],
+                    mintLimit: 1,
+                    transferLimit: 1,
+                    burnable: true,
+                    transferable: true,
+                    modifiable: true,
+                    pub: false   // not public
+
+                };
+
+                return performNonFungibleTokenStatus(nonFungibleTokenProperties.symbol, token.NonFungibleToken.approveNonFungibleToken, overrides).then((receipt) => {
+                    if (!silent) console.log(indent, "RECEIPT:", JSON.stringify(receipt));
+                });
+            });
+
+            
+            it("State", function () {
+                return issuerNonFungibleToken.getState().then((state) => {
+                    if (!silent) console.log(indent, "STATE:", JSON.stringify(state));
+                });
+            });
+
+            it("Transfer ownership", function () {
+                return issuerNonFungibleToken.transferOwnership(wallet.address).then((receipt) => {
+                    if (!silent) console.log(indent, "RECEIPT:", JSON.stringify(receipt));
+                    expect(receipt.status).to.equal(1);
+                });
+            });
+
+            it("Reject transfer ownership", function () {
+                return performNonFungibleTokenStatus(nonFungibleTokenProperties.symbol, token.NonFungibleToken.rejectNonFungibleTokenOwnership).then((receipt) => {
+                    if (!silent) console.log(indent, "RECEIPT:", JSON.stringify(receipt));
+                });
+            });
+
+            it("Reject transfer ownership - checkDuplication", function () {
+                return performNonFungibleTokenStatus(nonFungibleTokenProperties.symbol, token.NonFungibleToken.rejectNonFungibleTokenOwnership).then((receipt) => {
+                    expect(receipt).is.not.exist;
+                }).catch(error => {
+                    expect(error.code).to.equal(errors.EXISTS);
+                });
+            });
+
+            it("Accept ownership", function () {
+                return nonFungibleToken.acceptOwnership().then((receipt) => {
+                    if (!silent) console.log(indent, "RECEIPT:", JSON.stringify(receipt));
+                    expect(receipt).to.not.exist;
+                }).catch(err =>{
+                    expect(err.code).to.equal(errors.NOT_ALLOWED)
+                });
+            });
 });
 
 function performNonFungibleTokenStatus(symbol: string, perform: any, overrides?: any) {
