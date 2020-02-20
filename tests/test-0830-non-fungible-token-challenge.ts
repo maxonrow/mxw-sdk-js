@@ -271,18 +271,12 @@ describe('Suite: NonFungibleToken - challenge', function () {
             expect(err.code).to.equal(errors.CALL_EXCEPTION);
         })
     });
-
 });
-
-
-
-
 
 function performNonFungibleTokenStatus(symbol: string, perform: any, overrides?: any) {
     return perform(symbol, provider, overrides).then((transaction) => {
         return token.NonFungibleToken.signNonFungibleTokenStatusTransaction(transaction, issuer);
     }).then((transaction) => {
-
         return token.NonFungibleToken.sendNonFungibleTokenStatusTransaction(transaction, middleware).then((receipt) => {
             expect(receipt.status).to.equal(1);
 
@@ -295,8 +289,6 @@ function performNonFungibleTokenStatus(symbol: string, perform: any, overrides?:
         });
     });
 }
-
-
 
 function refresh(symbol: string) {
     return token.NonFungibleToken.fromSymbol(symbol, wallet).then((token) => {

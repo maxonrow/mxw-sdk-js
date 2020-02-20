@@ -1064,7 +1064,7 @@ export function getTransactionRequest(route: string, transactionType: string, ov
                     memo: string
                 } = checkFormat({
                     symbol: checkString,
-                    from: checkString,
+                    from: checkAddress,
                     itemID: checkString,
                     memo: allowNullOrEmpty(checkString)
                 }, overrides);
@@ -1098,7 +1098,7 @@ export function getTransactionRequest(route: string, transactionType: string, ov
                     memo: string
                 } = checkFormat({
                     symbol: checkString,
-                    from: checkString,
+                    from: checkAddress,
                     itemID: checkString,
                     memo: allowNullOrEmpty(checkString)
                 }, overrides);
@@ -1167,7 +1167,7 @@ export function getTransactionRequest(route: string, transactionType: string, ov
                     memo: string
                 } = checkFormat({
                     symbol: checkString,
-                    from: checkString,
+                    from: checkAddress,
                     itemID: checkString,
                     metadata: allowNullOrEmpty(checkString),
                     memo: allowNullOrEmpty(checkString)
@@ -1202,7 +1202,7 @@ export function getTransactionRequest(route: string, transactionType: string, ov
                     memo: string
                 } = checkFormat({
                     symbol: checkString,
-                    from: checkString,
+                    from: checkAddress,
                     memo: allowNullOrEmpty(checkString)
                 }, overrides);
 
@@ -1234,7 +1234,7 @@ export function getTransactionRequest(route: string, transactionType: string, ov
                     memo: string
                 } = checkFormat({
                     symbol: checkString,
-                    from: checkString,
+                    from: checkAddress,
                     metadata: allowNullOrEmpty(checkString),
                     memo: allowNullOrEmpty(checkString)
                 }, overrides);
@@ -1269,7 +1269,7 @@ export function getTransactionRequest(route: string, transactionType: string, ov
                     memo: string
                 } = checkFormat({
                     symbol: checkString,
-                    from: checkString,
+                    from: checkAddress,
                     itemID: checkString,
                     memo: allowNullOrEmpty(checkString)
                 }, overrides);
