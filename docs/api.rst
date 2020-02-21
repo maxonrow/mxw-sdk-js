@@ -8,6 +8,7 @@ Using the SDK
 
    api-wallet
    api-providers
+   api-signers
    api-kyc
    api-tokens
    api-nft

@@ -53,16 +53,16 @@ Prototype
 :sup:`prototype` . getParent() |nbsp| `=> Non-fungible Token<NonFungibleToken>`
     *Get parent* of the non-fungible token. 
 
-:sup:`prototype` . transferOwnership ( addressOrName ) |nbsp| `=> Promise<TransactionReceipt>`
+:sup:`prototype` . transferOwnership ( :ref:`AddressOrName <addressOrName>` ) |nbsp| `=> Promise<TransactionReceipt>`
     Sends the *transfer non-fungible token item* to another person and returns a :ref:`Promise <promise>` that resolves to a
     :ref:`Transaction Receipt <transaction-receipt>`.
 
 
-:sup:`prototype` . mint ( addressOrName) |nbsp| `=> Promise<TransactionReceipt>`
+:sup:`prototype` . mint ( :ref:`AddressOrName <addressOrName>`) |nbsp| `=> Promise<TransactionReceipt>`
     Sends the *mint non-fungible token item transaction* to the network and returns a :ref:`Promise <promise>` that resolves to a
     :ref:`Transaction Receipt <transaction-receipt>`.
 
-    The ``addressOrName`` can be set to recipient alias or wallet address. 
+    The :ref:`AddressOrName <addressOrName>` can be set to recipient alias or wallet address. 
 
 :sup:`prototype` . burn ( value ) |nbsp| `=> Promise<TransactionReceipt>`
     Sends the *burn non-fungible token item transaction* to the network and returns a :ref:`Promise <promise>` that resolves to a
@@ -71,19 +71,19 @@ Prototype
     The ``value`` is the number of *non-fungible token item* (as a :ref:`BigNumber <bignumber>`) that to be burned.
     Be aware of the number of decimals applied for the token.
 
-:sup:`prototype` . freeze ( addressOrName ) |nbsp| `=> Promise<TransactionReceipt>`
+:sup:`prototype` . freeze ( :ref:`AddressOrName <addressOrName>` ) |nbsp| `=> Promise<TransactionReceipt>`
     Sends the *freeze non-fungible token item transaction* to the network and returns a :ref:`Promise <promise>` that resolves to a
     :ref:`Transaction Receipt <transaction-receipt>`.
 
-    The ``addressOrName`` can be set to target holder alias or wallet address that to be freeze.
+    The :ref:`AddressOrName <addressOrName>` can be set to target holder alias or wallet address that to be freeze.
 
 .. note:: Only non-fungible token item middleware is allowed to sign ``freeze`` transaction.
 
-:sup:`prototype` . unfreeze ( addressOrName ) |nbsp| `=> Promise<TransactionReceipt>`
+:sup:`prototype` . unfreeze ( :ref:`AddressOrName <addressOrName>` ) |nbsp| `=> Promise<TransactionReceipt>`
     Sends the *unfreeze non-fungible token transaction* to the network and returns a :ref:`Promise <promise>` that resolves to a
     :ref:`Transaction Receipt <transaction-receipt>`.
 
-    The ``addressOrName`` can be set to target holder alias or wallet address that to be unfreeze.
+    The :ref:`AddressOrName <addressOrName>` can be set to target holder alias or wallet address that to be unfreeze.
 
 .. note:: Only non-fungible token item middleware is allowed to sign ``unfreeze`` transaction.
 

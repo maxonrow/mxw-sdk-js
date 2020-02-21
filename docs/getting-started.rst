@@ -79,7 +79,7 @@ distribution network) should suffice.
 
 Connect to Maxonrow blockchain
 ==============================
-| TBH
+| TBA
 | Connecting 99.9%........
 | And fatal error
 
@@ -87,8 +87,8 @@ Creating first SDK call
 =======================
 | Somebody call 911?
 
-Handling Errors(???)
-====================
+Handling Errors
+===============
 | 404
 
 .. _npm is installed: https://nodejs.org/en/
