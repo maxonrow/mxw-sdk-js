@@ -132,6 +132,12 @@ export declare class NonFungibleToken {
      */
     static create(tokenProperties: NonFungibleTokenProperties, signer: Signer, overrides?: any): Promise<TransactionResponse | NonFungibleToken>;
     /**
+   * Update non-fungible token metadata
+   * @param metadata new metadata
+   * @param overrides options
+   */
+    updateMetadata(metadata?: string, overrides?: any): Promise<TransactionResponse | TransactionReceipt>;
+    /**
     * Mint NFT item
     * @param toAddressOrName receiver address
     * @param item item to mint
