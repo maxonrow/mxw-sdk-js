@@ -42,11 +42,11 @@ JsonRpcProvider :sup:`( inherits from Provider )`
 :sup:`prototype` . connection
     An object describing the connection of the JSON-RPC endpoint with the properties:
 
-    - **url: ** *string* url (the JSON-RPC URL)
-    - **timeout: ** *int* RPC request timeout in milliseconds (default: 120,000 ms)
-    - **user: ** *string* username (a username to use for Basic Authentication) *optional*
-    - **password: ** *string* password ( a password to use for Basic Authentication) *optional*
-    - **allowInsecure: ** *boolean* allowable of Basic Authentication over an insecure HTTP network (default: false)
+    - **url :** *string* url (the JSON-RPC URL)
+    - **timeout :** *int* RPC request timeout in milliseconds (default: 120,000 ms)
+    - **user :** *string* username (a username to use for Basic Authentication) *optional*
+    - **password :** *string* password ( a password to use for Basic Authentication) *optional*
+    - **allowInsecure :** *boolean* allowable of Basic Authentication over an insecure HTTP network (default: false)
 
 
 new :sup:`mxw . providers` . JsonRpcProvider( [ urlOrInfo :sup:`= "http://localhost:26657"` ] [ , network ] )
@@ -54,11 +54,11 @@ new :sup:`mxw . providers` . JsonRpcProvider( [ urlOrInfo :sup:`= "http://localh
 
     The *urlOrInfo* may also be specified as an object with the properties:
 
-    - **url: ** *string* url (the JSON-RPC URL) ***required**
-    - **timeout: ** *int* RPC request timeout in milliseconds (default: 60,000 ms)
-    - **user: ** *string* username (a username to use for Basic Authentication) *optional*
-    - **password: ** *string* password ( a password to use for Basic Authentication) *optional*
-    - **allowInsecure: ** *boolean* allowable of Basic Authentication over an insecure HTTP network (default: false)
+    - **url :** *string* url (the JSON-RPC URL) ***required**
+    - **timeout :** *int* RPC request timeout in milliseconds (default: 60,000 ms)
+    - **user :** *string* username (a username to use for Basic Authentication) *optional*
+    - **password :** *string* password ( a password to use for Basic Authentication) *optional*
+    - **allowInsecure :** *boolean* allowable of Basic Authentication over an insecure HTTP network (default: false)
 
     **Also See:** JSON-RPC provider-specific :ref:`Properties <provider-jsonrpc-properties>` and :ref:`Operations <provider-jsonrpc-extra>`
 

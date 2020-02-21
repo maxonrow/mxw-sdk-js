@@ -29,6 +29,7 @@ Create Wallet
     | Ensure this wallet is stored somewhere safe, if lost there is **NO way to recover it**. 
 
     | Parameters can be use are:-
+    
         - **entropyLength :** *int* from 0 to 34 (higher value means greater security)
         - **path :** *string* directory for the mnemonic to store
         - **locale :** *string* worldlists
