@@ -1,6 +1,9 @@
 
-Cookbook
-********
+How to
+******
+
+| How to query transaction
+| How to create transaction
 
 This is a small (but growing) collection of simple recipes to perform common tasks
 with the Maxonrow blockchain.
