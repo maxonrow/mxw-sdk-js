@@ -188,7 +188,7 @@ describe('Suite: NonFungibleToken - private', function () {
                     expect(receipt).is.not.exist;
                 }).catch(error => {
                     expect(error.code).to.equal(errors.NOT_ALLOWED);
-                }); true
+                });
             });
 
             it("State", function () {
