@@ -23,6 +23,11 @@ version:
 install:
 	@npm install
 
+setup-env:
+	@cd tests; \
+		./pull-env.sh; \
+	cd ..;
+
 build:
 	@npm run build
 	@REGISTRY_URL=$(REGISTRY_URL) make --no-print-directory -C $(ROOT_PATH)/docs build
