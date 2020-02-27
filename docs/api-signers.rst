@@ -1,10 +1,12 @@
 .. |nbsp| unicode:: U+00A0 .. non-breaking space
 
+*******
 Signers
 *******
 
 Transactions
-------------
+############
+
 All properties for transaction are optional.
 
 .. code-block:: javascript
@@ -75,7 +77,7 @@ All properties for transaction are optional.
 
 
 Signing
--------
+#######
 
 :sup:`prototype` . sign ( transaction ) |nbsp| `=> Promise<string>`
     Signs *transaction* and returns a :ref:`Promise <promise>` that resolves to
@@ -197,7 +199,7 @@ Signing
 -----
 
 Name Service
-------------
+############
 
 :sup:`prototype` . createAlias ( name, appFee ) |nbsp| `=> Promise<TransactionReceipt>`
     Sign alias creation transaction and send it to network and returns a :ref:`Promise <promise>` that resolves to a
@@ -210,7 +212,7 @@ Name Service
 -----
 
 Cryptographic Functions
------------------------
+#######################
 
 :sup:`prototype` . computeSharedSecret ( otherPublicKey ) |nbsp| `=> string`
     Compute the *shared secret* by using other wallet's public key and returns as a :ref:`hex string <hexstring>`.
@@ -219,7 +221,7 @@ Cryptographic Functions
 -----
 
 Blockchain Operations
----------------------
+#####################
 
 These operations require the wallet have a provider attached to it.
 
@@ -228,25 +230,9 @@ These operations require the wallet have a provider attached to it.
     in **cin**) of the wallet. Be aware of the number of decimals for *cin* is 18.
     The balance can be convert to a human readable format by :ref:`formatMxw <formatMxw>`, versa :ref:`parseMxw <parseMxw>`.
 
-:sup:`prototype` . transfer ( :ref:`AddressOrName <addressOrName>`, value ) |nbsp| `=> Promise<TransactionReceipt>`
-    Sends the *transfer transaction* to the network and returns a :ref:`Promise <promise>` that resolves to a
-    :ref:`Transaction Receipt <transaction-receipt>`.
-
-    The :ref:`AddressOrName <addressOrName>` can be set to recipient alias or wallet address. The ``value`` is the number of *cin*
-    (as a :ref:`BigNumber <bignumber>`) that transfers to recipient. Be aware of the number of decimals for *cin*
-    is 18.
-
 :sup:`prototype` . getTransactionCount ( ) |nbsp| `=> Promise<BigNumber>`
     Returns a :ref:`Promise <promise>` that resovles to the number of transactions
     this account has ever sent (as a :ref:`BigNumber <bignumber>`).
-
-.. _sendTransaction:
-
-:sup:`prototype` . sendTransaction ( transaction ) |nbsp| `=> Promise<TransactionResponse>`
-    Sends the *transaction* (see :ref:`Transaction Requests <transaction-request>`) to
-    the network and returns a :ref:`Promise <promise>` that resolves to a
-    :ref:`Transaction Response <transaction-receipt>`. Any properties that are not
-    provided will be populated from the network.
 
 .. code-block:: javascript
     :caption: *query the network*
@@ -265,6 +251,13 @@ These operations require the wallet have a provider attached to it.
         console.log(nonce);
     });
 
+:sup:`prototype` . transfer ( :ref:`AddressOrName <addressOrName>`, value ) |nbsp| `=> Promise<TransactionReceipt>`
+    Sends the *transfer transaction* to the network and returns a :ref:`Promise <promise>` that resolves to a
+    :ref:`Transaction Receipt <transaction-receipt>`.
+
+    The :ref:`AddressOrName <addressOrName>` can be set to recipient alias or wallet address. The ``value`` is the number of *cin*
+    (as a :ref:`BigNumber <bignumber>`) that transfers to recipient. Be aware of the number of decimals for *cin*
+    is 18.
 
 .. code-block:: javascript
     :caption: *transfer mxw*
@@ -288,11 +281,20 @@ These operations require the wallet have a provider attached to it.
         // Should check the transaction status = 1 means successfully added into block
     });
 
+.. _sendTransaction:
+
+:sup:`prototype` . sendTransaction ( transaction ) |nbsp| `=> Promise<TransactionResponse>`
+    Sends the *transaction* (see :ref:`Transaction Requests <transaction-request>`) to
+    the network and returns a :ref:`Promise <promise>` that resolves to a
+    :ref:`Transaction Response <transaction-receipt>`. Any properties that are not
+    provided will be populated from the network.
+
+
 
 -----
 
 Encrypted JSON Wallets
-----------------------
+######################
 
 Many systems store private keys as encrypted JSON wallets, in various formats. There are several
 formats and algorithms that are used, all of which are supported to be read.
@@ -307,7 +309,7 @@ Wallet instance from a JSON wallet.
     All options are optional. The valid options are:
 
         - **salt** --- the salt to use for scrypt
-        - **iv** --- the initialization vecotr to use for aes-ctr-128
+        - **iv** --- the initialization vector to use for aes-ctr-128
         - **uuid** --- the UUID to use for the wallet
         - **scrypt** --- the scrypt parameters to use (N, r and p)
         - **entropy** --- the mnemonic entropy of this wallet; generally you should **not** specify this
@@ -337,7 +339,7 @@ Wallet instance from a JSON wallet.
 .. _signer:
 
 Signer API
-==========
+##########
 
 The Signer API is an abstract class which makes it easy to extend and add new signers,
 that can be used by this library and extension libraries. The :ref:`Wallet <wallet>`
@@ -347,7 +349,7 @@ To implement a Signer, inherit the abstract class *mxw.types.Signer* and impleme
 the following properties:
 
 :sup:`object` . provider
-    A :ref:`Provider <api-provider>` that is connected to the network. This is optional, however,
+    Returns :ref:`Provider <api-provider>` that is connected to the network. This is optional, however,
     without a *provider*, **only** *write-only* operations should be expected to work.
 
 :sup:`object` . getAddress ( ) |nbsp| `=> Promise<Address>`

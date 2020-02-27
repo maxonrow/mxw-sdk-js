@@ -1,7 +1,9 @@
+============
 Introduction
 ============
 
-WHAT IS BLOCKCHAIN
+******************
+What is blockchain
 ******************
 Google, Wikipedia is your best pal my friend
 

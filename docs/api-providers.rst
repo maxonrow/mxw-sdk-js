@@ -2,8 +2,9 @@
 
 .. _api-provider:
 
-Providers
-*********
+********
+Provider
+********
 
 A Provider abstracts a connection to the blockchain, for issuing queries
 and sending signed state changing transactions.
@@ -16,7 +17,7 @@ control or have access to, including mainnet, testnets, or localnets.
 .. _provider-connect:
 
 Connecting to Blockchain
-========================
+########################
 
 There are several methods to connect to the blockchain network provided. If you are not
 running your own local blockchain node, it is recommended that you use the ``getDefaultProvider()``
@@ -35,7 +36,7 @@ method.
 
 
 JsonRpcProvider :sup:`( inherits from Provider )`
------------------------------------------------------
+*************************************************
 
 .. _provider-jsonrpc-properties:
 
@@ -97,15 +98,14 @@ new :sup:`mxw . providers` . JsonRpcProvider( [ urlOrInfo :sup:`= "http://localh
 -----
 
 Properties
-==========
+**********
 
-Not all properties are mutable unless otherwise specified, and will reflect their
-default values if left unspecified.
+Not all properties are mutable unless otherwise specified, and will reflect thier default values if left unspecified.
 
 .. _provider:
 
 Provider Variables
-------------------
+==================
 
 :sup:`prototype` . blockNumber
     return the most recent block number (block height) this provider has seen and has triggered
@@ -139,8 +139,8 @@ testnet or private networks.
     A :ref:`Promise <promise>` that resolves to a `Network` object describing the
     connected network and chain. A network has the following properties:
 
-    - *name* --- the name of the network (e.g. "testnet")
     - *chainId* --- the chain ID (network ID) of the connected network
+    - *name* --- the name of the network (e.g. "testnet")
 
 .. code-block:: javascript
     :caption: *get a standard network*
@@ -216,7 +216,7 @@ Account
 .. _provider-blockchain:
 
 Blockchain Status
-=================
+================
 
 :sup:`prototype` . getBlockNumber ( ) |nbsp| `=> Promise<number>`
     Returns a :ref:`Promise <promise>` with the latest block number (as a Number).
@@ -306,7 +306,7 @@ Blockchain Status
 .. _waitForTransaction:
 
 Waiting for Transactions
-------------------------
+========================
 
 :sup:`prototype` . waitForTransaction ( transactionHash ) |nbsp| `=> Promise<TransactionReceipt>`
     Return a :ref:`Promise <promise>` which resolves to the
@@ -415,7 +415,15 @@ Block Responses
 .. _transaction-request:
 
 Transaction Requests
---------------------
+====================
+
+In order to excecute a transaction, a requests must be send. A Transaction Requests will contain following infomation:-
+
+*Transaction fee
+*Transaction memo
+    -Transaction Type(what kind of transaction is involve ex.transfer mxw, send message etc.)
+    -Transaction data or variables involve
+*Transaction signature (done by the requester)
 
 Any property which accepts a number may also be specified as a :ref:`BigNumber <bignumber>`
 or :ref:`hex string <hexstring>`. Any property may also be given as a :ref:`Promise <promise>`
@@ -477,7 +485,10 @@ which resolves to the expected type.
 .. _transaction-receipt:
 
 Transaction Receipts
---------------------
+====================
+
+| After every transaction, a receipt will be generated it contains every infomation regarding the transaction.
+| Transaction hash and block number is given, to check the transaction on blockchain.
 
 .. code-block:: javascript
 
@@ -570,12 +581,11 @@ Transaction Receipts
 -----
 
 Provider Specific Extra API Calls
-=================================
+*********************************
 
 .. _provider-jsonrpc-extra:
 
-JsonRpcProvider
----------------
+**JsonRpcProvider**
 
 :sup:`prototype` . send ( method , params ) |nbsp| `=> Promise<any>`
     Send the JSON-RPC *method* with *params*. This is useful for calling

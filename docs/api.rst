@@ -1,10 +1,11 @@
 .. _api:
 
+*************
 Using the SDK
 *************
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 4
 
    api-wallet
    api-providers

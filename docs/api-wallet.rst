@@ -5,6 +5,7 @@
 
 .. _api-wallet:
 
+*******
 Wallets
 *******
 
@@ -16,23 +17,23 @@ transactions and prove ownership on the blockchain network.
 .. _wallet:
 
 Wallet
-======
+######
 
 The **Wallet** implements the :ref:`Signer API <signer>` and can be used anywhere a *Signer*
 is expected and has all the required properties.
 
 Create Wallet
--------------
+*************
 
 :sup:`Wallet` . createRandom ( [ options ] ) |nbsp| `=> Wallet`
-    | Creates a new random wallet and mnemonic and encrypted JSON file is generated to load the wallet.
+    | Creates a new random wallet then generate mnemonic and an encrypted JSON file.
     | Ensure this wallet is stored somewhere safe, if lost there is **NO way to recover it**. 
 
     | Parameters can be use are:-
     
-        - **entropyLength :** *int* from 0 to 34 (higher value means greater security)
-        - **path :** *string* directory for the mnemonic to store
-        - **locale :** *string* worldlists
+        - **entropyLength :** *int* (from 16 to 32 & mutiple of 4 - higher value means greater security)
+        - **path :** *string* (directory to store mnemonic)
+        - **locale :** *string* (worldlists)
 
         The current supported wordlists are:
 
@@ -74,16 +75,18 @@ Create Wallet
     console.log("Mnemonic:", randomWallet.mnemonic);
 
 Create Instance of Existing Wallet
-----------------------------------
+**********************************
 
 new :sup:`Wallet` ( privateKey [ , provider ] )
     Creating a new instance of exisiting wallet from *privateKey* and optionally connect a provider
 
 .. code-block:: javascript
-    :caption: *load wallet using private key*
+    :caption: *load wallet using private key and connect it to provider*
 
+    //connect wallet to testnet
     let privateKey = "0x0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef";
-    let wallet = new mxw.Wallet(privateKey);
+    let provider = mxw.getDefaultProvider("testnet");
+    let walletWithProvider = new mxw.Wallet(privateKey, provider);
 
 .. _wallet-connect:
 
@@ -91,15 +94,15 @@ new :sup:`Wallet` ( privateKey [ , provider ] )
     Creates a new Wallet instance from an existing instance, connected to a new *provider*.
 
 .. code-block:: javascript
-    :caption: *load wallet using private key and connect it to provider*
+    :caption: *load wallet using private key then connect to provider*
 
+    //load wallet using private key
     let privateKey = "0x0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef";
     let wallet = new mxw.Wallet(privateKey);
 
     // Connect the wallet to testnet
     let provider = mxw.getDefaultProvider("testnet");
-    let walletWithProvider = new mxw.Wallet(privateKey, provider);
-
+    wallet.connect(provider);
 
 .. _fromEncryptedJson:
 
@@ -178,7 +181,7 @@ new :sup:`Wallet` ( privateKey [ , provider ] )
 .. _addressOrName:
 
 Prototype Variables
--------------------
+###################
 
 :sup:`prototype` . address
     | Returns public address of a wallet
@@ -190,11 +193,12 @@ Prototype Variables
 
 :sup:`prototype` . provider
     Returns a connected :ref:`Provider <provider>` which allows the wallet to
-    connect to the blockchain network to query its state and send transactions,
+    connect to the blockchain network to query its state and send transactions, 
     or null if no provider is connected.
 
     To change the provider, use the :ref:`connect <wallet-connect>` method, which will returns
-    a **new instance** of the Wallet connected to the provider.
+    a **new instance** of the Wallet connected to the provider.  
+    | *data type: string*
 
 :sup:`prototype` . mnemonic
     | Returns mnemonic phrase for this wallet, or null if the mnemonic is unknown.

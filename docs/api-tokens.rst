@@ -3,15 +3,16 @@
 .. _api-tokens:
 .. _api-fungible-token:
 
+**************
 Fungible Token
-==============
+**************
 
 Create fungible token required approval from authorities.
 
 -----
 
 Creating Instances
-------------------
+##################
 
 :sup:`FungibleToken` . create ( properties, signerOrProvider ) |nbsp| `=> Promise<FungibleToken>`
     Creates a new instance reference from *signerOrProvider* and send fungible token creation transaction to network
@@ -37,7 +38,7 @@ Creating Instances
 -----
 
 Prototype
----------
+#########
 
 :sup:`prototype` . state |nbsp| `=> TokenState`
 

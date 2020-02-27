@@ -2,6 +2,7 @@
 
 .. _api-kyc:
 
+***
 KYC
 ***
 
@@ -9,7 +10,7 @@ Know Your Customer (KYC) is **required** before any operation in Maxonrow blockc
 
 
 Creating Instances
-------------------
+##################
 
 :sup:`Kyc` . create ( signerOrProvider ) |nbsp| `=> Promise<Kyc>`
     Creates a new instance reference from *signerOrProvider* and optionally connect a provider.
@@ -21,7 +22,7 @@ Creating Instances
     let kyc = kyc.create(provider);
 
 Signing
--------
+#######
 
 :sup:`prototype` . getKycAddress ( keyComponent ) |nbsp| `=> string`
     Compute kyc address from key components by SHA2-256 cryptographic hash and
@@ -163,7 +164,7 @@ Signing
     The :ref:`AddressOrName <addressOrName>` can be set to target alias or wallet address. The ``kycAddress`` is the reference of relationship.
 
 Checking status
----------------
+###############
 
 :sup:`wallet` . isWhitelisted ( ) |nbsp| `=> Promise<Boolean>`
     Return a :ref:`Promise <promise>` of the wallet white list status.

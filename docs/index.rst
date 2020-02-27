@@ -3,7 +3,7 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-
+******************
 What is mxw-sdk-js
 ******************
 
@@ -11,6 +11,7 @@ The mxw-sdk-js library aims to be a complete and compact library for interacting
 
 -----
 
+========
 Features
 ========
 
