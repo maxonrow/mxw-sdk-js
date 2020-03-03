@@ -8,7 +8,7 @@
 # -- Project information -----------------------------------------------------
 
 project = 'mxw-sdk-js'
-copyright = '2019, Maxonrow'
+copyright = '2020, Maxonrow'
 author = 'Jean Soon'
 
 # The short X.Y version
