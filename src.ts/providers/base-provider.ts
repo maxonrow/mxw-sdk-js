@@ -32,7 +32,7 @@ import {
     Listener,
     AccountState,
     AliasState,
-    TokenState, TokenList, TokenAccountState,
+    TokenState, NFTokenState, NFTokenItemState, TokenList, TokenAccountState,
     TransactionReceipt, TransactionResponse, TransactionFee
 } from './abstract-provider';
 
@@ -101,6 +101,58 @@ function checkTokenState(data: any): TokenState {
         return key;
     });
 }
+
+function checkNonFungibleTokenState(data: any): NFTokenState {
+    return camelize(checkFormat({
+        Flags: checkNumber,
+        Name: checkString,
+        Symbol: checkString,
+        Owner: checkAddress,
+        NewOwner: checkAddress,
+        Metadata: allowNullOrEmpty(checkString),
+        Properties: allowNullOrEmpty(checkString),
+        TransferLimit: checkBigNumber,
+        MintLimit: checkBigNumber,
+        TotalSupply: checkString
+    }, data), (key) => {
+        switch (key) {
+            case "Flags": return "flags";
+            case "Name": return "name";
+            case "Symbol": return "symbol";
+            case "Owner": return "owner";
+            case "NewOwner": return "newOwner";
+            case "Metadata": return "metadata";
+            case "Properties": return "properties";
+            case "TransferLimit": return "transferLimit";
+            case "MintLimit": return "mintLimit";
+            case "TotalSupply": return "totalSupply"
+
+        }
+        return key;
+    });
+}
+
+function checkNonFungibleTokenItemState(data: any): NFTokenItemState {
+    return camelize(checkFormat({
+        ID: checkString,
+        Metadata: allowNullOrEmpty(checkString),
+        Properties: allowNullOrEmpty(checkString),
+        Frozen: checkBoolean,
+        TransferLimit: checkBigNumber
+
+    }, data), (key) => {
+        switch (key) {
+            case "ID": return "id";
+            case "Metadata": return "metadata";
+            case "Properties": return "properties";
+            case "Frozen": return "frozen";
+            case "TransferLimit": return "transferLimit";
+
+        }
+        return key;
+    });
+}
+
 
 function checkTokenAccountState(data: any): TokenAccountState {
     return camelize(checkFormat({
@@ -678,6 +730,45 @@ export class BaseProvider extends Provider {
             });
         });
     }
+
+    getNFTokenState(symbol: string | Promise<string>, blockTag?: BlockTag | Promise<BlockTag>): Promise<NFTokenState> {
+        return this.ready.then(() => {
+            return resolveProperties({ symbol: symbol, blockTag: blockTag }).then(({ symbol, blockTag }) => {
+                let params = {
+                    symbol: symbol,
+                    blockTag: checkBlockTag(blockTag)
+                };
+                return this.perform('getNFTokenState', params).then((result) => {
+                    let state: NFTokenState = result;
+
+                    if (result) {
+                        state = checkNonFungibleTokenState(result);
+                    }
+                    return state;
+                });
+            });
+        });
+    }
+
+    getNFTokenItemState(symbol: string | Promise<string>, itemID: string, blockTag?: BlockTag | Promise<BlockTag>): Promise<NFTokenItemState> {
+        return this.ready.then(() => {
+            return resolveProperties({ symbol: symbol, itemID: itemID, blockTag: blockTag }).then(({ symbol, itemID, blockTag }) => {
+                let params = {
+                    symbol: symbol,
+                    itemID: itemID,
+                    blockTag: checkBlockTag(blockTag)
+                };
+                return this.perform('getNFTokenItemState', params).then((result) => {
+                    let state: NFTokenItemState = result;
+                    if (result) {
+                        state = checkNonFungibleTokenItemState(result);
+                    }
+                    return state;
+                });
+            });
+        });
+    }
+
 
     getAliasState(address: string | Promise<string>, blockTag?: BlockTag | Promise<BlockTag>): Promise<AliasState> {
         return resolveProperties({ address, blockTag }).then(({ address, blockTag }) => {

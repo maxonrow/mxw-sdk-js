@@ -42,7 +42,10 @@ export function sortObject(obj) {
         let sorted = (Array.isArray(obj)) ? [] : {};
 
         Object.keys(obj).sort().forEach(function (key) {
-            if ("object" == typeof obj[key] && 0 < Object.keys(obj[key]).length) {
+            if (null == obj[key]) {
+                sorted[key] = obj[key];
+            }
+            else if ("object" == typeof obj[key] && 0 < Object.keys(obj[key]).length) {
                 sorted[key] = sortObject(obj[key]);
             }
             else {
@@ -92,6 +95,9 @@ export function iterate(obj, modifier?: (key: string, value: any, type: string) 
                     }
                 }
             }
+            else if (null === data)
+                modified[key] = data;
+            else { }
         });
         return modified;
     }
@@ -133,7 +139,13 @@ export function checkFormat(format: any, object: any): any {
                 if (value !== undefined) { result[key] = value; }
             }
         } catch (error) {
-            errors.throwError(errors.INVALID_FORMAT, 'invalid format object key ' + key + ": " + error.message, {
+            if (undefined === object[key]) {
+                errors.throwError('missing object key ' + key, errors.MISSING_ARGUMENT, {
+                    key,
+                    object
+                });
+            }
+            errors.throwError('invalid format object key ' + key + ": " + (error.reason ? error.reason : error.message), errors.INVALID_FORMAT, {
                 value: object[key],
                 key,
                 object
@@ -152,9 +164,30 @@ export function allowNull(check: CheckFormatFunc, nullValue?: any): CheckFormatF
     });
 }
 
+export function notAllowNull(check: CheckFormatFunc): CheckFormatFunc {
+    return (function (value: any) {
+        if (value == null) { throw new Error('is null'); }
+        return check(value);
+    });
+}
+
 export function allowNullOrEmpty(check: CheckFormatFunc, nullValue?: any): CheckFormatFunc {
     return (function (value: any) {
         if (value == null || '' === value) { return nullValue; }
+        return check(value);
+    });
+}
+
+export function notAllowNullOrEmpty(check: CheckFormatFunc): CheckFormatFunc {
+    return (function (value: any) {
+        if (isUndefinedOrNullOrEmpty(value)) { throw new Error('empty'); }
+        return check(value);
+    });
+}
+
+export function expectTypeOf(check: CheckFormatFunc, type: string): CheckFormatFunc {
+    return (function (value: any) {
+        if (type !== typeof value) { throw new Error("expected type " + type + ", but " + (typeof value)); }
         return check(value);
     });
 }
@@ -175,7 +208,6 @@ export function arrayOf(check: CheckFormatFunc): CheckFormatFunc {
 
 export function checkHash(hash: any, requirePrefix?: boolean): string {
     if (typeof (hash) === 'string') {
-        // geth-etc does add a "0x" prefix on receipt.root
         if (!requirePrefix && hash.substring(0, 2) !== '0x') { hash = '0x' + hash; }
         if (hexDataLength(hash) === 32) {
             return hash.toLowerCase();
@@ -188,8 +220,16 @@ export function checkNumber(number: any): number {
     return bigNumberify(number).toNumber();
 }
 
+export function checkNumberString(number: any): string {
+    return bigNumberify(number).toNumber().toString();
+}
+
 export function checkBigNumber(number: any): BigNumber {
     return bigNumberify(number);
+}
+
+export function checkBigNumberString(value: any): string {
+    return bigNumberify(value).toString();
 }
 
 export function checkBoolean(value: any): boolean {

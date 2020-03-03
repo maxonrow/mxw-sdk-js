@@ -35,7 +35,7 @@ export abstract class Signer {
         return isType(value, 'Signer');
     }
 
-//    readonly inherits: (child: any) => void;
+    //    readonly inherits: (child: any) => void;
 }
 
 //defineReadOnly(Signer, 'inherits', inheritable(Signer));

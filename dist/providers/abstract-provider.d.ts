@@ -35,6 +35,25 @@ export interface TokenState {
     newOwner: string;
     metadata: string;
 }
+export interface NFTokenState {
+    flags: number;
+    name: string;
+    symbol: string;
+    owner: string;
+    newOwner: string;
+    metadata: string;
+    mintLimit: BigNumber;
+    transferLimit: BigNumber;
+    endorserList: string[];
+    totalSupply: BigNumber;
+}
+export interface NFTokenItemState {
+    id: string;
+    properties: string[];
+    metadata: string[];
+    transferLimit: BigNumber;
+    frozen: boolean;
+}
 export interface TokenAccountState {
     owner: string;
     frozen: boolean;
@@ -154,6 +173,8 @@ export declare abstract class Provider implements OnceBlockable {
     abstract getTokenState(symbol: string | Promise<string>, blockTag?: BlockTag | Promise<BlockTag>): Promise<TokenState>;
     abstract getTokenList(blockTag?: BlockTag | Promise<BlockTag>): Promise<TokenList>;
     abstract getTokenAccountState(symbol: string | Promise<string>, address: string | Promise<string>, blockTag?: BlockTag | Promise<BlockTag>): Promise<TokenAccountState>;
+    abstract getNFTokenState(symbol: string | Promise<string>, blockTag?: BlockTag | Promise<BlockTag>): Promise<NFTokenState>;
+    abstract getNFTokenItemState(symbol: string | Promise<string>, itemID: string, blockTag?: BlockTag | Promise<BlockTag>): Promise<NFTokenItemState>;
     abstract getAccountState(addressOrName: string | Promise<string>, blockTag?: BlockTag | Promise<BlockTag>): Promise<AccountState>;
     abstract getAccountNumber(addressOrName: string | Promise<string>, blockTag?: BlockTag | Promise<BlockTag>): Promise<BigNumber>;
     abstract getBalance(addressOrName: string | Promise<string>, blockTag?: BlockTag | Promise<BlockTag>): Promise<BigNumber>;

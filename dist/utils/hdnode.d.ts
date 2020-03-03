@@ -21,7 +21,7 @@ export declare class HDNode {
      *   - fromSeed
      */
     constructor(constructorGuard: any, privateKey: string, publicKey: string, parentFingerprint: string, chainCode: string, index: number, depth: number, mnemonic: string, path: string, wordlist?: Wordlist);
-    readonly extendedKey: string;
+    get extendedKey(): string;
     neuter(): HDNode;
     private _derive;
     derivePath(path: string): HDNode;

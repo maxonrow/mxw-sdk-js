@@ -59,7 +59,7 @@ export class FallbackProvider extends BaseProvider {
             // The network won't be known until all child providers know
             let ready = Promise.all(providers.map((p) => p.getNetwork())).then((networks) => {
                 if (!checkNetworks(networks)) {
-                    errors.throwError('getNetwork returned null', errors.UNKNOWN_ERROR, { })
+                    errors.throwError('getNetwork returned null', errors.UNKNOWN_ERROR, {})
                 }
                 return networks[0];
             });

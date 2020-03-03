@@ -1,7 +1,7 @@
 import { BigNumber } from '../utils/bignumber';
 import { TransactionRequest } from '.';
 import { Provider, TransactionFeeSetting } from './abstract-provider';
-import { Block, BlockTag, EventType, Listener, AccountState, AliasState, TokenState, TokenList, TokenAccountState, TransactionReceipt, TransactionResponse, TransactionFee } from './abstract-provider';
+import { Block, BlockTag, EventType, Listener, AccountState, AliasState, TokenState, NFTokenState, NFTokenItemState, TokenList, TokenAccountState, TransactionReceipt, TransactionResponse, TransactionFee } from './abstract-provider';
 import { Transaction } from '../utils/transaction';
 import { Network, Networkish } from '../utils/networks';
 export declare class BaseProvider extends Provider {
@@ -36,6 +36,8 @@ export declare class BaseProvider extends Provider {
     getTokenState(symbol: string | Promise<string>, blockTag?: BlockTag | Promise<BlockTag>): Promise<TokenState>;
     getTokenList(blockTag?: BlockTag | Promise<BlockTag>): Promise<TokenList>;
     getTokenAccountState(symbol: string | Promise<string>, addressOrName: string | Promise<string>, blockTag?: BlockTag | Promise<BlockTag>): Promise<TokenAccountState>;
+    getNFTokenState(symbol: string | Promise<string>, blockTag?: BlockTag | Promise<BlockTag>): Promise<NFTokenState>;
+    getNFTokenItemState(symbol: string | Promise<string>, itemID: string, blockTag?: BlockTag | Promise<BlockTag>): Promise<NFTokenItemState>;
     getAliasState(address: string | Promise<string>, blockTag?: BlockTag | Promise<BlockTag>): Promise<AliasState>;
     getAccountState(addressOrName: string | Promise<string>, blockTag?: BlockTag | Promise<BlockTag>): Promise<AccountState>;
     getAccountNumber(addressOrName: string | Promise<string>, blockTag?: BlockTag | Promise<BlockTag>): Promise<BigNumber>;
@@ -69,11 +71,13 @@ export declare class BaseProvider extends Provider {
     removeListener(eventName: EventType, listener: Listener): Provider;
     private _doPoll;
     resetEventsBlock(blockNumber: number): void;
-    readonly network: Network;
+    get network(): Network;
     getNetwork(): Promise<Network>;
-    readonly blockNumber: number;
-    polling: boolean;
-    pollingInterval: number;
+    get blockNumber(): number;
+    get polling(): boolean;
+    set polling(value: boolean);
+    get pollingInterval(): number;
+    set pollingInterval(value: number);
     _getFastBlockNumber(): Promise<number>;
     _setFastBlockNumber(blockNumber: number): void;
     waitForTransaction(transactionHash: string, confirmations?: number): Promise<TransactionReceipt>;

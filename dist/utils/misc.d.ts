@@ -7,11 +7,16 @@ export declare function convertObject(object: any, convert?: (key: string, value
 export declare function checkFormat(format: any, object: any): any;
 export declare type CheckFormatFunc = (value: any) => any;
 export declare function allowNull(check: CheckFormatFunc, nullValue?: any): CheckFormatFunc;
+export declare function notAllowNull(check: CheckFormatFunc): CheckFormatFunc;
 export declare function allowNullOrEmpty(check: CheckFormatFunc, nullValue?: any): CheckFormatFunc;
+export declare function notAllowNullOrEmpty(check: CheckFormatFunc): CheckFormatFunc;
+export declare function expectTypeOf(check: CheckFormatFunc, type: string): CheckFormatFunc;
 export declare function arrayOf(check: CheckFormatFunc): CheckFormatFunc;
 export declare function checkHash(hash: any, requirePrefix?: boolean): string;
 export declare function checkNumber(number: any): number;
+export declare function checkNumberString(number: any): string;
 export declare function checkBigNumber(number: any): BigNumber;
+export declare function checkBigNumberString(value: any): string;
 export declare function checkBoolean(value: any): boolean;
 export declare function checkString(string: any): string;
 export declare function checkTimestamp(string: string): string;

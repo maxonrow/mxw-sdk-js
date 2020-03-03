@@ -12,16 +12,16 @@ export declare class Wallet extends AbstractSigner {
     private readonly signingKey;
     private accountNumber;
     constructor(privateKey: SigningKey | HDNode | Arrayish, provider?: Provider);
-    readonly address: string;
-    readonly hexAddress: string;
-    readonly mnemonic: string;
-    readonly wordlist: Wordlist;
-    readonly path: string;
-    readonly privateKey: string;
-    readonly publicKey: string;
-    readonly publicKeyType: string;
-    readonly compressedPublicKey: string;
-    readonly extendedPublicKey: string;
+    get address(): string;
+    get hexAddress(): string;
+    get mnemonic(): string;
+    get wordlist(): Wordlist;
+    get path(): string;
+    get privateKey(): string;
+    get publicKey(): string;
+    get publicKeyType(): string;
+    get compressedPublicKey(): string;
+    get extendedPublicKey(): string;
     computeSharedSecret(otherPublicKey: string): string;
     /**
      *  Create a new instance of this Wallet connected to provider.
