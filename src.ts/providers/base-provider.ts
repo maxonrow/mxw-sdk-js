@@ -32,7 +32,7 @@ import {
     Listener,
     AccountState,
     AliasState,
-    TokenState, NFTokenState, NFTokenItemState, TokenList, TokenAccountState,
+    TokenState, NFTokenState, NFTokenItemState, TokenList, TokenAccountState, MultiSigAccountState,
     TransactionReceipt, TransactionResponse, TransactionFee
 } from './abstract-provider';
 
