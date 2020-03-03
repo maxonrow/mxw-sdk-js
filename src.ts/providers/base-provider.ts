@@ -33,7 +33,7 @@ import {
     AccountState,
     AliasState,
     TokenState, TokenList, TokenAccountState,
-    TransactionReceipt, TransactionResponse, TransactionFee, MultiSigAccountState
+    TransactionReceipt, TransactionResponse, TransactionFee
 } from './abstract-provider';
 
 import { Transaction } from '../utils/transaction';
