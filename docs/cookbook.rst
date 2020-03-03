@@ -1,6 +1,6 @@
-******
-How To
-******
+*********
+Tutorial
+*********
 
 This is a small (but growing) collection of simple recipes to perform common tasks
 with the Maxonrow blockchain.
@@ -30,211 +30,6 @@ You can check your installed versions by running the following commands from a t
 
 -----
 
-Online Learning Tutorial
-########################
-
-Introduction:
-   This tutorial create a simple Online Learning application. The functions included here are: enrol student, add and approve course, student enrol to course.
-
-**1. Initial setup**
-********************
-
-To start with, we'll setup project directory like the following:
-
-|  /`MaxonrowTutorial`
-|     /`src`
-|        /`onlinelearning`
-|     /`package.json`
-
-
-.. note:: 
-   You can create `package.json` file using `npm init` command.
-   
-   | 1. On the command line, navigate to the root directory of your package      
-   |    ``cd /path/to/OnlineLearning``
-
-   | 2. Run the following command:      
-   |    ``npm init``
-
-   | 3. Answer the questions in the command line questionnaire
-
-Please refer to :ref:`Getting Started<start>` guide "Installing in Node.js" to include mxw-sdk-js library in the project. 
-
-Let's start by creating a file named `online-learning.ts` in folder [`/MaxonrowTutorial/src/onlinelearning`]. 
-
-**2. Enrol new Student (create new Wallet instance)**
-*****************************************************
-
-In this tutorial, the student is represented by the :ref:`Wallet <wallet>` instance.
-   
-.. code-block:: javascript
-
-   registerNewStudent() {
-      //create wallet instance
-      let student: mxw.Wallet = mxw.Wallet.createRandom();
-
-      console.log("Wallet address:", student.address);
-      console.log("Wallet mnemonic:", student.mnemonic);
-
-      //connect to provider
-      student.connect(this.providerConn);
-   }
-
-
-Once the Wallet instance is created using ``createRandom()``, we can use the Wallet mnemonic to query back the student wallet instance. 
-
-.. code-block:: javascript
-
-   let student: mxw.Wallet = mxw.Wallet.fromMnemonic("where frost endless true say luxury detect clever unusual rich fresh effort");
-
-.. note:: For various options on how to create a Wallet instance, please refer to :ref:`Wallet <wallet>` SDK. This tutorial is using simplest way to create Wallet instance.
-
-``connect()`` is method to connect the Wallet instance to :ref:`Provider <api-provider>`.
-     
- 
-**3. Add new course**
-**********************
-
-In this tutorial, the course is represented by :ref:`Non-Fungible-Token (NFT) <api-nft>`. Please note that the NFT properties `symbol` must be unique in the provider connection. If we attempt to create NFT using same symbol, error will be thrown. 
-
-.. code-block:: javascript
-
-   createNewCourse(courseName: string) {
-
-      nonFungibleTokenProperties = {
-         name: courseName,
-         symbol: courseName,
-         fee: {
-               to: nodeProvider.nonFungibleToken.feeCollector,
-               value: bigNumberify("1")
-         },
-         metadata: "Course " + courseName,
-         properties: courseName
-      };
-
-      //create NFT using above properties
-      return token.NonFungibleToken.create(nonFungibleTokenProperties, issuer, defaultOverrides).then((token) => {
-         console.log("Symbol:", nonFungibleTokenProperties.symbol);
-      });
-   }
-
-   
-We can use the symbol to query back this course NFT.
-   
-.. code-block:: javascript
-
-   var minter = new NonFungibleToken(courseSymbol, issuer);
-
-
-**4. Approve course**
-*********************
-
-Before NFT can mint an item, it has to be approved by three parties, i.e., provider, issuer and middleware. In approval method ``approveNonFungibleToken()``, we also need to pass in NFT state. 
-
-.. code-block:: javascript
-
-   approveCourse(courseSymbol: string, seatLimit: number) {
-      let nftState = {
-         tokenFees: [
-               { action: NonFungibleTokenActions.transfer, feeName: "default" },
-               { action: NonFungibleTokenActions.transferOwnership, feeName: "default" },
-               { action: NonFungibleTokenActions.acceptOwnership, feeName: "default" }
-         ],
-         endorserList: [],
-         mintLimit: seatLimit,
-         transferLimit: 1,
-         burnable: true,
-         transferable: true,
-         modifiable: true,
-         pub: false   // not public
-      };
-
-      //provider approve NFT, at same time, set NFT with above state
-      return token.NonFungibleToken.approveNonFungibleToken(courseSymbol, provider, nftState)
-         .then((transaction) => {
-               //issuer sign NFT
-               return token.NonFungibleToken.signNonFungibleTokenStatusTransaction(transaction, issuer);
-         }).then((transaction) => {
-               //middleware send NFT
-               return token.NonFungibleToken.sendNonFungibleTokenStatusTransaction(transaction, middleware)
-                  .then((receipt) => {
-                     console.log(receipt);
-                     return receipt;
-                  });
-         });
-   }
-
-
-**5. Student enrol course (NFT mint item + item transferred to wallet)**
-************************************************************************
-
-This method has two parts:
-
-| 1. Cource to issue entry pass to student (i.e. NFT mint item)
-| 2. Item transferred to wallet (entry pass transferred to student)
-
-.. code-block:: javascript
-
-   enrolStudentOnCourse(courseSymbol: string, theId: number, student: mxw.Wallet, ) {
-      var minter = new NonFungibleToken(courseSymbol, issuer);
-
-      //get mint limit from NFT state
-      return minter.getState().then((result) => {
-         let mintLimit: number = result.mintLimit.toNumber();
-         console.log("Mint Limit:", mintLimit);
-
-         let itemId = courseSymbol + '#' + theId;
-         let properties = "Course " + courseSymbol + " - Seat #" + theId;
-         let itemProp = {
-               symbol: courseSymbol,
-               itemID: itemId,
-               properties: properties,
-               metadata: properties
-         } as token.NonFungibleTokenItem;
-
-         console.log("Minting item:", itemId);
-         let nftItem: NonFungibleTokenItem;
-
-         //mint item
-         return minter.mint(issuer.address, itemProp).then((receipt) => {
-               console.log("Mint Receipt:", JSON.stringify(receipt));
-
-               //query item
-               return NonFungibleTokenItem.fromSymbol(courseSymbol, itemId, issuer).then((theItem) => {
-                  nftItem = theItem;
-
-                  //print its state
-                  return nftItem.getState().then((itemState) => {
-                     console.log("Item state:", JSON.stringify(itemState));
-                     console.log("Transferring NFT item to:" + student.address);
-
-                     //transfer item to wallet, with some memo
-                     let overrides = { memo: itemId + " transferred to " + student.address };
-                     return nftItem.transfer(student.address, overrides).then((receipt) => {
-                           console.log("Transfer NFT item receipt:", JSON.stringify(receipt));
-                     });
-
-                  });
-               }).catch(error => {
-                  console.log(error);
-               });
-         }).catch(error => {
-               console.log(error);
-         });
-      });
-   }
-
-
-.. note:: 
-   | Online Learning tutorial is organized into methods for individual functions, so you can pass in different parameters to see how things work. To run the code, first compile using ``tsc``, then run with command:
-   |  ``node dist/onlinelearning/online-learning.js <method_name>``
-
-   | Third argument is the method to call, followed by the method's parameter(s), if any. For example, below command shows how we can trigger ``addCourse()`` method using parameter `Art`:
-   |  ``node dist/onlinelearning/online-learning.js addCourse Art``
-
------
-
-
 Flight Ticketing System Tutorial
 ################################
 
@@ -244,31 +39,30 @@ Introduction:
 **1. Initial setup**
 ********************
 
-To start with, we'll continue in same project and create new folder [`flightticket`] under [`/MaxonrowTutorial/src/`] project directory like the following:
+To start with, we'll setup project directory like the following:
 
-|  /`MaxonrowTutorial`
+|  /`flight-ticket-tutorial`
 |     /`src`
-|        /`onlinelearning`
-|        /`flightticket` <==
 |     /`package.json`
 
-Create a new file name `flight-ticket.ts` in folder [`/MaxonrowTutorial/src/flightticket`].
+Create a new file name `flight-ticket.ts` in folder [`/flight-ticket-tutorial/src/`].
 
 **2. Create NFT**
 *****************
+First, we need to create a NFT. In this case, the airline are responsible to create the NTF.
 
 .. code-block:: javascript
 
    //set nft properties
    let ntfProperties = {
       name: "my2sgFlightTicket05",
-      symbol: "my2sg06",
+      symbol: "my2sg05",
       fee: {
          to: "mxw1qgwzdxf66tp5mjpkpfe593nvsst7qzfxzqq73d",
          value: bigNumberify("1")
       },
       properties: "fMYtSG@5",
-      metadata: "here"
+      metadata: "nothing"
    };
 
    //create nft token using properties above
@@ -276,9 +70,11 @@ Create a new file name `flight-ticket.ts` in folder [`/MaxonrowTutorial/src/flig
       console.log(JSON.stringify(token))
    });
 
+.. note:: properties **can't** be changed afterwards, it can use as a notes for imporant details,while metadata **can** be changed. 
 
 **3. Query NFT**
 ****************
+After the NTF is created we can use ``fromSymbol()`` method to query the NTF, and get its details.
 
 .. code-block:: javascript
 
@@ -290,6 +86,8 @@ Create a new file name `flight-ticket.ts` in folder [`/MaxonrowTutorial/src/flig
 
 **3. Authorise NFT**
 ********************
+Before the NTF can be use inside Maxonrow blockchain, it have to be authorized by three parties
+(provider, issuer and middleware). 
 
 .. code-block:: javascript
 
@@ -319,6 +117,7 @@ Create a new file name `flight-ticket.ts` in folder [`/MaxonrowTutorial/src/flig
 
 **4. Mint NFT item**      
 ********************
+After the NFT is authorized, the owner(airline) can start to mint items (print out tickets) to the passenger.
 
 .. code-block:: javascript
 
@@ -336,76 +135,70 @@ Create a new file name `flight-ticket.ts` in folder [`/MaxonrowTutorial/src/flig
    console.log(JSON.stringify(receipt));
    });      
 
-
-**5. Endorse item**
-*******************
-
-.. code-block:: javascript
-
-   //endorse item
-   var ntfInstance = new NonFungibleTokenItem("my2sg05","001", issuer);
-   ntfInstance.endorse().then((receipt) => {
-         console.log(receipt);
-   });
-
-
-**6. Transfer NFT item**
+**5. Transfer NFT item**
 ************************
+After the item is created, it will be owned by the NTF owner. So we have to transfer it to the passenger's wallet.
 
 .. code-block:: javascript
 
    //transfer item
    var nonFungibleTokenItem = new NonFungibleTokenItem("my2sg05","001", issuer);
-    nonFungibleTokenItem.transfer(middleware.address).then((receipt) => {
+    nonFungibleTokenItem.transfer(wallet.address).then((receipt) => {
         console.log(receipt);
     })
 
+**6. Endorse item**
+*******************
+On passenger boarding the plane, we can endorse the item by doing so we can ensure that the passenger, 
+has been on the plane. 
 
-**7. Overwrite the item metadata**
-**********************************
+.. code-block:: javascript
+
+   //endorse item
+   var nftInstance = new NonFungibleTokenItem("my2sg05","001", issuer);
+   nftInstance.endorse().then((receipt) => {
+         console.log(receipt);
+   });
+
+**7. Overwrite the metadata**
+*****************************
+As we mentioned earlier, both metadata of the NTF and item can be change by using ``updateMetadata()`` method.
+For this case we will overwrite the item metadata. 
 
 .. code-block:: javascript
 
    //overwrite the item metadata with string "overwrite"
-   ntfInstance.updateMetadata("overwrite")
+   nftInstance.updateMetadata("overwrite")
 
    var nftItemStatus;
-   ntfInstance.getState().then((result)=>{
+   nftInstance.getState().then((result)=>{
       nftItemStatus = result.metadata;
    });
 
-**8. Add new info into the item metadata**
-******************************************
+**8. Add new info into the metadata**
+*************************************
+If we query the item metadata and cache it first. We can adding new infomation on exsiting metadata.
 
 .. code-block:: javascript
+
+   var nftItemStatus;
+   nftInstance.getState().then((result)=>{
+      nftItemStatus = result.metadata;
+   });
 
    //adding new info into the item metadata
-   ntfInstance.updateMetadata(nftItemStatus+ "think not").then((receipt)=>{
+   nftInstance.updateMetadata(nftItemStatus+ "adding new").then((receipt)=>{
       console.log(receipt.status);
    });
-   ntfInstance.getState().then((result)=>{
+   nftInstance.getState().then((result)=>{
       nftItemStatus = result.metadata;
    });
 
-**9. Transfer MXW**
+
+**9. Freeze item**
 *******************
-.. code-block:: javascript
-
-   //transfer mxw
-   let amount = mxw.utils.parseMxw("1.0");
-   wallet.getBalance().then((result)=>{
-      console.log(result)
-   });
-   wallet.transfer(issuer.address,amount).then((receipt)=>{
-      console.log(receipt);
-   });
-   wallet.getBalance().then((result)=>{
-      console.log(result)
-   });
-
-
-**10. Freeze item**
-*******************
+In some cases, we might have to cancel or delay the flight. We can use the *freeze* the item to prevent owner 
+using it, but this operation must be authorized by three parties.
 
 .. code-block:: javascript
 
@@ -420,8 +213,10 @@ Create a new file name `flight-ticket.ts` in folder [`/MaxonrowTutorial/src/flig
    });
 
 
-**11. Unfreeze item**
+**10. Unfreeze item**
 *********************
+After the freezing, we can *unfreeze* it back. As unfreeze and freeze are administrative operation, it must be 
+authorized by three parties.
 
 .. code-block:: javascript
 
@@ -436,26 +231,280 @@ Create a new file name `flight-ticket.ts` in folder [`/MaxonrowTutorial/src/flig
    });
 
 
-**12. Burn item**
+**11. Burn item**
 *****************
+At last, the owner of the item can choose to burn the item(ticket) he owned.
 
 .. code-block:: javascript
 
    //burn item
-   var ntfInstance = new NonFungibleTokenItem("my2sg05","005", issuer);
-   ntfInstance.burn().then((receipt) => {
+   var nftInstance = new NonFungibleTokenItem("my2sg05","005", issuer);
+   nftInstance.burn().then((receipt) => {
       console.log(JSON.stringify(receipt));
    });
 
 
 .. note:: 
    | Flight Ticketing System tutorial is organized like a module. To run the code, first compile using ``tsc``, then run with command:
-   |  ``node dist/flightticket/flight-ticket.js``
+   |  ``node dist/flight-ticket.js``
+
+--------
+
+Online Learning Tutorial
+########################
+
+Introduction:
+   This tutorial create a simple Online Learning application. The functions included here are: enrol student, add and approve course, student enrol to course.
+
+**1. Initial setup**
+********************
+
+To start with, we'll setup project directory like the following:
+
+|  /`online-learning-tutorial`
+|     /`src`
+|     /`package.json`
+
+
+.. note:: 
+   You can create `package.json` file using `npm init` command.
+   
+   | 1. On the command line, navigate to the root directory of your package      
+   |    ``cd /path/to/OnlineLearning``
+
+   | 2. Run the following command:      
+   |    ``npm init``
+
+   | 3. Answer the questions in the command line questionnaire
+
+Please refer to :ref:`Getting Started<start>` guide "Installing in Node.js" to include mxw-sdk-js library in the project. 
+
+Let's start by creating a file named `online-learning.ts` in folder [`/online-learning-tutorial/src`]. 
+
+**2. Enrol new Student (create new Wallet instance)**
+*****************************************************
+
+:ref:`Wallet <wallet>` is an "account" created by each user inside Maxonrow blockchain. But for this tutorial,
+the wallet instance will represent student who wants to enroll this online course.
+   
+.. code-block:: javascript
+
+   registerNewStudent() {
+      // create wallet instance
+      let student: mxw.Wallet = mxw.Wallet.createRandom();
+
+      console.log("Wallet address:", student.address);
+      // sample output: mxw18mt86al0xpgh2qhvyeqgf8m96xpwz55sdfwc8n
+      console.log("Wallet mnemonic:", student.mnemonic);
+      // sample output: unaware timber engage dust away host narrow market hurry wave inherit bracket
+
+      // connect to provider
+      student.connect(this.providerConn);
+   }
+
+
+Once a Wallet is created using ``createRandom()`` method, we can use the Wallet ``fromMnemonic()`` method to 
+load an instance of the wallet that we just created.
+
+.. code-block:: javascript
+
+   let student: mxw.Wallet = mxw.Wallet.fromMnemonic("unaware timber engage dust away host narrow market hurry wave inherit bracket");
+
+.. note:: For various options on how to create a Wallet instance, please refer to :ref:`Wallet <wallet>` SDK. This tutorial is using simplest way to create Wallet instance.
+
+``connect()`` - to connect the Wallet instance to :ref:`Provider <api-provider>`.
+     
+ 
+**3. Add new course**
+**********************
+
+:ref:`Non-Fungible-Token (NFT) <api-nft>` is a token created and hold by a course owner, it can use to mint item
+(create seats) to the student who wants to attend the course.
+| Please note that the NFT properties `symbol` and `name` must be unique. 
+If we attempt to create NFT using same symbol or name, an error will be thrown. 
+
+.. code-block:: javascript
+
+   createNewCourse(courseName: string) {
+
+      nonFungibleTokenProperties = {
+         name: courseName,
+         symbol: courseName,
+         fee: {
+               to: nodeProvider.nonFungibleToken.feeCollector,
+               value: bigNumberify("1")
+         },
+         metadata: "Course " + courseName,
+         properties: courseName
+      };
+
+      // create NFT using above properties
+      return token.NonFungibleToken.create(nonFungibleTokenProperties, issuer, defaultOverrides).then((token) => {
+         console.log("Symbol:", nonFungibleTokenProperties.symbol);
+      });
+   }
+
+   
+If we want to check on the course details, we can use the symbol to query the NTF.
+   
+.. code-block:: javascript
+
+   var minter = new NonFungibleToken(courseSymbol, issuer);
+
+
+**4. Approve course**
+*********************
+
+Before the course owner can start to mint item, the NFT must be authorized by three parties, 
+(provider, issuer and middleware). 
+As part the procedure of authorization, inside the ``approveNonFungibleToken()`` method, we need to pass in the NFT state. 
+
+.. code-block:: javascript
+
+   approveCourse(courseSymbol: string, seatLimit: number) {
+      let nftState = {
+         tokenFees: [
+               { action: NonFungibleTokenActions.transfer, feeName: "default" },
+               { action: NonFungibleTokenActions.transferOwnership, feeName: "default" },
+               { action: NonFungibleTokenActions.acceptOwnership, feeName: "default" }
+         ],
+         endorserList: [],
+         mintLimit: seatLimit,
+         transferLimit: 1,
+         burnable: true,
+         transferable: true,
+         modifiable: true,
+         pub: false   // not public
+      };
+
+      // provider approves NFT, at same time, set NFT with above state
+      return token.NonFungibleToken.approveNonFungibleToken(courseSymbol, provider, nftState)
+         .then((transaction) => {
+               // issuer signs NFT status transaction
+               return token.NonFungibleToken.signNonFungibleTokenStatusTransaction(transaction, issuer);
+         }).then((transaction) => {
+               // middleware sends NFT NFT status transaction
+               return token.NonFungibleToken.sendNonFungibleTokenStatusTransaction(transaction, middleware)
+                  .then((receipt) => {
+                     console.log(receipt);
+                     return receipt;
+                  });
+         });
+   }
+
+
+**5. Student enrol course**
+******************************
+
+In this part will performs two actions:
+
+| 1. Mint an item (issue course entry pass)
+| 2. Transfer item to wallet (transfer entry pass to student)
+
+.. code-block:: javascript
+
+   enrolStudentToCourse(student: mxw.Wallet, courseSymbol: string, theId: number) {
+      return this.mintItem(courseSymbol, theId) // mint course entry pass
+         .then((nftItem) => {
+               let itemId = courseSymbol + "#" + theId;
+               return this.transferItem(nftItem, itemId, student); // transfer pass to student
+         })
+         .catch(error => { // handle error, if any
+               console.log("enrolStudentToCourse", error);
+               throw error;
+         });
+   }
+
+
+``mintItem()`` method mints an item and then transfer it to a wallet address. 
+When item is created, by default it will be owned by the NFT token owner. 
+Please note that limit of item can be mint is limited by the NFT mint limit, 
+that the NFT state we parse in when calling ``approveCourse()`` method. 
+Inside the item properties ``itemProp`` it must contain symbol, which must be same with its parent's NFT symbol, 
+item ID, properties and metadata. 
+Use ``getNftItemState()`` method to queries and prints out the NFT item state.
+
+.. code-block:: javascript
+
+   mintItem(courseSymbol: string, theId: number) { // query NFT created before
+      var minter = new NonFungibleToken(courseSymbol, issuer);
+      let itemId = courseSymbol + '#' + theId;
+      let properties = "Course " + courseSymbol + " - Seat #" + theId;
+      let itemProp = {
+         symbol: courseSymbol, // value must be same with NFT symbol, the parent
+         itemID: itemId, // value must be unique for same NFT
+         properties: properties,
+         metadata: properties
+      } as token.NonFungibleTokenItem;
+
+      // mint item to issuer wallet, with item properties defined above
+      return minter.mint(issuer.address, itemProp)
+         .then((receipt) => {
+               console.log("Mint item receipt:", receipt);
+               return NonFungibleTokenItem.fromSymbol(courseSymbol, itemId, issuer);
+         }).then((nftItem) => {
+               return this.getNftItemState(nftItem); // print out the NFT item state
+         })
+         .catch(error => { // handle error, if any
+               console.log("mintItem", error);
+               throw error;
+         });
+   }
+
+
+``transferItem()`` transfers NFT item ownership to the recipient wallet, in this case, the student. 
+``overrides`` is optional when transferring item.
+
+.. code-block:: javascript
+
+   transferItem(nftItem: NonFungibleTokenItem, itemId: string, student: mxw.Wallet) {
+      let overrides = { memo: itemId + " transferred to " + student.address }; // optional
+
+      // transfer NFT item to student
+      return nftItem.transfer(student.address, overrides)
+         .then((receipt) => {
+               console.log("Transfer NFT item receipt:", JSON.stringify(receipt));
+               return nftItem;
+         }).then((nftItem) => {
+               return this.getNftItemState(nftItem); // print out the NFT item state
+         })
+         .catch(error => { // handle error, if any
+               console.log("transferItem", error);
+               throw error;
+         });
+   }
+
+
+``getNftItemState()`` queries and prints out the NFT item state.
+
+.. code-block:: javascript
+
+   getNftItemState(nftItem: NonFungibleTokenItem) {
+      return nftItem.getState() // query NFT item state
+         .then((itemState) => {
+               console.log("Item state:", JSON.stringify(itemState)); // print NFT item state
+               return nftItem;
+         })
+         .catch(error => { // handle error, if any
+               console.log("getNftItemState", error);
+               throw error;
+         });
+   }
+
+
+.. note:: 
+   | Online Learning tutorial is organized into methods for individual functions, so you can pass in different parameters to see how things work. To run the code, first compile using ``tsc``, then run with command:
+   |  ``node dist/online-learning.js <method_name>``
+
+   | Third argument is the method to call, followed by the method's parameter(s), if any. For example, below command shows how we can trigger ``addCourse()`` method using parameter `Art`:
+   |  ``node dist/online-learning.js addCourse Art``
+
+
+For complete source code, please download from here `GitHub`_.
 
 -----
-
-For complete source code, please refer in GitHub.
 
 .. _VS Code: https://code.visualstudio.com/
 .. _Node: https://nodejs.org/en/download/
 .. _npm: https://nodejs.org/en/download/
+.. _GitHub: https://github.com/GeokTuanTeh/online-learning

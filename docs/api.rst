@@ -7,14 +7,15 @@ Using the SDK
 .. toctree::
    :maxdepth: 4
 
-   api-wallet
-   api-providers
-   api-signers
-   api-kyc
-   api-tokens
-   api-nft
-   api-name-service
-   api-utils
+   introduction
+   api-1wallet
+   api-2providers
+   api-4kyc
+   api-5tokens
+   api-6nft
+   api-7name-service
+   api-8utils
+   api-9misc
    
 
 -----

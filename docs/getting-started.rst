@@ -81,19 +81,6 @@ distribution network) should suffice.
 
 -----
 
-Connect to Maxonrow blockchain
-##############################
-| TBA
-| Connecting 99.9%........
-| And fatal error
-
-Creating first SDK call
-#######################
-| Somebody call 911?
-
-Handling Errors
-###############
-| 404
 
 .. _npm is installed: https://nodejs.org/en/
 .. _this script: https://cdn.ethers.io/scripts/ethers-v4.min.js
