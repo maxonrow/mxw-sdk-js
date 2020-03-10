@@ -92,3 +92,31 @@ Prototype
 
 :sup:`prototype` . updateMetadata(metadata) |nbsp| `=> Promise<TransactionReceipt>`
     Update the *metadata of non-fungible token item* to the network and returns a :ref:`Promise <promise>`
+
+
+
+
+
+
+
+
+
+
+
+
+
+Currently no place to stay so it stay here 
+
+
+Name Service
+############
+
+:sup:`prototype` . createAlias ( name, appFee ) |nbsp| `=> Promise<TransactionReceipt>`
+    Sign alias creation transaction and send it to network and returns a :ref:`Promise <promise>` that resolves to a
+    :ref:`Transaction Response <transaction-receipt>`. Alias application approval is required by authority.
+
+
+    Note: The alias should not contains any spaces, special characters or any sensitive words.
+    The application fee should be set according to the configured value.
+
+-----

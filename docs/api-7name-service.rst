@@ -2,6 +2,7 @@
 
 .. _api-name-service:
 
+************
 Name Service
 ************
 
@@ -16,7 +17,7 @@ Create alias required authorities approval and verification, and small fees will
 Once the application is approved, alias will be recorded into blockchain.
 
 Querying
---------
+########
 
 :sup:`provider` . resolveName ( name ) |nbsp| `=> Promise<Address>`
     Returns a :ref:`Promise <promise>` which resolves to the address of that the *alias*

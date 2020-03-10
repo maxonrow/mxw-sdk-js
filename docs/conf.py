@@ -2,13 +2,14 @@
 #
 # import os
 # import sys
+import time
 # sys.path.insert(0, os.path.abspath('.'))
 
 
 # -- Project information -----------------------------------------------------
 
 project = 'mxw-sdk-js'
-copyright = '2019, Maxonrow'
+copyright = '2019-'+ time.strftime("%Y")+', Maxonrow'
 author = 'Jean Soon'
 
 # The short X.Y version
@@ -93,7 +94,7 @@ html_theme_path = ["_themes",]
 html_theme_options = {
   'collapse_navigation': True,
   'sticky_navigation': False,
-  'style_nav_header_background': '#000066',
+  'style_nav_header_background': '#000056',
   'prev_next_buttons_location': 'both',
   'style_external_links':True,
 }
@@ -112,7 +113,14 @@ html_theme_options = {
 #   'headbgcolor' : '#990099',
 
 # }
-
+# extensions = ['sphinxjp.themes.revealjs']
+# html_theme = 'revealjs'
+# html_use_index = False
+# html_theme = 'sphinx_drove_theme'
+# import sphinx_drove_theme
+# html_theme_path = [sphinx_drove_theme.get_html_theme_path()]
 #adding css
 def setup(app):
   app.add_stylesheet( "css/hatnotes.css" )
+  app.add_stylesheet( "css/text.css")
+  app.add_stylesheet( "css/custom.css")
