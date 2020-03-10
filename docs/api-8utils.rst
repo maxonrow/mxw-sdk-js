@@ -1,5 +1,6 @@
 .. |nbsp| unicode:: U+00A0 .. non-breaking space
 
+*********
 Utilities
 *********
 
@@ -9,7 +10,7 @@ required to write dapps, process user input and format data.
 -----
 
 Addresses
-=========
+#########
 
 Wallet address is using the bech32 format (`BIP-173`_). There are several formats
 available to represent wallet addresses and various ways they are determined.
@@ -53,7 +54,7 @@ available to represent wallet addresses and various ways they are determined.
 .. _arrayish:
 
 Arrayish
-========
+########
 
 An arrayish object is used to describe binary data and has the following conditions met:
 
@@ -84,7 +85,7 @@ An arrayish object is used to describe binary data and has the following conditi
 .. _bignumber:
 
 Big Numbers
-===========
+###########
 
 A BigNumber is an immutable object which allow accurate math operations
 on values larger than :ref:`JavaScript can accurately handle <ieee754>`
@@ -140,7 +141,7 @@ can safely handle. Also see: :ref:`Constants <constants>`
 
 
 Creating Instances
-------------------
+******************
 
 :sup:`utils` . bigNumberify ( value ) |nbsp| :sup:`=> BigNumber`
     Returns a BigNumber instance of *value*. The *value* may be anything that can
@@ -174,7 +175,7 @@ Creating Instances
 .. _bytes32string:
 
 Bytes32 Strings
-===============
+###############
 
 Often for short strings, it is far more efficient to store them as
 a fixed, null-terminated bytes32, instead of a dynamic length-prefixed
@@ -207,7 +208,7 @@ bytes.
 .. _constants:
 
 Constants
-=========
+#########
 
 :sup:`mxw . constants` . AddressZero
     The address ``mxw000000000000000000000000000000000000000``.
@@ -236,10 +237,10 @@ Constants
 -----
 
 Cryptographic Functions
-=======================
+#######################
 
 Elliptic Curve
---------------
+**************
 
 :sup:`utils` . computeAddress ( publicOrPrivateKey ) |nbsp| `=> Address`
     Computes the address given a public key or private key.
@@ -279,7 +280,7 @@ Elliptic Curve
     });
 
 Hash Functions
---------------
+**************
 
 :sup:`utils` . sha256 ( hexStringOrArrayish ) |nbsp| `=> hex`
     Compute the SHA2-256 cryptographic hash of a value, returned as a hex string.
@@ -295,7 +296,7 @@ Hash Functions
 
 
 Hash Function Helpers
----------------------
+*********************
 
 :sup:`utils` . hashMessage ( stringOrArrayish ) |nbsp| `=> hex`
     Compute the SHA2-256 value by converting the message to bytes (as necessary).
@@ -317,7 +318,7 @@ Hash Function Helpers
     // "0xdc2a5349136fe31362ddca95d7f8d3adb35c8eb3261f39ff519b1e33988a3b1f"
 
 Key Derivation
---------------
+**************
 
 .. _pbkdf2:
 
@@ -327,7 +328,7 @@ Key Derivation
     and ``sha512``.
 
 Random
-------
+******
 
 :sup:`utils` . randomBytes ( length ) |nbsp| `=> Uint8Array`
     Return a Uint8Array of cryptographically secure random bytes
@@ -352,7 +353,7 @@ Random
 
 
 Mxw Strings and Cin
-===================
+##################
 
 .. _parseMxw:
 
@@ -411,7 +412,7 @@ Mxw Strings and Cin
 .. _hexstring:
 
 Hex Strings
-===========
+###########
 
 A hex string is **always** prefixed with "0x" and consists of the characters
 0 -- 9 and a -- f. It is always returned lower case with even-length, but any hex
@@ -445,7 +446,7 @@ string passed into a function may be any case and may be odd-length.
 .. _signature:
 
 Signatures
-==========
+##########
 
 There are two common formats for signatures in Ethereum. The **flat-format**, which
 is a hexstring with 65 bytes (with recoveryParam); or a hexstring with 64 bytes
@@ -502,7 +503,7 @@ is a hexstring with 65 bytes (with recoveryParam); or a hexstring with 64 bytes
 .. _utf8-strings:
 
 UTF-8 Strings
-=============
+#############
 
 .. _utf8-to-bytes:
 

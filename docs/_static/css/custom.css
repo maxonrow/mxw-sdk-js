@@ -1,0 +1,83 @@
+.toctree-l1.current >ul{ background-color:#000056 ;background-image: radial-gradient(circle farthest-side at bottom, rgb(0, 0, 85), rgb(0, 0, 65) 125%);}
+.toctree-l1{ border-top: solid 1px #1d2972;}
+.toctree-l1:last-child{border-bottom: solid 1px #1d2972;}
+.wy-nav-side{background-color:#000056;}
+.wy-menu-vertical a{
+                        font-size: 16px;
+                        font: bold;
+                        font-weight: 600;
+                        padding: 16px 15px 16px 26px;
+                        color:#ffffff;
+                        font-family:sans-serif;
+                        background-color: #000056;
+                        
+                    }
+
+.wy-menu-vertical li.on a, .wy-menu-vertical li.current >a{  
+                        font-weight: 600;
+                        font-family:'Open Sans', sans-serif;
+                        background-color: #000056;
+                        color:#c9a53e;
+                    }
+
+.wy-menu-vertical li.toctree-l1.current >a{
+                        border-top: none;
+                        border-bottom: none;
+}
+
+.wy-menu-vertical li.toctree-l2 >a, .wy-menu-vertical li.toctree-l3 >a, .wy-menu-vertical li.toctree-l4t >a{
+    font-size: 14px;
+    background-color: #000056;
+    color:#ffffff;
+}
+
+.wy-menu-vertical li.toctree-l2.current >a,.wy-menu-vertical li.toctree-l3.current >a,.wy-menu-vertical li.toctree-l4.current >a{
+    background-color: #000056;
+    color:#c9a53e;
+}
+
+.wy-menu-vertical li.toctree-l2.current li.toctree-l3 >a{
+    font-size: 14px;
+    background-color: #000056;
+    color:#ffffff;
+}
+.wy-menu-vertical li.toctree-l3.current li.toctree-l4 >a{
+    font-size: 14px;
+    background-color: #000056;
+    color:#ffffff;
+}
+.wy-menu-vertical li.toctree-l2.current li.toctree-l3.current >a{
+
+    color:#c9a53e;
+}
+.wy-menu-vertical li.toctree-l3.current li.toctree-l4.current >a{
+    color:#c9a53e;
+}
+
+.wy-menu-vertical li.toctree-l2 >a:hover, .wy-menu-vertical li.toctree-l3 >a:hover, .wy-menu-vertical li.toctree-l4 >a:hover{
+    background-color: #000056;
+    color: #c9a53e;
+}
+
+
+.wy-menu-vertical a:hover{
+    background-color: #000056;
+    color: #c9a53e;
+}
+
+.wy-menu-vertical li.toctree-l2.current li.toctree-l3> a:hover, .wy-menu-vertical li.current >a:hover{
+    background-color: #000056;
+    color: #c9a53e;
+}
+
+.wy-menu-vertical header, .wy-menu-vertical p.caption{
+    color: #888888;
+}
+
+.wy-nav-top{
+    background-color: #000056;
+}
+
+.wy-nav-content-wrap {
+    background: #ffffff;
+}

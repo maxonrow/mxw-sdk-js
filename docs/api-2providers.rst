@@ -2,10 +2,11 @@
 
 .. _api-provider:
 
-Providers
-*********
+****************
+Network Provider
+****************
 
-A Provider abstracts a connection to the blockchain, for issuing queries
+A Network Provider abstracts a connection to the blockchain, for issuing queries
 and sending signed state changing transactions.
 
 The *JsonRpcProvider* allow you to connect to blockchain nodes that you
@@ -16,13 +17,13 @@ control or have access to, including mainnet, testnets, or localnets.
 .. _provider-connect:
 
 Connecting to Blockchain
-========================
+########################
 
 There are several methods to connect to the blockchain network provided. If you are not
 running your own local blockchain node, it is recommended that you use the ``getDefaultProvider()``
 method.
 
-:sup:`mxw` . getDefaultProvider( [ network = "testnet" ] ) |nbsp| `=> Provider`
+:sup:`mxw` . getDefaultProvider( [ network = "localnet" ] ) |nbsp| `=> Provider`
     This creates a FallbackProvider backed by multiple backends.
     
     This is the **recommended** method of connecting to the blockchain network if you are
@@ -31,11 +32,11 @@ method.
 .. code-block:: javascript
     :caption: *get a standard network provider* 
 
-    let provider = mxw.getDefaultProvider("testnet");
+    let networkProvider = mxw.getDefaultProvider("localnet");
 
 
 JsonRpcProvider :sup:`( inherits from Provider )`
------------------------------------------------------
+*************************************************
 
 .. _provider-jsonrpc-properties:
 
@@ -62,7 +63,6 @@ new :sup:`mxw . providers` . JsonRpcProvider( [ urlOrInfo :sup:`= "http://localh
 
     **Also See:** JSON-RPC provider-specific :ref:`Properties <provider-jsonrpc-properties>` and :ref:`Operations <provider-jsonrpc-extra>`
 
-   
 
 .. code-block:: javascript
     :caption: *connect to a default provider*
@@ -71,7 +71,7 @@ new :sup:`mxw . providers` . JsonRpcProvider( [ urlOrInfo :sup:`= "http://localh
     //  - "homestead"
     //  - "testnet"
 
-    let provider = mxw.getDefaultProvider('testnet');
+    let networkProvider = mxw.getDefaultProvider('localnet');
 
 
 .. code-block:: javascript
@@ -97,19 +97,20 @@ new :sup:`mxw . providers` . JsonRpcProvider( [ urlOrInfo :sup:`= "http://localh
 -----
 
 Properties
-==========
+##########
 
-Not all properties are mutable unless otherwise specified, and will reflect their
-default values if left unspecified.
+Not all properties are mutable unless otherwise specified, and will reflect thier default values if left unspecified.
 
 .. _provider:
 
 Provider Variables
-------------------
+******************
 
 :sup:`prototype` . blockNumber
     return the most recent block number (block height) this provider has seen and has triggered
     events for. If no block has been seen, this is *null*.
+
+    *data type: integer*
 
 :sup:`prototype` . polling
     *mutable*
@@ -117,6 +118,8 @@ Provider Variables
     If the provider is currently polling because it is actively watching for events. This
     may be set to enable/disable polling temporarily or disabled permanently to allow a
     node process to exit.
+
+    *data type: boolean*
 
 :sup:`prototype` . pollingInterval
     *mutable*
@@ -127,10 +130,12 @@ Provider Variables
     setting this too low may result in the service blocking your IP address or otherwise
     throttling your API calls.
 
+    *data type: integer*
+
 .. _provider-network:
 
 Network
-=======
+*******
 
 A network represents various properties of a network, such as mainnet (i.e. "testnet"),
 testnet or private networks.
@@ -139,16 +144,16 @@ testnet or private networks.
     A :ref:`Promise <promise>` that resolves to a `Network` object describing the
     connected network and chain. A network has the following properties:
 
-    - *name* --- the name of the network (e.g. "testnet")
     - *chainId* --- the chain ID (network ID) of the connected network
+    - *name* --- the name of the network (e.g. "testnet")
 
 .. code-block:: javascript
     :caption: *get a standard network*
 
-    let network = mxw.providers.getNetwork('testnet');
+    let network = mxw.providers.getNetwork('localnet');
     // {
     //    chainId: "mxw",
-    //    name: "testnet"
+    //    name: "localnet"
     // }
 
 
@@ -165,7 +170,9 @@ testnet or private networks.
 .. _provider-account:
 
 Account
-=======
+*******
+
+*Wallet using in this part are dummy wallet, it doesn't have "real" user*
 
 :sup:`prototype` . getBalance ( :ref:`AddressOrName <addressOrName>` ) |nbsp| `=> Promise<BigNumber>`
     Returns a :ref:`Promise <promise>` with the balance (as a :ref:`BigNumber <bignumber>`) of
@@ -184,6 +191,9 @@ Account
         console.log("Balance: " + mxwString);
     });
 
+    //expected result:
+    //Balance: 0.0
+
 :sup:`prototype` . getTransactionCount ( :ref:`AddressOrName <addressOrName>` ) |nbsp| `=> Promise<BigNumber>`
     Returns a :ref:`Promise <promise>` with the number of sent transactions (as a :ref:`BigNumber <bignumber>`)
     from the :ref:`AddressOrName <addressOrName>`. This is also the nonce required to send a new transaction.
@@ -196,6 +206,9 @@ Account
     provider.getTransactionCount(address).then((nonce) => {
         console.log("Total Transactions Ever Sent: " + nonce.toString());
     });
+
+    //expected result:
+    //Total Transactions Ever Sent: 0
 
 :sup:`prototype` . getAccountNumber ( :ref:`AddressOrName <addressOrName>` ) |nbsp| `=> Promise<BigNumber>`
     Returns a :ref:`Promise <promise>` with the account number of wallet (as a :ref:`BigNumber <bignumber>`)
@@ -210,13 +223,16 @@ Account
         console.log("Account number: " + accountNumber.toString());
     });
 
+    //expected result:
+    //Account number:0
+
 
 -----
 
 .. _provider-blockchain:
 
 Blockchain Status
-=================
+*****************
 
 :sup:`prototype` . getBlockNumber ( ) |nbsp| `=> Promise<number>`
     Returns a :ref:`Promise <promise>` with the latest block number (as a Number).
@@ -227,6 +243,8 @@ Blockchain Status
     provider.getBlockNumber().then((blockNumber) => {
         console.log("Latest block number: " + blockNumber);
     });
+    // expected result:
+    // Latest block number: "*integer* latest block number" 
 
 :sup:`prototype` . getBlock ( blockHashOrBlockNumber ) |nbsp| `=> Promise<Block>`
     Returns a :ref:`Promise <promise>` with the block at *blockHashOrBlockNumber*. (See: :ref:`Block Responses <blockresponse>`)
@@ -238,6 +256,8 @@ Blockchain Status
     provider.getBlock(12345).then((block) => {
         console.log(block);
     });
+    //expected result:
+    //block response, click on the link above for more infomation
 
 :sup:`prototype` . getTransactionReceipt ( transactionHash ) |nbsp| `=> Promise<TransactionReceipt>`
     Returns a :ref:`Promise <promise>` with the transaction receipt with *transactionHash*.
@@ -251,6 +271,8 @@ Blockchain Status
     provider.getTransactionReceipt(transactionHash).then((receipt) => {
         console.log(receipt);
     });
+    //expected result:
+    //transaction receipt, click on the link above for more infomation
 
 :sup:`prototype` . getTransactionFee ( route, transactionType, overrides, ... ) |nbsp| `=> Promise<TransactionFee>`
     Returns a :ref:`Promise <promise>` that resolves to the estimated *transaction fee* structure.
@@ -297,7 +319,7 @@ Blockchain Status
     :caption: *query the transaction fee*
     
     let value = utils.parseMxw("10").toString();
-    provider.getTransactionFee("bank", "bank-send", null, value).then((fee) => {
+    provider.getTransactionFee("bank", "bank-send").then((fee) => {
         console.log("Fee:", fee);
     });
 
@@ -306,7 +328,7 @@ Blockchain Status
 .. _waitForTransaction:
 
 Waiting for Transactions
-------------------------
+************************
 
 :sup:`prototype` . waitForTransaction ( transactionHash ) |nbsp| `=> Promise<TransactionReceipt>`
     Return a :ref:`Promise <promise>` which resolves to the
@@ -320,10 +342,12 @@ Waiting for Transactions
         console.log(receipt);
     });
 
+    //expected result:
+    //transaction receipt, click on the link above for more details
 -----
 
 Objects and Types
-=================
+*****************
 
 There are several common objects and types that are commonly used as input parameters or
 return types for various provider calls.
@@ -333,7 +357,7 @@ return types for various provider calls.
 .. _blocktag:
 
 Block Tag
----------
+========
 
 A block tag is used to uniquely identify a block's position in the blockchain:
 
@@ -348,234 +372,13 @@ a Number or :ref:`hex string <hexstring>`:
 
 -----
 
-.. _blockresponse:
-
-Block Responses
----------------
-
-.. code-block:: javascript
-
-    {
-        // The block height
-        blockNumber: 221950,
-        // The block timestamp
-        blockTime: "2019-08-21T11:11:11.674244178Z",
-        // The block proposer address
-        proposerAddress: "mxwvaloper1kzzum9s468h2xe9sgasvyqheth4qk3sjh8l8a3",
-        // The total committed transactions
-        totalTransactions: 1234,
-
-        results: {
-            // The transaction was validated in the block
-            transactions: [
-                {
-                    // Transaction hash (unique identifier)
-                    hash: "0x47bef4762a8b5646f03b346e64cebde005370a2d4c0610c833fa17828ad1878e",
-                    nonce: 77,
-                    transactionIndex: 0
-
-                    events: [
-                        {
-                            // The event owner
-                            address: "mxw1x7tp9tt7mu0jm6qdmljgntvzzp53lrtndr7h8x",
-
-                            // The transaction event was emitted to
-                            event: {
-                                // the event hash for first 20 bytes SHA256 of event identifier
-                                // e.g: SHA256 of Transferred(string,string,bignumber)
-                                hash: "0x2cadcfb0c336769d503d557b26fcf1e91819e7e5",
-
-                                // The parameter of this event
-                                params: [
-                                    "mxw1x7tp9tt7mu0jm6qdmljgntvzzp53lrtndr7h8x",
-                                    "mxw1j4yh2gfumy8d327n0uvztg9075fjzd59vxf9ae",
-                                    "100000000000000000000000"
-                                ],
-                                transactionIndex: 0,    // the transaction index in the block
-                                eventIndex: 0           // the event index of this transaction
-                            }
-                        }
-                    ],
-
-                    // The transaction log messages
-                    logs: [
-                        {
-                            success: true,
-                            info: {
-                            }
-                        }
-                    ]
-                }
-            ]
-        }
-    }
-
------
-
-.. _transaction-request:
-
-Transaction Requests
---------------------
-
-Any property which accepts a number may also be specified as a :ref:`BigNumber <bignumber>`
-or :ref:`hex string <hexstring>`. Any property may also be given as a :ref:`Promise <promise>`
-which resolves to the expected type.
-
-.. code-block:: javascript
-
-    {
-        type: "cosmos-sdk/StdTx",
-        value: {
-            // Transaction system fee in 18 decimals (cin)
-            fee: {
-                amount: [
-                    {
-                        amount: "10000000000000000000",
-                        denom: "cin"
-                    }
-                ],
-                gas: "200000"
-            },
-
-            // Transaction memo that can fits in 256 UTF8 characters
-            memo: "",
-
-            msg: [
-                {
-                    // Transaction type
-                    type: "mxw/MsgSend",
-
-                    // Transaction message payload
-                    value: {
-                        amount: [
-                            {
-                                amount: "100000000000000000000000",
-                                denom: "cin"
-                            }
-                        ],
-                        fromAddress: "mxw1x7tp9tt7mu0jm6qdmljgntvzzp53lrtndr7h8x",
-                        toAddress: "mxw1j4yh2gfumy8d327n0uvztg9075fjzd59vxf9ae"
-                    }
-                }
-            ],
-
-            // Transaction signatures
-            signatures: [
-                {
-                    signature: "8F0GZv1QsMihuCrOS92x1TbpN0qhUNzhr+JuuHMD4x5O4jFuZPI8PIMAt0EqyCK2teF2SEiRYRm4RntXJulkWA==",
-                    pubKey: {
-                        type: "tendermint/PubKeySecp256k1",
-                        valu: "AvUZonVWLNSnH6s7WCdVgJEtQx1lLgtwsqjtFk4Yqabt"
-                    }
-                }
-            ]
-        }
-    }
-
------
-
-.. _transaction-receipt:
-
-Transaction Receipts
---------------------
-
-.. code-block:: javascript
-
-    {
-        // Transaction hash (unique identifier)
-        hash: "0x30080e4120ee65abdd2f7f9ba3ef2b42c34fb3e03de676d2f116a3a44ce65b74",
-
-        // The block this transaction was validated to
-        blockNumber: 350476,    // the block height
-        nonce: 265,             // the transaction sequence
-        index: 0,               // the transaction index always set 0 in receipt
-        
-        // Transaction status
-        status: 1,              // 1 indicated successful, 0 indicated failure during execution
-        confirmations: 2        // the number of block from latest block
-
-        result: {
-            events: [
-                {
-                    // The transaction event was emitted to
-                    address: "mxw1x7tp9tt7mu0jm6qdmljgntvzzp53lrtndr7h8x",  // the event producer
-                    event: {
-                        // the event hash for first 20 bytes SHA256 of event identifier
-                        // e.g: SHA256 of Transferred(string,string,bignumber)
-                        hash: "0x2cadcfb0c336769d503d557b26fcf1e91819e7e5",
-                        // The parameter of this event
-                        params: [
-                            "mxw1x7tp9tt7mu0jm6qdmljgntvzzp53lrtndr7h8x",
-                            "mxw1j4yh2gfumy8d327n0uvztg9075fjzd59vxf9ae",
-                            "100000000000000000000000"
-                        ],
-                        transactionIndex: 0,    // the transaction index always set 0 in receipt
-                        eventIndex: 0           // the event index of this transaction
-                    }
-                }
-            ],
-
-            // Transaction logs
-            logs: [
-                {
-                    success: true,
-                    info: {
-                    }
-                }
-            ]
-        },
-
-        // Transaction payload
-        data: {
-            type: "cosmos-sdk/StdTx",
-            value: {
-                fee: {
-                    amount: [
-                        {
-                            amount: "10000000000000000000",
-                            denom: "cin"
-                        }
-                    ],
-                    gas: "200000"
-                },
-                memo: "",
-                msg: [
-                    {
-                        type: "mxw/MsgSend",
-                        value: {
-                            amount: [
-                                {
-                                    amount: "100000000000000000000000",
-                                    denom: "cin"
-                                }
-                            ],
-                            fromAddress: "mxw1x7tp9tt7mu0jm6qdmljgntvzzp53lrtndr7h8x",
-                            toAddress: "mxw1j4yh2gfumy8d327n0uvztg9075fjzd59vxf9ae"
-                        }
-                    }
-                ],
-                signatures: [
-                    {
-                        signature: "8F0GZv1QsMihuCrOS92x1TbpN0qhUNzhr+JuuHMD4x5O4jFuZPI8PIMAt0EqyCK2teF2SEiRYRm4RntXJulkWA==",
-                        pubKey: {
-                            type: "tendermint/PubKeySecp256k1",
-                            valu: "AvUZonVWLNSnH6s7WCdVgJEtQx1lLgtwsqjtFk4Yqabt"
-                        }
-                    }
-                ]
-            }
-        }
-    }
-
------
 
 Provider Specific Extra API Calls
-=================================
+*********************************
 
 .. _provider-jsonrpc-extra:
 
-JsonRpcProvider
----------------
+**JsonRpcProvider**
 
 :sup:`prototype` . send ( method , params ) |nbsp| `=> Promise<any>`
     Send the JSON-RPC *method* with *params*. This is useful for calling
@@ -585,9 +388,12 @@ JsonRpcProvider
 .. code-block:: javascript
     :caption: *send vendor specific JSON-RPC API*
 
+    //method parameter is based on vendor RPC API 
     jsonRpcProvider.send('status', [ ]).then((result) => {
         console.log(result);
     });
+    // expected result:
+    // "status of the provider for this case"
 
 -----
 

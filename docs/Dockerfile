@@ -5,6 +5,7 @@ ADD ./version.txt /docs/
 ADD ./*.rst /docs/
 ADD ./*.py /docs/
 ADD ./_static /docs/_static
+ADD ./images /docs/images
 RUN sphinx-build -M html "." "_build" -D version=$(cat version.txt)
 
 FROM nginx:1.17.0-alpine
