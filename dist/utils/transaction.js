@@ -658,8 +658,8 @@ function getTransactionRequest(route, transactionType, overrides) {
                     name: misc_1.checkString,
                     owner: misc_1.checkAddress,
                     memo: misc_1.allowNullOrEmpty(misc_1.checkString),
-                    metadata: misc_1.allowNullOrEmpty(misc_1.arrayOf(misc_1.checkString)),
-                    properties: misc_1.allowNullOrEmpty(misc_1.arrayOf(misc_1.checkString)),
+                    metadata: misc_1.allowNullOrEmpty(misc_1.checkString),
+                    properties: misc_1.allowNullOrEmpty(misc_1.checkString),
                     symbol: misc_1.checkString,
                 }, overrides);
                 transaction = {
@@ -673,8 +673,8 @@ function getTransactionRequest(route, transactionType, overrides) {
                                         to: params.appFeeTo,
                                         value: params.appFeeValue.toString()
                                     },
-                                    metadata: params.metadata ? params.metadata : null,
-                                    properties: params.properties ? params.properties : null,
+                                    metadata: params.metadata ? params.metadata : "",
+                                    properties: params.properties ? params.properties : "",
                                     name: params.name,
                                     owner: params.owner,
                                     symbol: params.symbol,
@@ -721,8 +721,8 @@ function getTransactionRequest(route, transactionType, overrides) {
                     symbol: misc_1.checkString,
                     owner: misc_1.checkAddress,
                     to: misc_1.checkAddress,
-                    metadata: misc_1.arrayOf(misc_1.checkString),
-                    properties: misc_1.arrayOf(misc_1.checkString),
+                    metadata: misc_1.allowNullOrEmpty(misc_1.checkString),
+                    properties: misc_1.allowNullOrEmpty(misc_1.checkString),
                     memo: misc_1.allowNullOrEmpty(misc_1.checkString),
                 }, overrides);
                 transaction = {
@@ -736,8 +736,8 @@ function getTransactionRequest(route, transactionType, overrides) {
                                     symbol: params.symbol,
                                     owner: params.owner,
                                     to: params.to,
-                                    properties: params.properties,
-                                    metadata: params.metadata
+                                    properties: params.properties ? params.properties : "",
+                                    metadata: params.metadata ? params.metadata : ""
                                 }
                             }
                         ],
@@ -890,7 +890,7 @@ function getTransactionRequest(route, transactionType, overrides) {
                     symbol: misc_1.checkString,
                     from: misc_1.checkString,
                     itemID: misc_1.checkString,
-                    metadata: misc_1.allowNullOrEmpty(misc_1.arrayOf(misc_1.checkString)),
+                    metadata: misc_1.allowNullOrEmpty(misc_1.checkString),
                     memo: misc_1.allowNullOrEmpty(misc_1.checkString)
                 }, overrides);
                 transaction = {
@@ -903,7 +903,7 @@ function getTransactionRequest(route, transactionType, overrides) {
                                     symbol: params.symbol,
                                     from: params.from,
                                     itemID: params.itemID,
-                                    metadata: params.metadata
+                                    metadata: params.metadata ? params.metadata : ""
                                 }
                             }
                         ],

@@ -26,9 +26,8 @@ export interface NonFungibleTokenProperties {
         to: string;
         value: BigNumber;
     };
-    metadata?: string[];
-    properties?: string[];
-    owner?: string;
+    metadata?: string;
+    properties?: string;
 }
 export interface NonFungibleTokenFee {
     action: string;
@@ -37,8 +36,8 @@ export interface NonFungibleTokenFee {
 export interface NonFungibleTokenItem {
     symbol: string;
     itemID: string;
-    properties: string[];
-    metadata: string[];
+    properties?: string;
+    metadata?: string;
 }
 export interface NonFungibleTokenSignature {
     pub_key: {
