@@ -5,6 +5,7 @@ Misc
 ****
 
 .. _transaction:
+
 Transactions
 ############
 
@@ -74,7 +75,7 @@ All properties for transaction are optional.
         ],
         "memo": ""
     }
-}
+
 
 ------
 
@@ -85,11 +86,13 @@ Transaction Requests
 
 In order to excecute a transaction, a requests must be send. A Transaction Requests will contain following infomation:-
 
-*Transaction fee
-*Transaction memo
-    -Transaction Type(what kind of transaction is involve ex.transfer mxw, send message etc.)
-    -Transaction data or variables involve
-*Transaction signature (done by the requester)
+* Transaction fee
+
+* Transaction memo
+    - Transaction Type(what kind of transaction is involve ex.transfer mxw, send message etc.)
+    - Transaction data or variables involve
+
+* Transaction signature (done by the requester)
 
 Any property which accepts a number may also be specified as a :ref:`BigNumber <bignumber>`
 or :ref:`hex string <hexstring>`. Any property may also be given as a :ref:`Promise <promise>`

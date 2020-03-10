@@ -8,8 +8,6 @@ Fungible Token
 **************
 
 
------
-
 Creating Instances
 ##################
 Create fungible token required approval from authorities.
@@ -20,14 +18,14 @@ Create fungible token required approval from authorities.
 
     The valid fungible token properties are:
 
-        - **name: ** *string* name for the token
-        - **symbol: ** *string* symbol for the token
-        - **decimals: ** ref:`*BigNumber* <bignumber>` the number of decimals for balance
-        - **fixedSupply: ** *bool* the supply mechanisms type (``true``: fixed, ``false``: dynamic)
-        - **maxSupply** ref:`*BigNumber* <bignumber>` the maximum supply, set to 0 for unlimited supply (only applied to dynamic supply type)
-        - **fee** *int* application fee
-        - **owner** the owner of the token (default to wallet creator)
-        - **metadata** *string* remarks (optional)
+        - **name :** *string* name for the token
+        - **symbol :** *string* symbol for the token
+        - **decimals :** ref:`*BigNumber* <bignumber>` the number of decimals for balance
+        - **fixedSupply :** *bool* the supply mechanisms type (``true``: fixed, ``false``: dynamic)
+        - **maxSupply :** ref:`*BigNumber* <bignumber>` the maximum supply, set to 0 for unlimited supply (only applied to dynamic supply type)
+        - **fee :** *int* application fee
+        - **owner :** the owner of the token (default to wallet creator)
+        - **metadata :** *string* remarks (optional)
 
     .. note:: name and symbol should be unique
 

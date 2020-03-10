@@ -395,6 +395,7 @@ authentication purpose of any operations involved their shared asset.
     //expected result:
     //a hexstring, something like this
     //0xcdfa6c550d930fa45b9f938a96a3b76c90e1f90fed7ffd8bbcc6dbd566316e88
+    
 -----
 
 Blockchain Operations

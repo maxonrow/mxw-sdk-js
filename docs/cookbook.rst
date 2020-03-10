@@ -322,7 +322,7 @@ load an instance of the wallet that we just created.
 (create seats) to the student who wants to attend the course.
 
 | Please note that the NFT properties `symbol` must be unique. 
-If we attempt to create NFT using same symbol, an error will be thrown. 
+| If we attempt to create NFT using same symbol, an error will be thrown. 
 
 .. code-block:: javascript
 

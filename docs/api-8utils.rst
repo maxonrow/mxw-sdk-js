@@ -353,7 +353,7 @@ Random
 
 
 Mxw Strings and Cin
-##################
+###################
 
 .. _parseMxw:
 

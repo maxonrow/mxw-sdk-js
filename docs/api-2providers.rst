@@ -344,6 +344,7 @@ Waiting for Transactions
 
     //expected result:
     //transaction receipt, click on the link above for more details
+
 -----
 
 Objects and Types
@@ -357,7 +358,7 @@ return types for various provider calls.
 .. _blocktag:
 
 Block Tag
-========
+=========
 
 A block tag is used to uniquely identify a block's position in the blockchain:
 
