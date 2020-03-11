@@ -46,4 +46,9 @@ export declare class NonFungibleTokenItem {
     * @param overrides options
     */
     updateMetadata(metadata?: string, overrides?: any): Promise<TransactionResponse | TransactionReceipt>;
+    /**
+  * Burn non-fungible token item
+  * @param overrides options
+  */
+    burn(overrides?: any): Promise<TransactionReceipt>;
 }

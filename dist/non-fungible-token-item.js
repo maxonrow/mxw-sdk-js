@@ -120,7 +120,7 @@ class NonFungibleTokenItem {
                 return errors.throwError('transfer non fungible token item require signer address', errors.MISSING_ARGUMENT, { arg: 'signerAddress' });
             }
             return this.signer.provider.resolveName(toAddressOrName).then((toAddress) => {
-                let transaction = this.signer.provider.getTransactionRequest("nonFungible", "transferNonFungibleToken", {
+                let transaction = this.signer.provider.getTransactionRequest("nonFungible", "transferNonFungibleItem", {
                     symbol: this.symbol,
                     from: signerAddress,
                     to: toAddress,
@@ -213,6 +213,41 @@ class NonFungibleTokenItem {
                     }
                     throw this.signer.provider.checkTransactionReceipt(receipt, errors.CALL_EXCEPTION, "update non fungible token item metadata failed", {
                         method: "nonfungible-updateItemMetadata",
+                        receipt
+                    });
+                });
+            });
+        });
+    }
+    /**
+  * Burn non-fungible token item
+  * @param overrides options
+  */
+    burn(overrides) {
+        if (!this.signer) {
+            errors.throwError('burn non fungible token item require signer', errors.NOT_INITIALIZED, { arg: 'signer' });
+        }
+        return properties_1.resolveProperties({ address: this.signer.getAddress() }).then(({ address }) => {
+            if (!address) {
+                return errors.throwError('burn non fungible token item require signer address', errors.MISSING_ARGUMENT, { arg: 'signerAddress' });
+            }
+            let transaction = this.signer.provider.getTransactionRequest("nonFungible", "burnNonFungibleItem", {
+                symbol: this.symbol,
+                itemID: this.itemID,
+                from: address,
+            });
+            transaction.fee = (overrides && overrides.fee) ? overrides.fee : this.signer.provider.getTransactionFee(undefined, undefined, { tx: transaction });
+            return this.signer.sendTransaction(transaction, overrides).then((response) => {
+                if (overrides && overrides.sendOnly) {
+                    return response;
+                }
+                let confirmations = (overrides && overrides.confirmations) ? Number(overrides.confirmations) : null;
+                return this.signer.provider.waitForTransaction(response.hash, confirmations).then((receipt) => {
+                    if (1 == receipt.status) {
+                        return receipt;
+                    }
+                    throw this.signer.provider.checkTransactionReceipt(receipt, errors.CALL_EXCEPTION, "burn non fungible token item failed", {
+                        method: "nonfungible-burnNonFungibleItem",
                         receipt
                     });
                 });

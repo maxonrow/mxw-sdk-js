@@ -10,5 +10,10 @@ then
     # Dont follow me...
     git clone git@gitlab.com:mxw/mxw-sdk-js-secret.git
     cd ..
+else
+    cd env/mxw-sdk-js-secret
+    # Dont follow me...
+    git pull
+    cd ../..
 fi;
 cp -f env/mxw-sdk-js-secret/env.ts env.ts

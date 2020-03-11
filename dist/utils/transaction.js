@@ -714,7 +714,7 @@ function getTransactionRequest(route, transactionType, overrides) {
                 };
             }
             break;
-        case "nonFungible/mintNonFungibleToken":
+        case "nonFungible/mintNonFungibleItem":
             {
                 let params = misc_1.checkFormat({
                     itemID: misc_1.checkString,
@@ -730,7 +730,7 @@ function getTransactionRequest(route, transactionType, overrides) {
                     value: {
                         msg: [
                             {
-                                type: "nonFungible/mintNonFungibleToken",
+                                type: "nonFungible/mintNonFungibleItem",
                                 value: {
                                     itemID: params.itemID,
                                     symbol: params.symbol,
@@ -747,7 +747,7 @@ function getTransactionRequest(route, transactionType, overrides) {
                 };
             }
             break;
-        case "nonFungible/transferNonFungibleToken":
+        case "nonFungible/transferNonFungibleItem":
             {
                 let params = misc_1.checkFormat({
                     symbol: misc_1.checkString,
@@ -761,7 +761,7 @@ function getTransactionRequest(route, transactionType, overrides) {
                     value: {
                         msg: [
                             {
-                                type: "nonFungible/transferNonFungibleToken",
+                                type: "nonFungible/transferNonFungibleItem",
                                 value: {
                                     symbol: params.symbol,
                                     from: params.from,
@@ -803,11 +803,11 @@ function getTransactionRequest(route, transactionType, overrides) {
                 };
             }
             break;
-        case "nonFungible/burnNonFungibleToken":
+        case "nonFungible/burnNonFungibleItem":
             {
                 let params = misc_1.checkFormat({
                     symbol: misc_1.checkString,
-                    from: misc_1.checkString,
+                    from: misc_1.checkAddress,
                     itemID: misc_1.checkString,
                     memo: misc_1.allowNullOrEmpty(misc_1.checkString)
                 }, overrides);
@@ -816,7 +816,7 @@ function getTransactionRequest(route, transactionType, overrides) {
                     value: {
                         msg: [
                             {
-                                type: "nonFungible/burnNonFungibleToken",
+                                type: "nonFungible/burnNonFungibleItem",
                                 value: {
                                     symbol: params.symbol,
                                     from: params.from,
@@ -834,7 +834,7 @@ function getTransactionRequest(route, transactionType, overrides) {
             {
                 let params = misc_1.checkFormat({
                     symbol: misc_1.checkString,
-                    from: misc_1.checkString,
+                    from: misc_1.checkAddress,
                     itemID: misc_1.checkString,
                     memo: misc_1.allowNullOrEmpty(misc_1.checkString)
                 }, overrides);
@@ -888,7 +888,7 @@ function getTransactionRequest(route, transactionType, overrides) {
             {
                 let params = misc_1.checkFormat({
                     symbol: misc_1.checkString,
-                    from: misc_1.checkString,
+                    from: misc_1.checkAddress,
                     itemID: misc_1.checkString,
                     metadata: misc_1.allowNullOrEmpty(misc_1.checkString),
                     memo: misc_1.allowNullOrEmpty(misc_1.checkString)
@@ -917,7 +917,7 @@ function getTransactionRequest(route, transactionType, overrides) {
             {
                 let params = misc_1.checkFormat({
                     symbol: misc_1.checkString,
-                    from: misc_1.checkString,
+                    from: misc_1.checkAddress,
                     memo: misc_1.allowNullOrEmpty(misc_1.checkString)
                 }, overrides);
                 transaction = {
@@ -929,6 +929,60 @@ function getTransactionRequest(route, transactionType, overrides) {
                                 value: {
                                     symbol: params.symbol,
                                     from: params.from,
+                                }
+                            }
+                        ],
+                        memo: params.memo ? params.memo : ""
+                    },
+                    fee: null
+                };
+            }
+            break;
+        case "nonFungible/updateNFTMetadata":
+            {
+                let params = misc_1.checkFormat({
+                    symbol: misc_1.checkString,
+                    from: misc_1.checkAddress,
+                    metadata: misc_1.allowNullOrEmpty(misc_1.checkString),
+                    memo: misc_1.allowNullOrEmpty(misc_1.checkString)
+                }, overrides);
+                transaction = {
+                    type: "cosmos-sdk/StdTx",
+                    value: {
+                        msg: [
+                            {
+                                type: "nonFungible/updateNFTMetadata",
+                                value: {
+                                    symbol: params.symbol,
+                                    from: params.from,
+                                    metadata: params.metadata ? params.metadata : ""
+                                }
+                            }
+                        ],
+                        memo: params.memo ? params.memo : ""
+                    },
+                    fee: null
+                };
+            }
+            break;
+        case "nonFungible/burnNonFungibleToken":
+            {
+                let params = misc_1.checkFormat({
+                    symbol: misc_1.checkString,
+                    from: misc_1.checkAddress,
+                    itemID: misc_1.checkString,
+                    memo: misc_1.allowNullOrEmpty(misc_1.checkString)
+                }, overrides);
+                transaction = {
+                    type: "cosmos-sdk/StdTx",
+                    value: {
+                        msg: [
+                            {
+                                type: "nonFungible/burnNonFungibleToken",
+                                value: {
+                                    symbol: params.symbol,
+                                    from: params.from,
+                                    itemID: params.itemID,
                                 }
                             }
                         ],

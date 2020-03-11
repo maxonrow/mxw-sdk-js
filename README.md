@@ -20,6 +20,12 @@ Aims to be a complete and compact library for interacting with the Maxonrow Bloc
 
 -----
 
+Compiling the source code
+-------------------------
+
+To install all dependecies and build the source code run `make build`.
+
+
 Installing in Node.js
 ---------------------
 
