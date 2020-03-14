@@ -21,7 +21,7 @@ Creating Instances
 .. code-block:: javascript
     :caption: *create an instance of kyc with the reference from provider*
 
-    let provider = mxw.getDefaultProvider("testnet");
+    let provider = new mxw.Wallet(0x00000000000000000000000000000000000000000000000070726f7669646572);
     let kyc = Kyc.create(provider);
 
 Signing
@@ -51,7 +51,7 @@ Signing
     :caption: *Generate KYC address and signing*
         
         //create a new wallet to
-        let networkProvider = mxw.getDefaultProvider("testnet");
+        let networkProvider = mxw.getDefaultProvider("localnet");
         var wallet = mxw.Wallet.createRandom().connect(networkProvider);
         Kyc.create(wallet).then((kycR)=>{
             let seed = sha256(toUtf8Bytes(JSON.stringify(sortObject({
@@ -138,7 +138,7 @@ Checking status
     :caption: check if the wallet is white listed
 
     let privateKey = "0x0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef";
-    let networkProvider = mxw.getDefaultProvider("testnet");
+    let networkProvider = mxw.getDefaultProvider("localnet");
     let wallet = new mxw.Wallet(privateKey, networkProvider);
     wallet.isWhitelisted().then((result)=>{
         console.log(result);

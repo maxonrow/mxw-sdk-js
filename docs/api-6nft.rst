@@ -45,7 +45,7 @@ Create non fungible token required approval from authorities
 .. code-block:: javascript
     :caption: Create Non-fungible Token
 
-    let provider = mxw.getDefaultProvider("testnet");
+    let provider = new mxw.Wallet(0x00000000000000000000000000000000000000000000000070726f7669646572);
     let nonFungibleTokenProperties: NonFungibleTokenProperties;
     nonFungibleTokenProperties = {
         name: "MY " + "symbol",
@@ -100,7 +100,7 @@ Prototype
 .. code-block:: javascript
     :caption: authorities token
 
-        let provider = mxw.getDefaultProvider("testnet");
+        let provider = new mxw.Wallet(0x00000000000000000000000000000000000000000000000070726f7669646572);
         let issuer = new mxw.Wallet(0x0000000000000000000000000000000000000000000000000000697373756572);
         let middleware = new mxw.Wallet(0x000000000000000000000000000000000000000000006d6964646c6577617265);
 
@@ -132,7 +132,7 @@ Prototype
 .. code-block:: javascript
     :caption: transfer item ownership
 
-        let provider = mxw.getDefaultProvider("testnet");
+        let provider = new mxw.Wallet(0x00000000000000000000000000000000000000000000000070726f7669646572);
         let privateKey = "0x0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef";
         let wallet = new mxw.Wallet(privateKey, provider);
 
@@ -173,7 +173,7 @@ Prototype
 .. code-block:: javascript
     :caption: *update metadata of a non-fungible token*
 
-    let provider = mxw.getDefaultProvider("testnet");
+    let provider = new mxw.Wallet(0x00000000000000000000000000000000000000000000000070726f7669646572);
     let nonFungibleTokenProperties: NonFungibleTokenProperties;
     nonFungibleTokenProperties = {
         name: "MY " + symbol,
@@ -208,7 +208,7 @@ Freeze and unfreeze item
 .. code-block:: javascript
     :caption: freeze item
 
-        let provider = mxw.getDefaultProvider("testnet");
+        let provider = new mxw.Wallet(0x00000000000000000000000000000000000000000000000070726f7669646572);
         let issuer = new mxw.Wallet(0x0000000000000000000000000000000000000000000000000000697373756572);
         let middleware = new mxw.Wallet(0x000000000000000000000000000000000000000000006d6964646c6577617265);
 
@@ -223,7 +223,7 @@ Freeze and unfreeze item
 .. code-block:: javascript
     :caption: unfreeze item
 
-        let provider = mxw.getDefaultProvider("testnet");
+        let provider = new mxw.Wallet(0x00000000000000000000000000000000000000000000000070726f7669646572);
         let issuer = new mxw.Wallet(0x0000000000000000000000000000000000000000000000000000697373756572);
         let middleware = new mxw.Wallet(0x000000000000000000000000000000000000000000006d6964646c6577617265);
 
@@ -234,6 +234,7 @@ Freeze and unfreeze item
                 });
             });
         }); 
+
 ------
 
 Item

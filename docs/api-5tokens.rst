@@ -8,8 +8,6 @@ Fungible Token
 **************
 
 
------
-
 Creating Instances
 ##################
 Create fungible token required approval from authorities.
@@ -20,21 +18,21 @@ Create fungible token required approval from authorities.
 
     The valid fungible token properties are:
 
-        - **name: ** *string* name for the token
-        - **symbol: ** *string* symbol for the token
-        - **decimals: ** ref:`*BigNumber* <bignumber>` the number of decimals for balance
-        - **fixedSupply: ** *bool* the supply mechanisms type (``true``: fixed, ``false``: dynamic)
-        - **maxSupply** ref:`*BigNumber* <bignumber>` the maximum supply, set to 0 for unlimited supply (only applied to dynamic supply type)
-        - **fee** *int* application fee
-        - **owner** the owner of the token (default to wallet creator)
-        - **metadata** *string* remarks (optional)
+        - **name :** *string* name for the token
+        - **symbol :** *string* symbol for the token
+        - **decimals :** ref:`*BigNumber* <bignumber>` the number of decimals for balance
+        - **fixedSupply :** *bool* the supply mechanisms type (``true``: fixed, ``false``: dynamic)
+        - **maxSupply :** ref:`*BigNumber* <bignumber>` the maximum supply, set to 0 for unlimited supply (only applied to dynamic supply type)
+        - **fee :** *int* application fee
+        - **owner :** the owner of the token (default to wallet creator)
+        - **metadata :** *string* remarks (optional)
 
     .. note:: name and symbol should be unique
 
 .. code-block:: javascript
     :caption: Create Fungible Token
 
-    let provider = mxw.getDefaultProvider("testnet");
+    let provider = new mxw.Wallet(0x00000000000000000000000000000000000000000000000070726f7669646572);
     let fungibleTokenProperties = {
         name: "MY " + "symbol",
         symbol: "symbol",
@@ -137,7 +135,7 @@ Prototype
 .. code-block:: javascript
     :caption: freeze token
 
-    let provider = mxw.getDefaultProvider("testnet");
+        let provider = new mxw.Wallet(0x00000000000000000000000000000000000000000000000070726f7669646572);
         let issuer = new mxw.Wallet(0x0000000000000000000000000000000000000000000000000000697373756572);
         let middleware = new mxw.Wallet(0x000000000000000000000000000000000000000000006d6964646c6577617265);
 
@@ -160,7 +158,7 @@ Prototype
 .. code-block:: javascript
     :caption: unfreeze token
 
-    let provider = mxw.getDefaultProvider("testnet");
+        let provider = new mxw.Wallet(0x00000000000000000000000000000000000000000000000070726f7669646572);
         let issuer = new mxw.Wallet(0x0000000000000000000000000000000000000000000000000000697373756572);
         let middleware = new mxw.Wallet(0x000000000000000000000000000000000000000000006d6964646c6577617265);
 

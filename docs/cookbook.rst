@@ -320,8 +320,9 @@ load an instance of the wallet that we just created.
 
 :ref:`Non-Fungible-Token (NFT) <api-nft>` is a token created and hold by a course owner, it can use to mint item
 (create seats) to the student who wants to attend the course.
-| Please note that the NFT properties `symbol` and `name` must be unique. 
-If we attempt to create NFT using same symbol or name, an error will be thrown. 
+
+| Please note that the NFT properties `symbol` must be unique. 
+| If we attempt to create NFT using same symbol, an error will be thrown. 
 
 .. code-block:: javascript
 
@@ -416,12 +417,10 @@ In this part will performs two actions:
    }
 
 
-``mintItem()`` method mints an item and then transfer it to a wallet address. 
+``mintItem()`` method mints an item. 
 When item is created, by default it will be owned by the NFT token owner. 
-Please note that limit of item can be mint is limited by the NFT mint limit, 
-that the NFT state we parse in when calling ``approveCourse()`` method. 
-Inside the item properties ``itemProp`` it must contain symbol, which must be same with its parent's NFT symbol, 
-item ID, properties and metadata. 
+A token can't mint item more that its mint limit. 
+The item's symbol must same the course symbol.
 Use ``getNftItemState()`` method to queries and prints out the NFT item state.
 
 .. code-block:: javascript

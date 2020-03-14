@@ -29,7 +29,8 @@ Create Wallet
 
 :sup:`Wallet` . createRandom ( [ options ] ) |nbsp| `=> Wallet`
     | Creates a new random wallet then generate mnemonic and an encrypted JSON file.
-    | Ensure this wallet is stored somewhere safe, if lost there is **NO way to recover it**. 
+    | Ensure these infomation is stored somewhere safe, if lost there is **NO way to recover it**. 
+
 
     | Parameters can be use are:-
     
@@ -52,13 +53,17 @@ Create Wallet
     Chinese (traditional) ``wordlists.zh_tw``        
     ===================== ===========================
 
+.. warning:: 
+        Highly recommend to show mnemonic of the wallet to the user, and advise them to write it down
+        because there is **no way to recover** the wallet back.
+
 .. code-block:: javascript
     :caption: *create a new wallet using random generated private key*
 
-    let randomWallet = mxw.Wallet.createRandom();
-    console.log("Address:", randomWallet.address);
     //By default, the wallet is created by 16 hexadecimal digits private key, 
     //and will generate mnemonic using wordlists.en
+    let randomWallet = mxw.Wallet.createRandom();
+    console.log("Address:", randomWallet.address);
 
     //expected result:
     //a random string, it will looks something like this
@@ -92,15 +97,18 @@ Create Wallet
 Create Instance of Existing Wallet
 ==================================
 
+There is 3 ways to load a wallet, private key, mnemonic and JSON file. If user doesn't have any
+one of this, it is **impossible** to recover the wallet back.
+
 new :sup:`Wallet` ( privateKey [ , provider ] )
     Creating a new instance of exisiting wallet from *privateKey* and optionally connect a provider
 
 .. code-block:: javascript
     :caption: *load wallet using private key and connect it to provider*
 
-    //connect wallet to testnet
+    //connect wallet to localnet
     let privateKey = "0x0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef";
-    let provider = mxw.getDefaultProvider("testnet");
+    let networkProvider = mxw.getDefaultProvider("localnet");
     let walletWithProvider = new mxw.Wallet(privateKey, provider);
 
 .. _wallet-connect:
@@ -115,8 +123,8 @@ new :sup:`Wallet` ( privateKey [ , provider ] )
     let privateKey = "0x0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef";
     let wallet = new mxw.Wallet(privateKey);
 
-    // Connect the wallet to testnet
-    let provider = mxw.getDefaultProvider("testnet");
+    // Connect the wallet to localnet
+    let networkProvider = mxw.getDefaultProvider("localnet");
     wallet.connect(provider);
 
 .. _fromEncryptedJson:
@@ -201,6 +209,7 @@ new :sup:`Wallet` ( privateKey [ , provider ] )
 
 Prototype Variables
 *******************
+These are the variables you can get from wallet.
 
 :sup:`prototype` . address
     | Returns public address of a wallet
@@ -237,6 +246,8 @@ Signer is required in a transaction, it is to add a layer of security. Ensure no
 
 Signing
 *******
+An encrypting process by using own private key, 
+if sending to another wallet, it will encrypt again with their public key.
 
 :sup:`prototype` . signMessage ( message ) |nbsp| `=> Promise<string>`
     Signs *message* and returns a :ref:`Promise <promise>` that resolves to
@@ -308,7 +319,7 @@ Signing
     :caption: *signing transactions*
 
     let privateKey = "0xca250aeca008d36b4b4ff83709343c9e4c4ea461e5aa5fa51d57a0fe11eb045e";
-    let provider = mxw.getDefaultProvider("testnet");
+    let networkProvider = mxw.getDefaultProvider("localnet");
     let wallet = new mxw.Wallet(privateKey, provider);
 
     console.log(wallet.address);
@@ -367,9 +378,13 @@ Signing
 Cryptographic Functions
 ***********************
 
-:sup:`prototype` . computeSharedSecret ( otherPublicKey ) |nbsp| `=> string`
+Share secret is used when two parties are agree on sharing their asset inside a blockchain.
+After a share secret is computed, it will return as a hexstring. The hexstring can be use for 
+authentication purpose of any operations involved their shared asset.
+
+:sup:`prototype` . computeSharedSecret ( otherPublicKey ) |nbsp| `=> hexstring`
     Compute the *shared secret* by using other wallet's public key and returns as a :ref:`hex string <hexstring>`.
-    In general, the shared secret should not directly uses as encryption key. Instead of derive it using :ref:`pbkdf2 <pbkdf2>`.
+    In general, the shared secret should not dirly uses as encryption key. Instead of derive it using :ref:`pbkdf2 <pbkdf2>`.
 
 .. code-block:: javascript
     :caption: compute shared secret using own private key and other public key
@@ -380,12 +395,13 @@ Cryptographic Functions
     //expected result:
     //a hexstring, something like this
     //0xcdfa6c550d930fa45b9f938a96a3b76c90e1f90fed7ffd8bbcc6dbd566316e88
+    
 -----
 
 Blockchain Operations
 *********************
 
-These operations require the wallet have a provider attached to it.
+These operations require wallet to be connected to blockchain by a network provider.
 
 :sup:`prototype` . getBalance ( ) |nbsp| `=> Promise<BigNumber>`
     Returns a :ref:`Promise <promise>` that resolves to the balance (as a :ref:`BigNumber <bignumber>`,
@@ -395,8 +411,9 @@ These operations require the wallet have a provider attached to it.
 .. code-block:: javascript
     :caption: check wallet balance
 
+        let networkProvider = mxw.getDefaultProvider("localnet");
         let privateKey = "0x0000000000000000000000000000000000000000000000000000000000000001";
-        let wallet = new mxw.Wallet(privateKey,uatProvider);
+        let wallet = new mxw.Wallet(privateKey,provider);
         wallet.getBalance().then((balance)=>{
             console.log(mxw.utils.formatMxw("Wallet balance: " + balance));
         });
@@ -411,7 +428,7 @@ These operations require the wallet have a provider attached to it.
     :caption: *query the network*
 
     // We require a provider to query the network
-    let provider = mxw.getDefaultProvider("testnet");
+    let networkProvider = mxw.getDefaultProvider("localnet");
 
     let privateKey = "0x0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef";
     let wallet = new mxw.Wallet(privateKey, provider);
@@ -440,7 +457,7 @@ These operations require the wallet have a provider attached to it.
     :caption: *transfer mxw*
 
     // We require a provider to send transactions
-    let provider = mxw.getDefaultProvider("testnet");
+    let networkProvider = mxw.getDefaultProvider("localnet");
 
     let privateKey = "0x0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef";
     let wallet = new mxw.Wallet(privateKey, provider);

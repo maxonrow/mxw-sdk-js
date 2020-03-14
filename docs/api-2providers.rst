@@ -23,7 +23,7 @@ There are several methods to connect to the blockchain network provided. If you 
 running your own local blockchain node, it is recommended that you use the ``getDefaultProvider()``
 method.
 
-:sup:`mxw` . getDefaultProvider( [ network = "testnet" ] ) |nbsp| `=> Provider`
+:sup:`mxw` . getDefaultProvider( [ network = "localnet" ] ) |nbsp| `=> Provider`
     This creates a FallbackProvider backed by multiple backends.
     
     This is the **recommended** method of connecting to the blockchain network if you are
@@ -32,7 +32,7 @@ method.
 .. code-block:: javascript
     :caption: *get a standard network provider* 
 
-    let provider = mxw.getDefaultProvider("testnet");
+    let networkProvider = mxw.getDefaultProvider("localnet");
 
 
 JsonRpcProvider :sup:`( inherits from Provider )`
@@ -71,7 +71,7 @@ new :sup:`mxw . providers` . JsonRpcProvider( [ urlOrInfo :sup:`= "http://localh
     //  - "homestead"
     //  - "testnet"
 
-    let provider = mxw.getDefaultProvider('testnet');
+    let networkProvider = mxw.getDefaultProvider('localnet');
 
 
 .. code-block:: javascript
@@ -150,10 +150,10 @@ testnet or private networks.
 .. code-block:: javascript
     :caption: *get a standard network*
 
-    let network = mxw.providers.getNetwork('testnet');
+    let network = mxw.providers.getNetwork('localnet');
     // {
     //    chainId: "mxw",
-    //    name: "testnet"
+    //    name: "localnet"
     // }
 
 
@@ -344,6 +344,7 @@ Waiting for Transactions
 
     //expected result:
     //transaction receipt, click on the link above for more details
+
 -----
 
 Objects and Types
@@ -357,7 +358,7 @@ return types for various provider calls.
 .. _blocktag:
 
 Block Tag
-========
+=========
 
 A block tag is used to uniquely identify a block's position in the blockchain:
 

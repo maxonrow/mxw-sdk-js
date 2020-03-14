@@ -2,13 +2,14 @@
 #
 # import os
 # import sys
+import time
 # sys.path.insert(0, os.path.abspath('.'))
 
 
 # -- Project information -----------------------------------------------------
 
 project = 'mxw-sdk-js'
-copyright = '2020, Maxonrow'
+copyright = '2019-'+ time.strftime("%Y")+', Maxonrow'
 author = 'Jean Soon'
 
 # The short X.Y version

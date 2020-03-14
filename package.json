@@ -1,6 +1,6 @@
 {
   "name": "mxw-sdk-js",
-  "version": "0.8.0",
+  "version": "0.8.1-rc.1",
   "description": "Maxonrow blockchain SDK",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -28,8 +28,6 @@
     "test-constants": "mocha --timeout 60000 -r ts-node/register tests/test-0610-constants.ts",
     "test-non-fungible-token-private": "mocha --timeout 60000 -r ts-node/register tests/test-0800-non-fungible-token-private.ts",
     "test-non-fungible-token-public": "mocha --timeout 60000 -r ts-node/register tests/test-0810-non-fungible-token-public.ts",
-    "test-non-fungible-token-burn": "mocha --timeout 60000 -r ts-node/register tests/test-0820-non-fungible-token-burn.ts",
-    "test-non-fungible-token-challenge": "mocha --timeout 60000 -r ts-node/register tests/test-0830-non-fungible-token-challenge.ts",
     "dist-test": "npm run build && mocha --timeout 60000 -r ts-node/register tests/test-*.ts",
     "dist-test-provider": "npm run build && mocha --timeout 60000 -r ts-node/register tests/test-0500-provider.ts",
     "dist-test-wallet": "npm run build && mocha --timeout 60000 -r ts-node/register tests/test-0200-wallet.ts",
@@ -38,10 +36,6 @@
     "dist-test-fungible-token": "npm run build && mocha --timeout 60000 -r ts-node/register tests/test-03*.ts",
     "dist-test-fungible-token-fix": "npm run build && mocha --timeout 60000 -r ts-node/register tests/test-0300-fungible-token-fix.ts",
     "dist-test-fungible-token-dyn": "npm run build && mocha --timeout 60000 -r ts-node/register tests/test-0310-fungible-token-dyn.ts",
-    "dist-test-non-fungible-token-private": "npm run build && mocha --timeout 60000 -r ts-node/register tests/test-0800-non-fungible-token-private.ts",
-    "dist-test-non-fungible-token-public": "npm run build && mocha --timeout 60000 -r ts-node/register tests/test-0800-non-fungible-token-public.ts",
-    "dist-test-non-fungible-token-burn": "npm run build && mocha --timeout 60000 -r ts-node/register tests/test-0800-non-fungible-token-burn.ts",
-    "dist-test-non-fungible-token-challenge": "npm run build && mocha --timeout 60000 -r ts-node/register tests/test-0800-non-fungible-token-challenge.ts",
     "dist-test-alias": "npm run build && mocha --timeout 60000 -r ts-node/register tests/test-0400-alias.ts",
     "dist-test-utils": "npm run build && mocha --timeout 60000 -r ts-node/register tests/test-0600-utils.ts",
     "dist-test-object": "npm run build && mocha --timeout 60000 -r ts-node/register tests/test-0601-object.ts",
@@ -51,10 +45,7 @@
     "dist-debug-wallet": "npm run build && mocha --inspect-brk --timeout 3000000 -r ts-node/register tests/test-0200-wallet.ts",
     "dist-debug-kyc": "npm run build && mocha --inspect-brk --timeout 3000000 -r ts-node/register tests/test-0100-kyc.ts",
     "dist-debug-kyc-bulk": "npm run build && mocha --inspect-brk --timeout 3000000 -r ts-node/register tests/test-0101-kyc-bulk.ts",
-    "dist-debug-non-fungible-token-private": "npm run build && mocha --inspect-brk --timeout 3000000 -r ts-node/register tests/test-0800-non-fungible-token-private.ts",
-    "dist-debug-non-fungible-token-public": "npm run build && mocha --inspect-brk --timeout 3000000 -r ts-node/register tests/test-0800-non-fungible-token-public.ts",
-    "dist-debug-non-fungible-token-burn": "npm run build && mocha --inspect-brk --timeout 3000000 -r ts-node/register tests/test-0800-non-fungible-token-burn.ts",
-    "dist-debug-non-fungible-token-challenge": "npm run build && mocha --inspect-brk --timeout 3000000 -r ts-node/register tests/test-0800-non-fungible-token-challenge.ts",
+    "dist-debug-non-fungible-token": "npm run build && mocha --inspect-brk --timeout 3000000 -r ts-node/register tests/test-0800-non-fungible-token.ts",
     "dist-debug-fungible-token-fix": "npm run build && mocha --inspect-brk --timeout 3000000 -r ts-node/register tests/test-0300-fungible-token-fix.ts",
     "dist-debug-fungible-token-dyn": "npm run build && mocha --inspect-brk --timeout 3000000 -r ts-node/register tests/test-0310-fungible-token-dyn.ts",
     "dist-debug-alias": "npm run build && mocha --inspect-brk --timeout 3000000 -r ts-node/register tests/test-0400-alias.ts",
@@ -69,9 +60,9 @@
     "url": "https://github.com/maxonrow/mxw-sdk-js.git"
   },
   "devDependencies": {
-    "@babel/core": "^7.8.4",
-    "@babel/preset-env": "^7.8.4",
-    "@babel/preset-react": "^7.8.3",
+    "@babel/core": "^7.6.2",
+    "@babel/preset-env": "^7.6.2",
+    "@babel/preset-react": "^7.0.0",
     "babel-loader": "^8.0.6",
     "babel-plugin-transform-class-properties": "^6.24.1",
     "babel-plugin-transform-object-rest-spread": "^6.26.0",
@@ -79,21 +70,23 @@
     "dts-bundle": "^0.7.3",
     "jest": "^24.8.0",
     "mocha": "^6.2.2",
-    "ts-node": "^8.6.2",
-    "typescript": "^3.8.2",
-    "webpack": "^4.41.6",
-    "webpack-cli": "^3.3.11"
+    "ts-node": "^8.4.1",
+    "typescript": "^3.7.5",
+    "uglifyjs-webpack-plugin": "^2.1.3",
+    "webpack": "^4.41.0",
+    "webpack-cli": "^3.3.9"
   },
   "dependencies": {
-    "@types/node": "^12.12.28",
+    "@types/node": "^12.7.8",
     "aes-js": "^3.1.2",
-    "axios": "^0.19.2",
+    "axios": "^0.19.0",
     "bech32": "^1.1.3",
     "bn.js": "^4.11.8",
     "elliptic": "^6.5.1",
     "hash.js": "^1.1.7",
     "js-sha3": "^0.8.0",
     "scrypt-js": "^2.0.4",
-    "uuid": "^3.4.0"
+    "uuid": "^3.3.2",
+    "vscode": "^1.1.36"
   }
 }
