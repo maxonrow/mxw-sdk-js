@@ -11,7 +11,7 @@ let silent = true;
 
 describe('Suite: Utils', function () {
     if (silent) { silent = nodeProvider.trace.silent; }
-    
+
     it("Test bytes", function () {
         expect(utils.isHexString("0x01")).to.be.true;
     });
@@ -89,9 +89,9 @@ describe('Suite: Utils', function () {
         if (!silent) console.log(indent, hash);
         expect("0x6cabdb6b53060a1961f7cceede7e07022505a83870fadb64f9699074150f033e").to.equal(hash);
     });
-        
-    it("Adhoc test", function () {
 
+    it("Adhoc test", function () {
+        
     });
 
 });
