@@ -1,6 +1,6 @@
 'use strict';
 
-import { version } from './_version';
+import { version } from "./mxw";
 
 // Object not initialized
 export const NOT_INITIALIZED = 'NOT_INITIALIZED';
@@ -155,7 +155,7 @@ export function createError(message: string, code: string, params: any): any {
     error.reason = reason;
     error.code = code
 
-    Object.keys(params).forEach(function(key) {
+    Object.keys(params).forEach(function (key) {
         error[key] = params[key];
     });
 
@@ -193,7 +193,7 @@ export function checkNormalize(): void {
         ["NFD", "NFC", "NFKD", "NFKC"].forEach((form) => {
             try {
                 "test".normalize(form);
-            } catch(error) {
+            } catch (error) {
                 throw new Error('missing ' + form);
             }
         });
@@ -206,7 +206,7 @@ export function checkNormalize(): void {
     }
 }
 
-const LogLevels: { [ name: string ]: number } = { debug: 1, normal: 2, info: 2, warn: 3, error: 4, off: 5 };
+const LogLevels: { [name: string]: number } = { debug: 1, normal: 2, info: 2, warn: 3, error: 4, off: 5 };
 let LogLevel = LogLevels["normal"];
 
 export function setLogLevel(logLevel: string): void {
