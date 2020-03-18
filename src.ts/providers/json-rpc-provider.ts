@@ -408,6 +408,25 @@ export class JsonRpcProvider extends BaseProvider {
                     throw error;
                 });
 
+            case 'getMultiSigPendingTx':
+                return this.send('abci_query', ["/custom/auth/get_multisig_pending_tx/" + params.address + "/" + params.txID, "", params.blockTag, null]).then(result => {
+                    if (result && result.response) {
+                        if (result.response.value) {
+                            try {
+                                let value = toUtf8String(base64Decode(result.response.value));
+                                return JSON.parse(value);
+                            }
+                            catch (error) {
+                            }
+                        }
+                    }
+                    let error = this.checkResponseLog(method, result, null);
+                    if (error && errors.NOT_FOUND == error.code) {
+                        return null;
+                    }
+                    throw error;
+                });
+
             case 'getStatus':
                 return this.send('status', []);
 

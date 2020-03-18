@@ -1,12 +1,13 @@
 'use strict';
 
-import { arrayify, hexlify, stripZeros, concat } from './bytes';
+import { arrayify, hexlify, stripZeros, concat, isHexString } from './bytes';
 import { AddressPrefix, ValOperatorAddressPrefix, KycAddressPrefix } from '../constants';
 import { keccak256 } from './keccak256';
 import errors = require('../errors');
 import { BigNumber, Arrayish } from '.';
 import { sha256 } from './sha2';
 import { isUndefinedOrNullOrEmpty } from './misc';
+import { computeHexAddress, computeAddress, hash } from './secp256k1';
 
 function getChecksum(address: string): string {
     if (typeof (address) !== 'string') {
@@ -107,3 +108,16 @@ export function deriveAddress(from: string, nonce: Arrayish | BigNumber | number
 
     return getChecksum(value);
 }
+
+export function getMultiSigAddress(from: string, nonce: Arrayish | BigNumber | number) {
+    if (!from) { throw new Error('missing from address'); }
+    if (!nonce) { throw new Error('missing nonce'); }
+    let hexAddress = isHexString(from) ? from : computeHexAddress(from);
+    let value = sha256(concat([
+        hexAddress, stripZeros(hexlify(nonce))
+    ]));
+    let bytes = hexlify(hash('ripemd160', Buffer.from(value.substring(2), 'hex')));
+    return computeAddress(bytes);
+}
+
+

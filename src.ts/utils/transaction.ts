@@ -285,15 +285,17 @@ export function getTransactionRequest(route: string, transactionType: string, ov
         case "multisig/auth-updateMultiSigAccount":
             {
                 let params: {
-                    from: string,
+                    owner: string,
                     groupAddress: string,
-                    threshold: BigNumberish,
+                    threshold: BigNumber,
                     signers: any,
+                    memo: string,
                 } = checkFormat({
-                    from: checkAddress,
+                    owner: checkAddress,
                     groupAddress: checkAddress,
                     threshold: checkBigNumber,
-                    signers: checkAny
+                    signers: checkAny,
+                    memo: allowNullOrEmpty(checkString)
                 }, overrides);
 
                 transaction = {
@@ -303,13 +305,14 @@ export function getTransactionRequest(route: string, transactionType: string, ov
                             {
                                 type: "mxw/msgUpdateMultiSigAccount",
                                 value: {
-                                    owner: params.from,
+                                    owner: params.owner,
                                     groupAddress: params.groupAddress,
                                     threshold: params.threshold,
                                     signers: params.signers
                                 }
                             }
-                        ]
+                        ],
+                        memo: params.memo ? params.memo : ""
                     },
                     fee: null
                 };
@@ -349,12 +352,12 @@ export function getTransactionRequest(route: string, transactionType: string, ov
             {
                 let params: {
                     groupAddress: string,
-                    tx: any,
+                    stdTx: any,
                     sender: string,
                     memo: string
                 } = checkFormat({
                     groupAddress: checkAddress,
-                    tx: checkAny,
+                    stdTx: checkAny,
                     sender: checkAddress,
                     memo: allowNullOrEmpty(checkString)
                 }, overrides);
@@ -367,7 +370,7 @@ export function getTransactionRequest(route: string, transactionType: string, ov
                                 type: "mxw/msgCreateMultiSigTx",
                                 value: {
                                     groupAddress: params.groupAddress,
-                                    tx: params.tx,
+                                    stdTx: params.stdTx,
                                     sender: params.sender
                                 }
                             }
@@ -383,11 +386,13 @@ export function getTransactionRequest(route: string, transactionType: string, ov
                 let params: {
                     groupAddress: string,
                     txId: BigNumberish,
-                    sender: string
+                    sender: string,
+                    signature: any,
                 } = checkFormat({
                     groupAddress: checkAddress,
                     txID: checkBigNumber,
-                    sender: checkAddress
+                    sender: checkAddress,
+                    signature: checkAny,
                 }, overrides);
 
                 transaction = {
@@ -399,7 +404,8 @@ export function getTransactionRequest(route: string, transactionType: string, ov
                                 value: {
                                     groupAddress: params.groupAddress,
                                     txID: params.txId,
-                                    sender: params.sender
+                                    sender: params.sender,
+                                    signature: params.signature,
                                 }
                             }
                         ]

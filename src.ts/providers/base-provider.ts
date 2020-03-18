@@ -32,7 +32,7 @@ import {
     Listener,
     AccountState,
     AliasState,
-    TokenState, NFTokenState, NFTokenItemState, TokenList, TokenAccountState, MultiSigAccountState,
+    TokenState, NFTokenState, NFTokenItemState, TokenList, TokenAccountState, MultiSigPendingTx,
     TransactionReceipt, TransactionResponse, TransactionFee
 } from './abstract-provider';
 
@@ -809,15 +809,16 @@ export class BaseProvider extends Provider {
         });
     }
 
-    getMultiSigAccountState(addressOrName: string | Promise<string>, blockTag?: BlockTag | Promise<BlockTag>): Promise<MultiSigAccountState> {
+    getMultiSigPendingTx(addressOrName: string | Promise<string>, txID: string, blockTag?: BlockTag | Promise<BlockTag>): Promise<MultiSigPendingTx> {
         return this.ready.then(() => {
-            return resolveProperties({ addressOrName: addressOrName, blockTag: blockTag }).then(({ addressOrName, blockTag }) => {
+            return resolveProperties({ addressOrName: addressOrName, txID, blockTag: blockTag }).then(({ addressOrName, blockTag }) => {
                 return this.resolveName(addressOrName).then((address) => {
                     let params = {
                         address: address,
+                        txID:  txID,
                         blockTag: checkBlockTag(blockTag)
                     };
-                    return this.perform('getMultiSigAccountState', params).then((result) => {
+                    return this.perform('getMultiSigPendingTx', params).then((result) => {
                         if (result) {
                             result = camelize(checkFormat({
                                 type: checkString,
@@ -830,6 +831,7 @@ export class BaseProvider extends Provider {
             });
         });
     }
+
 
     getAccountNumber(addressOrName: string | Promise<string>, blockTag?: BlockTag | Promise<BlockTag>): Promise<BigNumber> {
         return this.ready.then(() => {

@@ -12,7 +12,7 @@ import { SigningKey } from './utils/signing-key';
 import { populateTransaction, serialize as serializeTransaction } from './utils/transaction';
 import { Wordlist } from './utils/wordlist';
 import { sha256 } from './utils/sha2';
-import { sortObject, iterate } from './utils/misc';
+import { sortObject, iterate, isUndefinedOrNullOrEmpty } from './utils/misc';
 import { toUtf8Bytes, bigNumberify } from './utils';
 import { smallestUnitName } from './utils/units';
 
@@ -149,25 +149,35 @@ export class Wallet extends AbstractSigner {
                 tx.value.fee = transaction.fee;
             }
 
+            let accountNumber = tx.accountNumber;
+            let sequence = tx.nonce;
+
+            // Cater for MultiSig signature for internal transaction
+            if (overrides && !isUndefinedOrNullOrEmpty(overrides.accountNumber) && !isUndefinedOrNullOrEmpty(overrides.nonce)){
+                accountNumber = overrides.accountNumber;
+                sequence = overrides.nonce;
+            }
+            else {
+                // Control the nonce to cater bulk transaction submission
+                if (overrides && overrides.bulkSend) {
+                    if (undefined !== this.nonce) {
+                        if (this.nonce.gte(tx.nonce)) {
+                            tx.nonce = this.nonce.add(1);
+                        }
+                    }
+                }
+                this.nonce = tx.nonce;
+                sequence = tx.nonce.toString();
+            }
+            
             let payload = {
-                account_number: tx.accountNumber.toString() || '0',
+                account_number: accountNumber.toString() || '0',
                 chain_id: tx.chainId,
                 fee: tx.fee,
                 memo: tx.value.memo,
                 msgs: tx.value.msg,
-                sequence: '0'
+                sequence: sequence.toString() || '0'
             };
-
-            // Control the nonce to cater bulk transaction submission
-            if (overrides && overrides.bulkSend) {
-                if (undefined !== this.nonce) {
-                    if (this.nonce.gte(tx.nonce)) {
-                        tx.nonce = this.nonce.add(1);
-                    }
-                }
-            }
-            this.nonce = tx.nonce;
-            payload.sequence = tx.nonce.toString();
 
             // Convert number and big number to string
             payload = iterate(payload, function (key, value, type) {
@@ -179,6 +189,8 @@ export class Wallet extends AbstractSigner {
                 return value;
             });
             payload = sortObject(payload);
+
+            console.log("transaccccccccctionssss     " + JSON.stringify(payload));
 
             // Log signature payload
             if (overrides && overrides.logSignaturePayload) {

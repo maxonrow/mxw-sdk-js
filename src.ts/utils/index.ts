@@ -13,7 +13,7 @@ import { sha256 } from './sha2';
 import * as base64 from './base64';
 import { computeAddress, computeHexAddress, computePublicKey, recoverAddress, recoverPublicKey, verifyMessage, verify } from './secp256k1';
 import { formatBytes32String, parseBytes32String, toUtf8Bytes, toUtf8String } from './utf8';
-import { getAddress, getHash, deriveAddress } from './address';
+import { getAddress, getHash, deriveAddress, getMultiSigAddress } from './address';
 import { hashMessage, id, namehash } from './hash';
 import * as bech32 from './bech32';
 import { BigNumber, bigNumberify } from './bignumber';
@@ -48,7 +48,7 @@ export {
   serializeTransaction,
 
   getNetwork,
-  
+
   getJsonWalletAddress,
 
   EncryptOptions,
@@ -92,6 +92,7 @@ export {
   getAddress,
   getHash,
   deriveAddress,
+  getMultiSigAddress,
 
   hashMessage,
   id,
