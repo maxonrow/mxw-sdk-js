@@ -117,22 +117,24 @@ export class MultiSigWallet extends Signer {
             errors.throwError('create multisig transaction require signer', errors.NOT_INITIALIZED, { arg: 'signer' });
         }
         return resolveProperties({ signerAddress: this.signer.getAddress() }).then(({ signerAddress }) => {
-            return this.signInternalTransaction(transaction, overrides).then((signedInternalTransaction) => {
-                if (!signerAddress) {
-                    return errors.throwError('create multisig transaction', errors.MISSING_ARGUMENT, { arg: 'signerAddress' });
-                }
-                return this.provider.resolveName(this.groupAddress).then((groupAddress) => {
-                    if (signedInternalTransaction.hash) {
-                        delete signedInternalTransaction.hash;
+            return populateTransaction(transaction, this.provider, this.signer.getAddress()).then((internalTransaction) => {
+                return this.signInternalTransaction(internalTransaction, overrides).then((signedInternalTransaction) => {
+                    if (!signerAddress) {
+                        return errors.throwError('create multisig transaction', errors.MISSING_ARGUMENT, { arg: 'signerAddress' });
                     }
-                    let tx = this.provider.getTransactionRequest("multisig", "auth-createMutiSigTx", {
-                        groupAddress,
-                        stdTx: signedInternalTransaction,
-                        sender: signerAddress,
-                        memo: (overrides && overrides.memo) ? overrides.memo : ""
+                    return this.provider.resolveName(this.groupAddress).then((groupAddress) => {
+                        if (signedInternalTransaction.hash) {
+                            delete signedInternalTransaction.hash;
+                        }
+                        let tx = this.provider.getTransactionRequest("multisig", "auth-createMutiSigTx", {
+                            groupAddress,
+                            stdTx: signedInternalTransaction.value,
+                            sender: signerAddress,
+                            memo: (overrides && overrides.memo) ? overrides.memo : ""
+                        });
+                        tx.fee = (overrides && overrides.fee) ? overrides.fee : this.provider.getTransactionFee(undefined, undefined, { tx });
+                        return this.sendRawTransaction(tx, overrides);
                     });
-                    tx.fee = (overrides && overrides.fee) ? overrides.fee : this.provider.getTransactionFee(undefined, undefined, { tx });
-                    return this.sendRawTransaction(tx, overrides);
                 });
             });
         });
@@ -189,7 +191,7 @@ export class MultiSigWallet extends Signer {
     private sendRawTransaction(transaction: TransactionRequest, overrides?: any) {
         if (!this.provider) { errors.throwError('missing provider', errors.NOT_INITIALIZED, { argument: 'provider' }); }
 
-        return populateTransaction(transaction, this.provider, this.address).then((tx) => {
+        return populateTransaction(transaction, this.provider, this.signer.getAddress()).then((tx) => {
             // Removing multisig signature elements, so that it will be using wallet signature instead of multisig.
             if (overrides && overrides["accountNumber"]) {
                 delete overrides["accountNumber"];
@@ -354,15 +356,15 @@ export class MultiSigWallet extends Signer {
         if (!this.signer) {
             errors.throwError('query multisig pending tx require signer', errors.NOT_INITIALIZED, { arg: 'signer' });
         }
-        return resolveProperties({ signerAddress: this.groupAddress }).then(({ groupAddress }) => {
-            if (!groupAddress) {
-                errors.throwError('query multisig pending tx group address', errors.MISSING_ARGUMENT, { arg: 'groupAddress' });
-            }
+        //return resolveProperties({ signerAddress: this.groupAddress }).then(({ groupAddress }) => {
+        if (!this.groupAddress) {
+            errors.throwError('query multisig pending tx group address', errors.MISSING_ARGUMENT, { arg: 'groupAddress' });
+        }
 
-            return this.provider.getMultiSigPendingTx(groupAddress, txID, blockTag).then((result) => {
-                return result;
-            });
+        return this.provider.getMultiSigPendingTx(this.groupAddress, txID, blockTag).then((result) => {
+            return result;
         });
+        //});
     }
 
     public refresh(overrides?: any) {

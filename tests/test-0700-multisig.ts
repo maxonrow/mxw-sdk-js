@@ -111,11 +111,11 @@ describe('Suite: MultiSig - Create ', function () {
 
     it("Multisig account Update", function () {
 
-        let signers = [wallet.address, issuer.address];
+        let signers = [wallet.address, issuer.address, middleware.address];
         updateMultiSigWalletProperties = {
             owner: wallet.address,
             groupAddress: multiSigWallet.groupAddress.toString(),
-            threshold: bigNumberify(1),
+            threshold: bigNumberify(3),
             signers: signers,
         };
         return MultiSig.MultiSigWallet.update(updateMultiSigWalletProperties, wallet).then((txReceipt) => {
@@ -125,12 +125,32 @@ describe('Suite: MultiSig - Create ', function () {
     });
 
 
-    it("Multisig create Transfer", function () {
+    it("Transfer to group account", function () {
+        let value = mxw.utils.parseMxw("100");
+        let overrides = {
+            logSignaturePayload: defaultOverrides.logSignaturePayload,
+            logSignedTransaction: defaultOverrides.logSignedTransaction,
+            memo: "Hello Blockchain!"
+        }
+        return wallet.provider.getTransactionFee("bank", "bank-send", {
+            from: wallet.address,
+            to: multiSigWallet.groupAddress,
+            value,
+            memo: overrides.memo
+        }).then((fee) => {
+            overrides["fee"] = fee;
+            return wallet.transfer(multiSigWallet.groupAddress, value, overrides).then((receipt) => {
+                expect(receipt).to.exist;
+                if (!silent) console.log(indent, "transfer.receipt:", JSON.stringify(receipt));
+            });
+        });
+    });
 
+    it("Multisig create Transfer", function () {
         let transaction = providerConnection.getTransactionRequest("bank", "bank-send", {
             from: multiSigWallet.groupAddress,
             to: wallet.address,
-            value: mxw.utils.parseMxw("100"),
+            value: mxw.utils.parseMxw("1"),
             memo: "pipipapipu",
             denom: smallestUnitName
         });
@@ -139,6 +159,12 @@ describe('Suite: MultiSig - Create ', function () {
             return multiSigWallet.sendTransaction(transaction).then((txReceipt) => {
                 expect(txReceipt).to.exist;
             });
+        });
+    });
+
+    it("send confirmation", function () {
+        return multiSigWallet.sendConfirmTransaction(0).then((respond) => {
+            expect(respond).to.exist;
         });
     });
 });
