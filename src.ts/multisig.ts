@@ -7,7 +7,7 @@ import { Signer } from './abstract-signer';
 import { defineReadOnly, resolveProperties, checkProperties } from './utils/properties';
 import { populateTransaction, parse as parseTransaction } from './utils/transaction';
 
-import { checkFormat, checkString, checkNumber, checkAny, checkBigNumber } from './utils/misc';
+import { checkFormat, checkString, checkNumber, checkAny, checkBigNumber, isUndefinedOrNullOrEmpty } from './utils/misc';
 import { BigNumberish, Arrayish, getMultiSigAddress, BigNumber } from './utils';
 
 export interface MultiSigWalletProperties {
@@ -99,12 +99,18 @@ export class MultiSigWallet extends Signer {
         if (!this._multisigAccountState) {
             errors.throwError('multisig account state not found', errors.NOT_INITIALIZED, { arg: 'multisigAccountState' })
         }
-        overrides = {
+        console.log("overridesssssss : " + JSON.stringify(overrides));
+        // console.log("overridees.noce" + overrides.nonce);
+        // console.log(!(overrides.nonce));
+        console.log((overrides && !isUndefinedOrNullOrEmpty(overrides.nonce)));
+        let overrides2 = {
             ...overrides,
             accountNumber: this.multisigAccountState.value.accountNumber,
-            nonce: this.multisigAccountState.value.multisig.counter
+            // cater for send confirm transaction, the counter will be using txId.
+            nonce: (overrides && !isUndefinedOrNullOrEmpty(overrides.nonce)) ? overrides.nonce : this.multisigAccountState.value.multisig.counter
         }
-        return this.signer.sign(transaction, overrides).then((signedTransaction) => {
+        console.log("overridesssssss2 : " + JSON.stringify(overrides2));
+        return this.signer.sign(transaction, overrides2).then((signedTransaction) => {
             // Decode base64 signed transaction
             return parseTransaction(signedTransaction);
         });
@@ -155,36 +161,55 @@ export class MultiSigWallet extends Signer {
                 }).then((pendingTx) => {
                     // delete the returned signatures, we don need those to be include in signing payload.
                     delete pendingTx.value.signatures;
-                    return this.signInternalTransaction(pendingTx, overrides);
-                }).then((signedPendingTx) => {
-                    let tx = this.provider.getTransactionRequest("multisig", "auth-signMutiSigTx", {
-                        groupAddress,
-                        txId: transactionId,
-                        sender: signerAddress,
-                        // there is always signed by one signer for pendingTx so take the first one.
-                        signature: signedPendingTx.value.signatures[0],
-                        memo: (overrides && overrides.memo) ? overrides.memo : ""
-                    });
-                    tx.fee = (overrides && overrides.fee) ? overrides.fee : this.provider.getTransactionFee(undefined, undefined, { tx });
-                    return populateTransaction(tx, this.provider, this.signer.getAddress()).then((internalTransaction) => {
-                        return this.sendRawTransaction(internalTransaction, overrides).then((response) => {
-                            if (overrides && overrides.sendOnly) {
-                                return response;
-                            }
-                            let confirmations = (overrides && overrides.confirmations) ? Number(overrides.confirmations) : null;
-
-                            return this.signer.provider.waitForTransaction(response.hash, confirmations).then((receipt) => {
-                                if (1 == receipt.status) {
-                                    return receipt;
+                    let transactionRequest: TransactionRequest;
+                    transactionRequest = {
+                        type: pendingTx.type,
+                        value: {
+                            msg: pendingTx.value.msg,
+                            memo: pendingTx.value.memo
+                        },
+                        nonce: transactionId,
+                        fee: pendingTx.value.fee,
+                        accountNumber: this.multisigAccountState.value.accountNumber
+                    }
+                    // signing pending tx the counter(nonce) will be transactionId.
+                    overrides = {
+                        ...overrides,
+                        nonce: transactionId
+                    }
+                    console.log("overidessssss" + JSON.stringify(overrides));
+                    return populateTransaction(transactionRequest, this.provider, this.signer.getAddress()).then((internalPendingTransaction) => {
+                        return this.signInternalTransaction(internalPendingTransaction, overrides);
+                    }).then((signedPendingTx) => {
+                        let tx = this.provider.getTransactionRequest("multisig", "auth-signMutiSigTx", {
+                            groupAddress,
+                            txId: transactionId,
+                            sender: signerAddress,
+                            // there is always signed by one signer for pendingTx so take the first one.
+                            signature: signedPendingTx.value.signatures[0],
+                            memo: (overrides && overrides.memo) ? overrides.memo : ""
+                        });
+                        tx.fee = (overrides && overrides.fee) ? overrides.fee : this.provider.getTransactionFee(undefined, undefined, { tx });
+                        return populateTransaction(tx, this.provider, this.signer.getAddress()).then((internalTransaction) => {
+                            return this.sendRawTransaction(internalTransaction, overrides).then((response) => {
+                                if (overrides && overrides.sendOnly) {
+                                    return response;
                                 }
-                                throw this.signer.provider.checkTransactionReceipt(receipt, errors.CALL_EXCEPTION, "confirm multisig transaction failed", {
-                                    method: "auth-signMutiSigTx",
-                                    receipt
+                                let confirmations = (overrides && overrides.confirmations) ? Number(overrides.confirmations) : null;
+
+                                return this.signer.provider.waitForTransaction(response.hash, confirmations).then((receipt) => {
+                                    if (1 == receipt.status) {
+                                        return receipt;
+                                    }
+                                    throw this.signer.provider.checkTransactionReceipt(receipt, errors.CALL_EXCEPTION, "confirm multisig transaction failed", {
+                                        method: "auth-signMutiSigTx",
+                                        receipt
+                                    });
                                 });
                             });
                         });
-                    });
 
+                    });
                 });
             });
         });
@@ -252,10 +277,6 @@ export class MultiSigWallet extends Signer {
 
             return signer.sendTransaction(transaction, overrides).then((response) => {
                 let groupAddress = getMultiSigAddress(signerAddress, signer.getNonce().add(1))
-
-                console.log("groupAddress:", groupAddress);
-                //console.log("getAddress:", (groupAddress));
-
                 if (overrides && overrides.sendOnly) {
                     return response;
                 }

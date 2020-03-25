@@ -230,7 +230,7 @@ export function populateTransaction(transaction: any, provider: Provider, from: 
     checkTransaction(transaction);
 
     let tx = shallowCopy(transaction);
-
+    
     if (null == tx.fee) {
         errors.throwError("missing fee", errors.MISSING_FEES, {});
     }

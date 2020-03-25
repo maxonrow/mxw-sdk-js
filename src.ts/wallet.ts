@@ -138,6 +138,7 @@ export class Wallet extends AbstractSigner {
             }
         }
         return resolveProperties(transaction).then((tx) => {
+            console.log("txtxtxtxxtxtxtxtxtxtx" + JSON.stringify(tx));
             if (!tx.nonce || !tx.accountNumber || !tx.value || !tx.value.msg || !Array.isArray(tx.value.msg)) {
                 errors.throwError('missing transaction field', errors.MISSING_ARGUMENT, { argument: 'value', value: tx });
             }
@@ -153,7 +154,7 @@ export class Wallet extends AbstractSigner {
             let sequence = tx.nonce;
 
             // Cater for MultiSig signature for internal transaction
-            if (overrides && !isUndefinedOrNullOrEmpty(overrides.accountNumber) && !isUndefinedOrNullOrEmpty(overrides.nonce)){
+            if (overrides && !isUndefinedOrNullOrEmpty(overrides.accountNumber) && !isUndefinedOrNullOrEmpty(overrides.nonce)) {
                 accountNumber = overrides.accountNumber;
                 sequence = overrides.nonce;
             }
@@ -169,7 +170,7 @@ export class Wallet extends AbstractSigner {
                 this.nonce = tx.nonce;
                 sequence = tx.nonce.toString();
             }
-            
+
             let payload = {
                 account_number: accountNumber.toString() || '0',
                 chain_id: tx.chainId,
@@ -189,6 +190,8 @@ export class Wallet extends AbstractSigner {
                 return value;
             });
             payload = sortObject(payload);
+
+            console.log("transactionsssssss", JSON.stringify(payload));
 
             // Log signature payload
             if (overrides && overrides.logSignaturePayload) {
