@@ -93,17 +93,8 @@ describe('Suite: MultiSig - Create ', function () {
         });
     });
 
-    // it("Create - checkDuplication", function () {
-    //     return MultiSig.MultiSigWallet.create(multiSigWalletProperties, wallet).then((res) => {
-    //         expect(res).is.not.exist;
-    //     }).catch(error => {
-    //         expect(error.code).to.equal(errors.EXISTS);
-    //     });
-    // });
-
     it("Query", function () {
         return MultiSig.MultiSigWallet.fromGroupAddress(multiSigWallet.groupAddress, wallet).then((res) => {
-            //expect(multisigWallet).to.exist;
             console.log(indent, "Created MultiSigWallet:", JSON.stringify(res.multisigAccountState));
             multiSigWallet = res
         });
