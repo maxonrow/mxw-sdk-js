@@ -149,13 +149,12 @@ describe('Suite: MultiSig - Create ', function () {
             transaction["fee"] = fee;
             return multiSigWallet.sendTransaction(transaction).then((txReceipt) => {
                 expect(txReceipt).to.exist;
+                return multiSigWallet.sendConfirmTransaction(0).then((respond) => {
+                    expect(respond).to.exist;
+                });
             });
         });
     });
 
-    it("send confirmation", function () {
-        return multiSigWallet.sendConfirmTransaction(0).then((respond) => {
-            expect(respond).to.exist;
-        });
-    });
+
 });

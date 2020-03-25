@@ -190,8 +190,6 @@ export class Wallet extends AbstractSigner {
             });
             payload = sortObject(payload);
 
-            console.log("transaccccccccctionssss     " + JSON.stringify(payload));
-
             // Log signature payload
             if (overrides && overrides.logSignaturePayload) {
                 overrides.logSignaturePayload(payload);

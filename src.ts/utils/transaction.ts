@@ -388,11 +388,13 @@ export function getTransactionRequest(route: string, transactionType: string, ov
                     txId: BigNumberish,
                     sender: string,
                     signature: any,
+                    memo: string
                 } = checkFormat({
                     groupAddress: checkAddress,
-                    txID: checkBigNumber,
+                    txId: checkBigNumber,
                     sender: checkAddress,
                     signature: checkAny,
+                    memo: allowNullOrEmpty(checkString)
                 }, overrides);
 
                 transaction = {
@@ -400,15 +402,16 @@ export function getTransactionRequest(route: string, transactionType: string, ov
                     value: {
                         msg: [
                             {
-                                type: "mxw/msgSignMutiSigTx",
+                                type: "mxw/msgSignMultiSigTx",
                                 value: {
                                     groupAddress: params.groupAddress,
-                                    txID: params.txId,
+                                    txId: params.txId,
                                     sender: params.sender,
                                     signature: params.signature,
                                 }
                             }
-                        ]
+                        ],
+                        memo: params.memo ? params.memo : ""
                     },
                     fee: null
                 };
