@@ -792,14 +792,12 @@ function setNonFungibleTokenStatus(symbol: string, status: string, signer: Signe
         case "APPROVE_TRANFER_TOKEN_OWNERSHIP":
         case "REJECT_TRANFER_TOKEN_OWNERSHIP":
         case "REJECT":
+        case "FREEZE":
+        case "UNFREEZE":
             mintLimit = "0";
             transferLimit = "0";
             endorserList = null;
 
-            break;
-
-        case "FREEZE":
-        case "UNFREEZE":
             break;
 
         default:
