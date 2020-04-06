@@ -149,7 +149,9 @@ describe('Suite: MultiSig - Create ', function () {
             transaction["fee"] = fee;
             return multiSigWallet.sendTransaction(transaction).then((txReceipt) => {
                 expect(txReceipt).to.exist;
-                return multiSigWallet.sendConfirmTransaction(0).then((respond) => {
+                let anotherSigner = new MultiSig.MultiSigWallet(multiSigWallet.groupAddress, issuer)
+                anotherSigner.refresh();
+                return anotherSigner.sendConfirmTransaction(0).then((respond) => {
                     expect(respond).to.exist;
                 });
             });

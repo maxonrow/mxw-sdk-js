@@ -8,7 +8,7 @@ import { defineReadOnly, resolveProperties, checkProperties } from './utils/prop
 import { populateTransaction, parse as parseTransaction } from './utils/transaction';
 
 import { checkFormat, checkString, checkNumber, checkAny, checkBigNumber, isUndefinedOrNullOrEmpty } from './utils/misc';
-import { BigNumberish, Arrayish, getMultiSigAddress, BigNumber } from './utils';
+import { BigNumberish, Arrayish, getMultiSigAddress, BigNumber, bigNumberify } from './utils';
 
 export interface MultiSigWalletProperties {
     owner: string,
@@ -99,18 +99,13 @@ export class MultiSigWallet extends Signer {
         if (!this._multisigAccountState) {
             errors.throwError('multisig account state not found', errors.NOT_INITIALIZED, { arg: 'multisigAccountState' })
         }
-        console.log("overridesssssss : " + JSON.stringify(overrides));
-        // console.log("overridees.noce" + overrides.nonce);
-        // console.log(!(overrides.nonce));
-        console.log((overrides && !isUndefinedOrNullOrEmpty(overrides.nonce)));
-        let overrides2 = {
+        let override = {
             ...overrides,
             accountNumber: this.multisigAccountState.value.accountNumber,
             // cater for send confirm transaction, the counter will be using txId.
-            nonce: (overrides && !isUndefinedOrNullOrEmpty(overrides.nonce)) ? overrides.nonce : this.multisigAccountState.value.multisig.counter
+            nonce: (overrides && !isUndefinedOrNullOrEmpty(overrides.nonce)) ? bigNumberify(overrides.nonce) : this.multisigAccountState.value.multisig.counter
         }
-        console.log("overridesssssss2 : " + JSON.stringify(overrides2));
-        return this.signer.sign(transaction, overrides2).then((signedTransaction) => {
+        return this.signer.sign(transaction, override).then((signedTransaction) => {
             // Decode base64 signed transaction
             return parseTransaction(signedTransaction);
         });
@@ -168,16 +163,14 @@ export class MultiSigWallet extends Signer {
                             msg: pendingTx.value.msg,
                             memo: pendingTx.value.memo
                         },
-                        nonce: transactionId,
                         fee: pendingTx.value.fee,
                         accountNumber: this.multisigAccountState.value.accountNumber
                     }
                     // signing pending tx the counter(nonce) will be transactionId.
                     overrides = {
                         ...overrides,
-                        nonce: transactionId
+                        nonce: transactionId.toString()
                     }
-                    console.log("overidessssss" + JSON.stringify(overrides));
                     return populateTransaction(transactionRequest, this.provider, this.signer.getAddress()).then((internalPendingTransaction) => {
                         return this.signInternalTransaction(internalPendingTransaction, overrides);
                     }).then((signedPendingTx) => {
@@ -217,7 +210,6 @@ export class MultiSigWallet extends Signer {
 
     private sendRawTransaction(transaction: TransactionRequest, overrides?: any) {
         if (!this.provider) { errors.throwError('missing provider', errors.NOT_INITIALIZED, { argument: 'provider' }); }
-
         return populateTransaction(transaction, this.provider, this.signer.getAddress()).then((tx) => {
             // Removing multisig signature elements, so that it will be using wallet signature instead of multisig.
             if (overrides && overrides["accountNumber"]) {
@@ -308,27 +300,23 @@ export class MultiSigWallet extends Signer {
         if (properties && 'string' === typeof (properties)) {
             properties = JSON.parse(properties);
         }
-
         checkProperties(properties, {
             owner: true,
             groupAddress: true,
             threshold: true,
             signers: true,
         }, true);
-
         return resolveProperties({ address: signer.getAddress() }).then(({ address }) => {
             if (!address) {
                 errors.throwError('update multisig wallet require signer address', errors.MISSING_ARGUMENT, { required: 'signer' });
             }
             properties.owner = address; // Set signer address as owner
-
             let multisig: UpdateMultiSigWalletProperties = checkFormat({
                 owner: checkString,
                 groupAddress: checkString,
                 threshold: checkBigNumber,
                 signers: checkAny,
             }, properties);
-
             let transaction = signer.provider.getTransactionRequest("multisig", "auth-updateMultiSigAccount", {
                 owner: multisig.owner,
                 groupAddress: multisig.groupAddress,
@@ -395,7 +383,6 @@ export class MultiSigWallet extends Signer {
         if (!this.provider) {
             errors.throwError('not initialized', errors.NOT_INITIALIZED, { arg: 'itemID' });
         }
-
         return this.getState(null, { ...overrides, queryOnly: true }).then((state) => {
             this._multisigAccountState = state;
             return this;
@@ -409,7 +396,6 @@ export class MultiSigWallet extends Signer {
         if (!this.provider) {
             errors.throwError('not initialized', errors.NOT_INITIALIZED, { arg: 'itemID' });
         }
-
         return this.provider.getAccountState(this.groupAddress, blockTag).then((result) => {
             if (!result) {
                 errors.throwError('Group account state is not available', errors.NOT_AVAILABLE, { arg: 'groupAddress' });
@@ -431,7 +417,6 @@ export class MultiSigWallet extends Signer {
 
     public getAccountNumber(blockTag?: BlockTag) {
         if (!this.provider) { errors.throwError('missing provider', errors.NOT_INITIALIZED, { argument: 'provider' }); }
-
         if (!this.accountNumber) {
             return this.provider.getAccountNumber(this.address, blockTag).then((accountNumber) => {
                 this.accountNumber = accountNumber;

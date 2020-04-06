@@ -138,7 +138,6 @@ export class Wallet extends AbstractSigner {
             }
         }
         return resolveProperties(transaction).then((tx) => {
-            console.log("txtxtxtxxtxtxtxtxtxtx" + JSON.stringify(tx));
             if (!tx.nonce || !tx.accountNumber || !tx.value || !tx.value.msg || !Array.isArray(tx.value.msg)) {
                 errors.throwError('missing transaction field', errors.MISSING_ARGUMENT, { argument: 'value', value: tx });
             }
@@ -190,8 +189,6 @@ export class Wallet extends AbstractSigner {
                 return value;
             });
             payload = sortObject(payload);
-
-            console.log("transactionsssssss", JSON.stringify(payload));
 
             // Log signature payload
             if (overrides && overrides.logSignaturePayload) {
