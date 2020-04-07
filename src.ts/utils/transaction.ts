@@ -230,7 +230,7 @@ export function populateTransaction(transaction: any, provider: Provider, from: 
     checkTransaction(transaction);
 
     let tx = shallowCopy(transaction);
-
+    
     if (null == tx.fee) {
         errors.throwError("missing fee", errors.MISSING_FEES, {});
     }
@@ -249,6 +249,204 @@ export function getTransactionRequest(route: string, transactionType: string, ov
 
     let moduleName = route + "/" + transactionType;
     switch (moduleName) {
+        case "multisig/auth-createMultiSigAccount":
+            {
+                let params: {
+                    from: string,
+                    threshold: Number,
+                    signers: any,
+                    memo: string,
+                } = checkFormat({
+                    from: checkAddress,
+                    threshold: checkNumber,
+                    signers: checkAny,
+                    memo: allowNullOrEmpty(checkString)
+                }, overrides);
+
+                transaction = {
+                    type: "cosmos-sdk/StdTx",
+                    value: {
+                        msg: [
+                            {
+                                type: "mxw/msgCreateMultiSigAccount",
+                                value: {
+                                    owner: params.from,
+                                    threshold: params.threshold,
+                                    signers: params.signers
+                                }
+                            }
+                        ],
+                        memo: params.memo ? params.memo : ""
+                    },
+                    fee: null,
+                };
+            }
+            break;
+        case "multisig/auth-updateMultiSigAccount":
+            {
+                let params: {
+                    owner: string,
+                    groupAddress: string,
+                    threshold: BigNumber,
+                    signers: any,
+                    memo: string,
+                } = checkFormat({
+                    owner: checkAddress,
+                    groupAddress: checkAddress,
+                    threshold: checkBigNumber,
+                    signers: checkAny,
+                    memo: allowNullOrEmpty(checkString)
+                }, overrides);
+
+                transaction = {
+                    type: "cosmos-sdk/StdTx",
+                    value: {
+                        msg: [
+                            {
+                                type: "mxw/msgUpdateMultiSigAccount",
+                                value: {
+                                    owner: params.owner,
+                                    groupAddress: params.groupAddress,
+                                    threshold: params.threshold,
+                                    signers: params.signers
+                                }
+                            }
+                        ],
+                        memo: params.memo ? params.memo : ""
+                    },
+                    fee: null
+                };
+            }
+            break;
+        case "multisig/auth-transferMultiSigOwner":
+            {
+                let params: {
+                    groupAddress: string,
+                    from: string,
+                    to: string
+                } = checkFormat({
+                    groupAddress: checkAddress,
+                    from: checkAddress,
+                    to: checkAddress
+                }, overrides);
+
+                transaction = {
+                    type: "cosmos-sdk/StdTx",
+                    value: {
+                        msg: [
+                            {
+                                type: "mxw/msgTransferMultiSigOwner",
+                                value: {
+                                    groupAddress: params.groupAddress,
+                                    owner: params.from,
+                                    newOwner: params.to
+                                }
+                            }
+                        ]
+                    },
+                    fee: null
+                };
+            }
+            break;
+        case "multisig/auth-createMutiSigTx":
+            {
+                let params: {
+                    groupAddress: string,
+                    stdTx: any,
+                    sender: string,
+                    memo: string
+                } = checkFormat({
+                    groupAddress: checkAddress,
+                    stdTx: checkAny,
+                    sender: checkAddress,
+                    memo: allowNullOrEmpty(checkString)
+                }, overrides);
+
+                transaction = {
+                    type: "cosmos-sdk/StdTx",
+                    value: {
+                        msg: [
+                            {
+                                type: "mxw/msgCreateMultiSigTx",
+                                value: {
+                                    groupAddress: params.groupAddress,
+                                    stdTx: params.stdTx,
+                                    sender: params.sender
+                                }
+                            }
+                        ],
+                        memo: params.memo ? params.memo : ""
+                    },
+                    fee: null
+                };
+            }
+            break;
+        case "multisig/auth-signMutiSigTx":
+            {
+                let params: {
+                    groupAddress: string,
+                    txId: BigNumberish,
+                    sender: string,
+                    signature: any,
+                    memo: string
+                } = checkFormat({
+                    groupAddress: checkAddress,
+                    txId: checkBigNumber,
+                    sender: checkAddress,
+                    signature: checkAny,
+                    memo: allowNullOrEmpty(checkString)
+                }, overrides);
+
+                transaction = {
+                    type: "cosmos-sdk/StdTx",
+                    value: {
+                        msg: [
+                            {
+                                type: "mxw/msgSignMultiSigTx",
+                                value: {
+                                    groupAddress: params.groupAddress,
+                                    txId: params.txId,
+                                    sender: params.sender,
+                                    signature: params.signature,
+                                }
+                            }
+                        ],
+                        memo: params.memo ? params.memo : ""
+                    },
+                    fee: null
+                };
+            }
+            break;
+        case "multisig/auth-deleteMutiSigTx":
+            {
+                let params: {
+                    groupAddress: string,
+                    txID: BigNumberish,
+                    sender: string
+                } = checkFormat({
+                    groupAddress: checkAddress,
+                    txID: checkBigNumber,
+                    sender: checkAddress
+                }, overrides);
+
+                transaction = {
+                    type: "cosmos-sdk/StdTx",
+                    value: {
+                        msg: [
+                            {
+                                type: "mxw/msgDeleteMutiSigTx",
+                                value: {
+                                    groupAddress: params.groupAddress,
+                                    txID: params.txID,
+                                    sender: params.sender
+                                }
+                            }
+                        ]
+                    },
+                    fee: null
+                };
+            }
+            break;
         case "bank/bank-send":
             {
                 let params: {

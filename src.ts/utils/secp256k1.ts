@@ -28,7 +28,7 @@ function getCurve() {
     return _curve;
 }
 
-function hash(algorithm: string, data: string | Buffer) {
+export function hash(algorithm: string, data: string | Buffer) {
     return createHash(algorithm).update(data).digest();
 }
 

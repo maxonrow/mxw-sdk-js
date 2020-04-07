@@ -32,7 +32,7 @@ import {
     Listener,
     AccountState,
     AliasState,
-    TokenState, NFTokenState, NFTokenItemState, TokenList, TokenAccountState,
+    TokenState, NFTokenState, NFTokenItemState, TokenList, TokenAccountState, MultiSigPendingTx,
     TransactionReceipt, TransactionResponse, TransactionFee
 } from './abstract-provider';
 
@@ -808,6 +808,30 @@ export class BaseProvider extends Provider {
             });
         });
     }
+
+    getMultiSigPendingTx(addressOrName: string | Promise<string>, txID: string, blockTag?: BlockTag | Promise<BlockTag>): Promise<MultiSigPendingTx> {
+        return this.ready.then(() => {
+            return resolveProperties({ addressOrName: addressOrName, txID, blockTag: blockTag }).then(({ addressOrName, blockTag }) => {
+                return this.resolveName(addressOrName).then((address) => {
+                    let params = {
+                        address: address,
+                        txID:  txID,
+                        blockTag: checkBlockTag(blockTag)
+                    };
+                    return this.perform('getMultiSigPendingTx', params).then((result) => {
+                        if (result) {
+                            result = camelize(checkFormat({
+                                type: checkString,
+                                value: checkAny
+                            }, result));
+                        }
+                        return result;
+                    });
+                });
+            });
+        });
+    }
+
 
     getAccountNumber(addressOrName: string | Promise<string>, blockTag?: BlockTag | Promise<BlockTag>): Promise<BigNumber> {
         return this.ready.then(() => {
