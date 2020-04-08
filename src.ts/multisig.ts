@@ -73,15 +73,15 @@ export class MultiSigWallet extends Signer {
     }
 
     public getPublicKeyType() {
-        return Promise.reject(errors.createError(errors.NOT_IMPLEMENTED, "multisig wallet does not have public key", {}));
+        return errors.throwError('multisig wallet does not have public key', errors.NOT_IMPLEMENTED, { });
     }
 
     public getCompressedPublicKey() {
-        return Promise.reject(errors.createError(errors.NOT_IMPLEMENTED, "multisig wallet does not have public key", {}));
+        return errors.throwError('multisig wallet does not have public key', errors.NOT_IMPLEMENTED, { });
     }
 
     public signMessage(message: Arrayish | string, excludeRecoveryParam?: boolean) {
-        return Promise.reject(errors.createError(errors.NOT_IMPLEMENTED, "multisig wallet does not have private key for signing", {}));
+        return errors.throwError('multisig wallet does not have private key for signing', errors.NOT_IMPLEMENTED, { });
     }
 
     public sign(transaction: TransactionRequest, overrides?: any) {
