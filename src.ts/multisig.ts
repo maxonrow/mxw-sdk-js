@@ -344,7 +344,7 @@ export class MultiSigWallet extends Signer {
     }
 
     /**
-     * Load MultiSigWallet instance by symbol
+     * Load MultiSigWallet instance by address
      * @param symbol token symbol
      * @param signerOrProvider wallet object
      * @param overrides options
