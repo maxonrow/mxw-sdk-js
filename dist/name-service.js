@@ -87,6 +87,25 @@ class Alias {
      * @param overrides options
      */
     static sendAliasStatusTransaction(transaction, signer, overrides) {
+        return this.getAliasStatusTransactionRequest(transaction, signer, overrides).then((tx) => {
+            return signer.sendTransaction(tx, overrides).then((response) => {
+                if (overrides && overrides.sendOnly) {
+                    return response;
+                }
+                let confirmations = (overrides && overrides.confirmations) ? Number(overrides.confirmations) : null;
+                return signer.provider.waitForTransaction(response.hash, confirmations).then((receipt) => {
+                    if (1 == receipt.status) {
+                        return receipt;
+                    }
+                    throw signer.provider.checkTransactionReceipt(receipt, errors.CALL_EXCEPTION, "set alias status failed", {
+                        method: "nameservice/setAliasStatus",
+                        receipt
+                    });
+                });
+            });
+        });
+    }
+    static getAliasStatusTransactionRequest(transaction, signer, overrides) {
         if (!abstract_signer_1.Signer.isSigner(signer)) {
             errors.throwError('send alias status transaction require signer', errors.MISSING_ARGUMENT, { arg: 'signer' });
         }
@@ -103,21 +122,7 @@ class Alias {
                 memo: (overrides && overrides.memo) ? overrides.memo : "",
             });
             tx.fee = signer.provider.getTransactionFee(undefined, undefined, { tx });
-            return signer.sendTransaction(tx, overrides).then((response) => {
-                if (overrides && overrides.sendOnly) {
-                    return response;
-                }
-                let confirmations = (overrides && overrides.confirmations) ? Number(overrides.confirmations) : null;
-                return signer.provider.waitForTransaction(response.hash, confirmations).then((receipt) => {
-                    if (1 == receipt.status) {
-                        return receipt;
-                    }
-                    throw signer.provider.checkTransactionReceipt(receipt, errors.CALL_EXCEPTION, "set alias status failed", {
-                        method: "nameservice/setAliasStatus",
-                        receipt
-                    });
-                });
-            });
+            return tx;
         });
     }
     /**

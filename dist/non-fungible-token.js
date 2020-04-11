@@ -123,6 +123,27 @@ class NonFungibleToken {
     * @param overrides options
     */
     transferOwnership(addressOrName, overrides) {
+        return this.getTransferOwnershipTransactionRequest(addressOrName, overrides).then((tx) => {
+            return this.signer.sendTransaction(tx, overrides).then((response) => {
+                if (overrides && overrides.sendOnly) {
+                    return response;
+                }
+                let confirmations = (overrides && overrides.confirmations) ? Number(overrides.confirmations) : null;
+                return this.signer.provider.waitForTransaction(response.hash, confirmations).then((receipt) => {
+                    if (1 == receipt.status) {
+                        return this.getState(null, overrides).then(() => {
+                            return receipt;
+                        });
+                    }
+                    throw this.signer.provider.checkTransactionReceipt(receipt, errors.CALL_EXCEPTION, "transfer non fungible token ownership failed", {
+                        method: "nonFungible-transferNonFungibleTokenOwnership",
+                        receipt
+                    });
+                });
+            });
+        });
+    }
+    getTransferOwnershipTransactionRequest(addressOrName, overrides) {
         if (!this.signer) {
             errors.throwError('transfer non fungible token ownership require signer', errors.NOT_INITIALIZED, { arg: 'signer' });
         }
@@ -131,30 +152,14 @@ class NonFungibleToken {
                 return errors.throwError('transfer non fungible token ownership require signer address', errors.MISSING_ARGUMENT, { required: 'signerAddress' });
             }
             return this.provider.resolveName(addressOrName).then((toAddress) => {
-                let transaction = this.provider.getTransactionRequest("nonFungible", "transferNonFungibleTokenOwnership", {
+                let tx = this.provider.getTransactionRequest("nonFungible", "transferNonFungibleTokenOwnership", {
                     symbol: this.symbol,
                     from: signerAddress,
                     to: toAddress,
                     memo: (overrides && overrides.memo) ? overrides.memo : ""
                 });
-                transaction.fee = (overrides && overrides.fee) ? overrides.fee : this.provider.getTransactionFee(undefined, undefined, { tx: transaction });
-                return this.signer.sendTransaction(transaction, overrides).then((response) => {
-                    if (overrides && overrides.sendOnly) {
-                        return response;
-                    }
-                    let confirmations = (overrides && overrides.confirmations) ? Number(overrides.confirmations) : null;
-                    return this.signer.provider.waitForTransaction(response.hash, confirmations).then((receipt) => {
-                        if (1 == receipt.status) {
-                            return this.getState(null, overrides).then(() => {
-                                return receipt;
-                            });
-                        }
-                        throw this.signer.provider.checkTransactionReceipt(receipt, errors.CALL_EXCEPTION, "transfer non fungible token ownership failed", {
-                            method: "nonFungible-transferNonFungibleTokenOwnership",
-                            receipt
-                        });
-                    });
-                });
+                tx.fee = (overrides && overrides.fee) ? overrides.fee : this.provider.getTransactionFee(undefined, undefined, { tx });
+                return tx;
             });
         });
     }
@@ -163,21 +168,8 @@ class NonFungibleToken {
     * @param overrides options
     */
     acceptOwnership(overrides) {
-        if (!this.signer) {
-            errors.throwError('accept fungible token ownership require signer', errors.NOT_INITIALIZED, { arg: 'signer' });
-        }
-        this.isUsable; // check token useability, otherwise throw error
-        return properties_1.resolveProperties({ signerAddress: this.signer.getAddress() }).then(({ signerAddress }) => {
-            if (!signerAddress) {
-                return errors.throwError('accept fungible token ownership require signer address', errors.MISSING_ARGUMENT, { required: 'signerAddress' });
-            }
-            let transaction = this.provider.getTransactionRequest("nonFungible", "acceptNonFungibleTokenOwnership", {
-                symbol: this.symbol,
-                from: signerAddress,
-                memo: (overrides && overrides.memo) ? overrides.memo : ""
-            });
-            transaction.fee = (overrides && overrides.fee) ? overrides.fee : this.provider.getTransactionFee(undefined, undefined, { tx: transaction });
-            return this.signer.sendTransaction(transaction, overrides).then((response) => {
+        return this.getAcceptOwnershipTransactionRequest(overrides).then((tx) => {
+            return this.signer.sendTransaction(tx, overrides).then((response) => {
                 if (overrides && overrides.sendOnly) {
                     return response;
                 }
@@ -195,6 +187,24 @@ class NonFungibleToken {
                     });
                 });
             });
+        });
+    }
+    getAcceptOwnershipTransactionRequest(overrides) {
+        if (!this.signer) {
+            errors.throwError('accept fungible token ownership require signer', errors.NOT_INITIALIZED, { arg: 'signer' });
+        }
+        this.isUsable; // check token useability, otherwise throw error
+        return properties_1.resolveProperties({ signerAddress: this.signer.getAddress() }).then(({ signerAddress }) => {
+            if (!signerAddress) {
+                return errors.throwError('accept fungible token ownership require signer address', errors.MISSING_ARGUMENT, { required: 'signerAddress' });
+            }
+            let tx = this.provider.getTransactionRequest("nonFungible", "acceptNonFungibleTokenOwnership", {
+                symbol: this.symbol,
+                from: signerAddress,
+                memo: (overrides && overrides.memo) ? overrides.memo : ""
+            });
+            tx.fee = (overrides && overrides.fee) ? overrides.fee : this.provider.getTransactionFee(undefined, undefined, { tx });
+            return tx;
         });
     }
     /**
@@ -216,6 +226,25 @@ class NonFungibleToken {
      * @param overrides options
      */
     static create(tokenProperties, signer, overrides) {
+        return this.getCreateTransactionRequest(tokenProperties, signer, overrides).then((tx) => {
+            return signer.sendTransaction(tx, overrides).then((response) => {
+                if (overrides && overrides.sendOnly) {
+                    return response;
+                }
+                let confirmations = (overrides && overrides.confirmations) ? Number(overrides.confirmations) : null;
+                return signer.provider.waitForTransaction(response.hash, confirmations).then((receipt) => {
+                    if (1 == receipt.status) {
+                        return this.fromSymbol(tokenProperties.symbol, signer, overrides);
+                    }
+                    throw signer.provider.checkTransactionReceipt(receipt, errors.CALL_EXCEPTION, "create non fungible token failed", {
+                        method: "nonFungible-createNonFungibleToken",
+                        receipt
+                    });
+                });
+            });
+        });
+    }
+    static getCreateTransactionRequest(tokenProperties, signer, overrides) {
         if (!abstract_signer_1.Signer.isSigner(signer)) {
             errors.throwError('create non fungible token transaction require signer', errors.MISSING_ARGUMENT, { arg: 'signer' });
         }
@@ -247,7 +276,7 @@ class NonFungibleToken {
             if (utils_1.bigNumberify(nonFungibleToken.fee.value).lte(0)) {
                 errors.throwError('create non fungible token transaction require non-zero application fee', errors.MISSING_FEES, { value: nonFungibleToken });
             }
-            let transaction = signer.provider.getTransactionRequest("nonFungible", "createNonFungibleToken", {
+            let tx = signer.provider.getTransactionRequest("nonFungible", "createNonFungibleToken", {
                 appFeeTo: nonFungibleToken.fee.to,
                 appFeeValue: nonFungibleToken.fee.value.toString(),
                 name: nonFungibleToken.name,
@@ -257,44 +286,18 @@ class NonFungibleToken {
                 properties: nonFungibleToken.properties || "",
                 symbol: nonFungibleToken.symbol
             });
-            transaction.fee = signer.provider.getTransactionFee(undefined, undefined, { tx: transaction });
-            return signer.sendTransaction(transaction, overrides).then((response) => {
-                if (overrides && overrides.sendOnly) {
-                    return response;
-                }
-                let confirmations = (overrides && overrides.confirmations) ? Number(overrides.confirmations) : null;
-                return signer.provider.waitForTransaction(response.hash, confirmations).then((receipt) => {
-                    if (1 == receipt.status) {
-                        return this.fromSymbol(tokenProperties.symbol, signer, overrides);
-                    }
-                    throw signer.provider.checkTransactionReceipt(receipt, errors.CALL_EXCEPTION, "create non fungible token failed", {
-                        method: "nonFungible-createNonFungibleToken",
-                        receipt
-                    });
-                });
-            });
+            tx.fee = signer.provider.getTransactionFee(undefined, undefined, { tx });
+            return tx;
         });
     }
     /**
-   * Update non-fungible token metadata
-   * @param metadata new metadata
-   * @param overrides options
-   */
+     * Update non-fungible token metadata
+     * @param metadata new metadata
+     * @param overrides options
+     */
     updateMetadata(metadata, overrides) {
-        if (!this.signer) {
-            errors.throwError('update non fungible token item metadata require signer', errors.NOT_INITIALIZED, { arg: 'signer' });
-        }
-        return properties_1.resolveProperties({ address: this.signer.getAddress() }).then(({ address }) => {
-            if (!address) {
-                return errors.throwError('update non fungible token item metadata require signer address', errors.MISSING_ARGUMENT, { arg: 'signerAddress' });
-            }
-            let transaction = this.signer.provider.getTransactionRequest("nonFungible", "updateNFTMetadata", {
-                symbol: this.symbol,
-                from: address,
-                metadata
-            });
-            transaction.fee = (overrides && overrides.fee) ? overrides.fee : this.signer.provider.getTransactionFee(undefined, undefined, { tx: transaction });
-            return this.signer.sendTransaction(transaction, overrides).then((response) => {
+        return this.getUpdateMetadataTransactionRequest(metadata, overrides).then((tx) => {
+            return this.signer.sendTransaction(tx, overrides).then((response) => {
                 if (overrides && overrides.sendOnly) {
                     return response;
                 }
@@ -311,6 +314,23 @@ class NonFungibleToken {
             });
         });
     }
+    getUpdateMetadataTransactionRequest(metadata, overrides) {
+        if (!this.signer) {
+            errors.throwError('update non fungible token item metadata require signer', errors.NOT_INITIALIZED, { arg: 'signer' });
+        }
+        return properties_1.resolveProperties({ address: this.signer.getAddress() }).then(({ address }) => {
+            if (!address) {
+                return errors.throwError('update non fungible token item metadata require signer address', errors.MISSING_ARGUMENT, { arg: 'signerAddress' });
+            }
+            let tx = this.signer.provider.getTransactionRequest("nonFungible", "updateNFTMetadata", {
+                symbol: this.symbol,
+                from: address,
+                metadata
+            });
+            tx.fee = (overrides && overrides.fee) ? overrides.fee : this.signer.provider.getTransactionFee(undefined, undefined, { tx });
+            return tx;
+        });
+    }
     /**
     * Mint NFT item
     * @param toAddressOrName receiver address
@@ -318,6 +338,25 @@ class NonFungibleToken {
     * @param overrides options
     */
     mint(toAddressOrName, item, overrides) {
+        return this.getMintTransactionRequest(toAddressOrName, item, overrides).then((tx) => {
+            return this.signer.sendTransaction(tx, overrides).then((response) => {
+                if (overrides && overrides.sendOnly) {
+                    return response;
+                }
+                let confirmations = (overrides && overrides.confirmations) ? Number(overrides.confirmations) : null;
+                return this.signer.provider.waitForTransaction(response.hash, confirmations).then((receipt) => {
+                    if (1 == receipt.status) {
+                        return receipt;
+                    }
+                    throw this.signer.provider.checkTransactionReceipt(receipt, errors.CALL_EXCEPTION, "mint non fungible token failed", {
+                        method: "nonFungible-mintNonFungibleToken",
+                        receipt
+                    });
+                });
+            });
+        });
+    }
+    getMintTransactionRequest(toAddressOrName, item, overrides) {
         if (!this.signer) {
             errors.throwError('transfer non fungible token ownership require signer', errors.NOT_INITIALIZED, { arg: 'signer' });
         }
@@ -327,7 +366,7 @@ class NonFungibleToken {
                 return errors.throwError('mint fungible token require signer address', errors.MISSING_ARGUMENT, { arg: 'signerAddress' });
             }
             return this.signer.provider.resolveName(toAddressOrName).then((toAddress) => {
-                let transaction = this.signer.provider.getTransactionRequest("nonFungible", "mintNonFungibleItem", {
+                let tx = this.signer.provider.getTransactionRequest("nonFungible", "mintNonFungibleItem", {
                     symbol: item.symbol,
                     to: toAddress,
                     itemID: item.itemID,
@@ -336,22 +375,8 @@ class NonFungibleToken {
                     metadata: item.metadata || "",
                     memo: (overrides && overrides.memo) ? overrides.memo : ""
                 });
-                transaction.fee = (overrides && overrides.fee) ? overrides.fee : this.signer.provider.getTransactionFee(undefined, undefined, { tx: transaction });
-                return this.signer.sendTransaction(transaction, overrides).then((response) => {
-                    if (overrides && overrides.sendOnly) {
-                        return response;
-                    }
-                    let confirmations = (overrides && overrides.confirmations) ? Number(overrides.confirmations) : null;
-                    return this.signer.provider.waitForTransaction(response.hash, confirmations).then((receipt) => {
-                        if (1 == receipt.status) {
-                            return receipt;
-                        }
-                        throw this.signer.provider.checkTransactionReceipt(receipt, errors.CALL_EXCEPTION, "mint non fungible token failed", {
-                            method: "nonFungible-mintNonFungibleToken",
-                            receipt
-                        });
-                    });
-                });
+                tx.fee = (overrides && overrides.fee) ? overrides.fee : this.signer.provider.getTransactionFee(undefined, undefined, { tx });
+                return tx;
             });
         });
     }
@@ -492,19 +517,7 @@ class NonFungibleToken {
      * @param overrides options
      */
     static sendNonFungibleTokenStatusTransaction(transaction, signer, overrides) {
-        if (!abstract_signer_1.Signer.isSigner(signer)) {
-            errors.throwError('send non fungible token status transaction require signer', errors.MISSING_ARGUMENT, { arg: 'signer' });
-        }
-        properties_1.checkProperties(transaction, { payload: true, signatures: true });
-        transaction = checkNonFungibleTokenStatus(transaction);
-        return properties_1.resolveProperties({ signerAddress: signer.getAddress() }).then(({ signerAddress }) => {
-            let tx = signer.provider.getTransactionRequest("nonFungible", "setNonFungibleTokenStatus", {
-                payload: transaction.payload,
-                signatures: transaction.signatures,
-                owner: signerAddress,
-                memo: (overrides && overrides.memo) ? overrides.memo : "",
-            });
-            tx.fee = signer.provider.getTransactionFee(undefined, undefined, { tx });
+        return this.getNonFungibleTokenStatusTransactionRequest(transaction, signer, overrides).then((tx) => {
             return signer.sendTransaction(tx, overrides).then((response) => {
                 if (overrides && overrides.sendOnly) {
                     return response;
@@ -522,6 +535,23 @@ class NonFungibleToken {
             });
         });
     }
+    static getNonFungibleTokenStatusTransactionRequest(transaction, signer, overrides) {
+        if (!abstract_signer_1.Signer.isSigner(signer)) {
+            errors.throwError('send non fungible token status transaction require signer', errors.MISSING_ARGUMENT, { arg: 'signer' });
+        }
+        properties_1.checkProperties(transaction, { payload: true, signatures: true });
+        transaction = checkNonFungibleTokenStatus(transaction);
+        return properties_1.resolveProperties({ signerAddress: signer.getAddress() }).then(({ signerAddress }) => {
+            let tx = signer.provider.getTransactionRequest("nonFungible", "setNonFungibleTokenStatus", {
+                payload: transaction.payload,
+                signatures: transaction.signatures,
+                owner: signerAddress,
+                memo: (overrides && overrides.memo) ? overrides.memo : "",
+            });
+            tx.fee = signer.provider.getTransactionFee(undefined, undefined, { tx });
+            return tx;
+        });
+    }
     /**
      * Send non fungible token item status transaction by middleware
      * @param transaction non fungible token status transaction
@@ -529,19 +559,7 @@ class NonFungibleToken {
      * @param overrides options
      */
     static sendNonFungibleTokenItemStatusTransaction(transaction, signer, overrides) {
-        if (!abstract_signer_1.Signer.isSigner(signer)) {
-            errors.throwError('send non fungible token item status transaction require signer', errors.MISSING_ARGUMENT, { arg: 'signer' });
-        }
-        properties_1.checkProperties(transaction, { payload: true, signatures: true });
-        transaction = checkNonFungibleTokenItemStatus(transaction);
-        return properties_1.resolveProperties({ signerAddress: signer.getAddress() }).then(({ signerAddress }) => {
-            let tx = signer.provider.getTransactionRequest("nonFungible", "setNonFungibleItemStatus", {
-                payload: transaction.payload,
-                signatures: transaction.signatures,
-                owner: signerAddress,
-                memo: (overrides && overrides.memo) ? overrides.memo : "",
-            });
-            tx.fee = signer.provider.getTransactionFee(undefined, undefined, { tx });
+        return this.getNonFungibleTokenItemStatusTransactionRequest(transaction, signer, overrides).then((tx) => {
             return signer.sendTransaction(tx, overrides).then((response) => {
                 if (overrides && overrides.sendOnly) {
                     return response;
@@ -557,6 +575,23 @@ class NonFungibleToken {
                     });
                 });
             });
+        });
+    }
+    static getNonFungibleTokenItemStatusTransactionRequest(transaction, signer, overrides) {
+        if (!abstract_signer_1.Signer.isSigner(signer)) {
+            errors.throwError('send non fungible token item status transaction require signer', errors.MISSING_ARGUMENT, { arg: 'signer' });
+        }
+        properties_1.checkProperties(transaction, { payload: true, signatures: true });
+        transaction = checkNonFungibleTokenItemStatus(transaction);
+        return properties_1.resolveProperties({ signerAddress: signer.getAddress() }).then(({ signerAddress }) => {
+            let tx = signer.provider.getTransactionRequest("nonFungible", "setNonFungibleItemStatus", {
+                payload: transaction.payload,
+                signatures: transaction.signatures,
+                owner: signerAddress,
+                memo: (overrides && overrides.memo) ? overrides.memo : "",
+            });
+            tx.fee = signer.provider.getTransactionFee(undefined, undefined, { tx });
+            return tx;
         });
     }
     /**
@@ -633,12 +668,11 @@ function setNonFungibleTokenStatus(symbol, status, signer, overrides) {
         case "APPROVE_TRANFER_TOKEN_OWNERSHIP":
         case "REJECT_TRANFER_TOKEN_OWNERSHIP":
         case "REJECT":
+        case "FREEZE":
+        case "UNFREEZE":
             mintLimit = "0";
             transferLimit = "0";
             endorserList = null;
-            break;
-        case "FREEZE":
-        case "UNFREEZE":
             break;
         default:
             errors.throwError('invalid non fungible token status', errors.UNEXPECTED_ARGUMENT, { arg: 'status', value: status });

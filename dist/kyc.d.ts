@@ -1,4 +1,4 @@
-import { Provider } from './providers/abstract-provider';
+import { Provider, TransactionRequest } from './providers/abstract-provider';
 import { Signer } from './abstract-signer';
 import { TransactionReceipt, TransactionResponse } from './providers/abstract-provider';
 import { BigNumber } from './utils';
@@ -59,7 +59,8 @@ export declare class Kyc {
      * @param transaction transaction object
      * @param overrides options
      */
-    whitelist(transaction?: KycTransaction, overrides?: any): Promise<TransactionResponse | TransactionReceipt>;
+    whitelist(transaction: KycTransaction, overrides?: any): Promise<TransactionResponse | TransactionReceipt>;
+    getWhitelistTransactionRequest(transaction: KycTransaction, overrides?: any): Promise<TransactionRequest>;
     /**
      * Generate kyc address by hashing the key components
      * @param keyComponent key component to form the kyc address
@@ -104,13 +105,16 @@ export declare class Kyc {
      * @param signer signer wallet
      * @param overrides options
      */
-    static sendRevokeTransaction(transaction: KycRevokeTransaction, signer: Signer, overrides?: any): Promise<TransactionReceipt>;
+    static sendRevokeTransaction(transaction: KycRevokeTransaction, signer: Signer, overrides?: any): Promise<TransactionResponse | TransactionReceipt>;
+    static getRevokeTransactionRequest(transaction: KycRevokeTransaction, signer: Signer, overrides?: any): Promise<TransactionRequest>;
     /**
      * Create relationship between wallets
      */
     static bind(addressOrName: string | Promise<string>, kycAddress: string, signer: Signer, overrides?: any): Promise<TransactionResponse | TransactionReceipt>;
+    static getBindTransactionRequest(addressOrName: string | Promise<string>, kycAddress: string, signer: Signer, overrides?: any): Promise<TransactionRequest>;
     /**
      * Remove relationship between wallets
      */
     static unbind(addressOrName: string | Promise<string>, kycAddress: string, signer: Signer, overrides?: any): Promise<TransactionResponse | TransactionReceipt>;
+    static getUnbindTransactionRequest(addressOrName: string | Promise<string>, kycAddress: string, signer: Signer, overrides?: any): Promise<TransactionRequest>;
 }

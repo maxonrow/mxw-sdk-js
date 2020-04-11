@@ -1,5 +1,6 @@
 import { Signer } from './abstract-signer';
 import { BigNumber } from './utils';
+import { TransactionResponse, TransactionReceipt, TransactionRequest } from './providers';
 export interface AliasStatus {
     alias: {
         name: string;
@@ -38,7 +39,8 @@ export declare class Alias {
      * @param signer signer wallet
      * @param overrides options
      */
-    static sendAliasStatusTransaction(transaction: AliasStatusTransaction, signer: Signer, overrides?: any): Promise<import("./providers").TransactionReceipt>;
+    static sendAliasStatusTransaction(transaction: AliasStatusTransaction, signer: Signer, overrides?: any): Promise<TransactionResponse | TransactionReceipt>;
+    static getAliasStatusTransactionRequest(transaction: AliasStatusTransaction, signer: Signer, overrides?: any): Promise<TransactionRequest>;
     /**
      * Approve alias by provider
      * @param name alias name
