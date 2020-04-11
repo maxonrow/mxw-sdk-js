@@ -123,9 +123,12 @@ export class Wallet extends AbstractSigner {
     }
 
     sign(transaction: TransactionRequest, overrides?: any) {
-        if (transaction.nonce == null || transaction.accountNumber == null) {
+        if (transaction.chainId == null || transaction.nonce == null || transaction.accountNumber == null) {
             transaction = shallowCopy(transaction);
 
+            if (transaction.chainId == null) {
+                transaction.chainId = this.provider.getNetwork().then((network) => network.chainId);
+            }
             if (transaction.nonce == null) {
                 transaction.nonce = this.getTransactionCount("pending");
             }
@@ -134,7 +137,7 @@ export class Wallet extends AbstractSigner {
             }
         }
         return resolveProperties(transaction).then((tx) => {
-            if (!tx.nonce || !tx.accountNumber || !tx.value || !tx.value.msg || !Array.isArray(tx.value.msg)) {
+            if (!tx.chainId || !tx.nonce || !tx.accountNumber || !tx.value || !tx.value.msg || !Array.isArray(tx.value.msg)) {
                 errors.throwError('missing transaction field', errors.MISSING_ARGUMENT, { argument: 'value', value: tx });
             }
             if (!Array.isArray(tx.value.msg)) {
