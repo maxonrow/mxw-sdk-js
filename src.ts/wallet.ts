@@ -142,7 +142,7 @@ export class Wallet extends AbstractSigner {
             }
 
             if (!tx.value.fee) {
-                tx.value.fee = transaction.fee;
+                tx.value.fee = tx.fee;
             }
 
             let payload = {
