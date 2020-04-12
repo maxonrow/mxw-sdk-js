@@ -396,6 +396,13 @@ if ("" != nodeProvider.nonFungibleToken.middleware) {
         });
     })
 
+    describe('Suite: NonFungibleToken - public', function () {
+        this.slow(slowThreshold); // define the threshold for slow indicator
+
+        it("Clean up", function () {
+            providerConnection.removeAllListeners();
+        });
+    });
 
     function performNonFungibleTokenStatus(symbol: string, perform: any, overrides?: any) {
         return perform(symbol, provider, overrides).then((transaction) => {

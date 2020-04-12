@@ -127,9 +127,12 @@ export class Wallet extends AbstractSigner {
     }
 
     sign(transaction: TransactionRequest, overrides?: any) {
-        if (transaction.nonce == null || transaction.accountNumber == null) {
+        if (transaction.chainId == null || transaction.nonce == null || transaction.accountNumber == null) {
             transaction = shallowCopy(transaction);
 
+            if (transaction.chainId == null) {
+                transaction.chainId = this.provider.getNetwork().then((network) => network.chainId);
+            }
             if (transaction.nonce == null) {
                 transaction.nonce = this.getTransactionCount("pending");
             }
@@ -138,7 +141,7 @@ export class Wallet extends AbstractSigner {
             }
         }
         return resolveProperties(transaction).then((tx) => {
-            if (!tx.nonce || !tx.accountNumber || !tx.value || !tx.value.msg || !Array.isArray(tx.value.msg)) {
+            if (!tx.chainId || !tx.nonce || !tx.accountNumber || !tx.value || !tx.value.msg || !Array.isArray(tx.value.msg)) {
                 errors.throwError('missing transaction field', errors.MISSING_ARGUMENT, { argument: 'value', value: tx });
             }
             if (!Array.isArray(tx.value.msg)) {
@@ -146,7 +149,7 @@ export class Wallet extends AbstractSigner {
             }
 
             if (!tx.value.fee) {
-                tx.value.fee = transaction.fee;
+                tx.value.fee = tx.fee;
             }
 
             let accountNumber = tx.accountNumber;
@@ -236,25 +239,8 @@ export class Wallet extends AbstractSigner {
     }
 
     transfer(addressOrName: string | Promise<string>, value: BigNumberish, overrides?: any): Promise<TransactionResponse | TransactionReceipt> {
-        if (!this.provider) { errors.throwError('missing provider', errors.NOT_INITIALIZED, { argument: 'provider' }); }
-
-        if (addressOrName instanceof Promise) {
-            return addressOrName.then((address) => {
-                return this.transfer(address, value, overrides);
-            });
-        }
-
-        return this.provider.resolveName(addressOrName).then((address) => {
-            let transaction = this.provider.getTransactionRequest("bank", "bank-send", {
-                from: this.address,
-                to: address,
-                value: value,
-                memo: (overrides && overrides.memo) ? overrides.memo : "",
-                denom: (overrides && overrides.denom) ? overrides.denom : smallestUnitName
-            });
-            transaction.fee = (overrides && overrides.fee) ? overrides.fee : this.provider.getTransactionFee(undefined, undefined, { tx: transaction });
-
-            return this.sendTransaction(transaction, overrides).then((response) => {
+        return this.getTransferTransactionRequest(addressOrName, value, overrides).then((tx) => {
+            return this.sendTransaction(tx, overrides).then((response) => {
                 if (overrides && overrides.sendOnly) {
                     return response;
                 }
@@ -273,6 +259,29 @@ export class Wallet extends AbstractSigner {
         });
     }
 
+    getTransferTransactionRequest(addressOrName: string | Promise<string>, value: BigNumberish, overrides?: any): Promise<TransactionRequest> {
+        if (!this.provider) { errors.throwError('missing provider', errors.NOT_INITIALIZED, { argument: 'provider' }); }
+
+        if (addressOrName instanceof Promise) {
+            return addressOrName.then((address) => {
+                return this.getTransferTransactionRequest(address, value, overrides);
+            });
+        }
+
+        return this.provider.resolveName(addressOrName).then((address) => {
+            let tx = this.provider.getTransactionRequest("bank", "bank-send", {
+                from: this.address,
+                to: address,
+                value: value,
+                memo: (overrides && overrides.memo) ? overrides.memo : "",
+                denom: (overrides && overrides.denom) ? overrides.denom : smallestUnitName
+            });
+            tx.fee = (overrides && overrides.fee) ? overrides.fee : this.provider.getTransactionFee(undefined, undefined, { tx });
+
+            return tx;
+        });
+    }
+
     isWhitelisted(blockTag?: BlockTag): Promise<Boolean> {
         if (!this.provider) { errors.throwError('missing provider', errors.NOT_INITIALIZED, { argument: 'provider' }); }
         return this.provider.isWhitelisted(this.address, blockTag);
@@ -284,28 +293,8 @@ export class Wallet extends AbstractSigner {
     }
 
     createAlias(name: string | Promise<string>, appFee: { to: string, value: BigNumberish }, overrides?: any): Promise<TransactionResponse | TransactionReceipt> {
-        if (!this.provider) { errors.throwError('missing provider', errors.NOT_INITIALIZED, { argument: 'provider' }); }
-
-        checkProperties(appFee, {
-            to: true,
-            value: true
-        }, true);
-
-        if (bigNumberify(appFee.value).lte(0)) {
-            errors.throwError('create alias transaction require non-zero application fee', errors.MISSING_FEES, { value: appFee });
-        }
-
-        return resolveProperties({ name: name }).then(({ name }) => {
-            let transaction = this.provider.getTransactionRequest("nameservice", "nameservice-createAlias", {
-                appFeeTo: appFee.to,
-                appFeeValue: appFee.value.toString(),
-                name,
-                owner: this.address,
-                memo: (overrides && overrides.memo) ? overrides.memo : ""
-            });
-            transaction.fee = this.provider.getTransactionFee(undefined, undefined, { tx: transaction });
-
-            return this.sendTransaction(transaction, overrides).then((response) => {
+        return this.getCreateAliasTransactionRequest(name, appFee, overrides).then((tx) => {
+            return this.sendTransaction(tx, overrides).then((response) => {
                 if (overrides && overrides.sendOnly) {
                     return response;
                 }
@@ -321,6 +310,32 @@ export class Wallet extends AbstractSigner {
                     });
                 });
             });
+        });
+    }
+
+    getCreateAliasTransactionRequest(name: string | Promise<string>, appFee: { to: string, value: BigNumberish }, overrides?: any): Promise<TransactionRequest> {
+        if (!this.provider) { errors.throwError('missing provider', errors.NOT_INITIALIZED, { argument: 'provider' }); }
+
+        checkProperties(appFee, {
+            to: true,
+            value: true
+        }, true);
+
+        if (bigNumberify(appFee.value).lte(0)) {
+            errors.throwError('create alias transaction require non-zero application fee', errors.MISSING_FEES, { value: appFee });
+        }
+
+        return resolveProperties({ name: name }).then(({ name }) => {
+            let tx = this.provider.getTransactionRequest("nameservice", "nameservice-createAlias", {
+                appFeeTo: appFee.to,
+                appFeeValue: appFee.value.toString(),
+                name,
+                owner: this.address,
+                memo: (overrides && overrides.memo) ? overrides.memo : ""
+            });
+            tx.fee = this.provider.getTransactionFee(undefined, undefined, { tx });
+
+            return tx;
         });
     }
 

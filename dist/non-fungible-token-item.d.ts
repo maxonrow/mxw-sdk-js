@@ -1,4 +1,4 @@
-import { Provider } from './providers/abstract-provider';
+import { Provider, TransactionRequest } from './providers/abstract-provider';
 import { Signer } from './abstract-signer';
 import { TransactionReceipt, TransactionResponse, BlockTag, NFTokenItemState } from './providers/abstract-provider';
 import { NonFungibleToken } from './non-fungible-token';
@@ -35,20 +35,24 @@ export declare class NonFungibleTokenItem {
      * @param overrides options
      */
     transfer(toAddressOrName: string | Promise<string>, overrides?: any): Promise<TransactionResponse | TransactionReceipt>;
+    getTransferTransactionRequest(toAddressOrName: string | Promise<string>, overrides?: any): Promise<TransactionRequest>;
     /**
     * Endorse token item by endorser
     * @param overrides options
     */
     endorse(overrides?: any): Promise<TransactionResponse | TransactionReceipt>;
+    getEndorseTransactionRequest(overrides?: any): Promise<TransactionRequest>;
     /**
     * Update token item metadata
     * @param metadata metadata to update
     * @param overrides options
     */
     updateMetadata(metadata?: string, overrides?: any): Promise<TransactionResponse | TransactionReceipt>;
+    getUpdateMetadataTransactionRequest(metadata?: string, overrides?: any): Promise<TransactionRequest>;
     /**
-  * Burn non-fungible token item
-  * @param overrides options
-  */
-    burn(overrides?: any): Promise<TransactionReceipt>;
+     * Burn non-fungible token item
+     * @param overrides options
+     */
+    burn(overrides?: any): Promise<TransactionResponse | TransactionReceipt>;
+    getBurnTransactionRequest(overrides?: any): Promise<TransactionRequest>;
 }

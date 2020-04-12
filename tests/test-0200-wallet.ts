@@ -218,6 +218,33 @@ if ("" != nodeProvider.kyc.middleware) {
             });
         });
 
+        it("Transfer with manual broadcast", function () {
+            let value = mxw.utils.parseMxw("100");
+            let overrides = {
+                logSignaturePayload: defaultOverrides.logSignaturePayload,
+                logSignedTransaction: defaultOverrides.logSignedTransaction,
+                memo: "Hello Blockchain!"
+            }
+            return wallet.provider.getTransactionFee("bank", "bank-send", {
+                from: wallet.address,
+                to: walletAirDrop.address,
+                value,
+                memo: overrides.memo
+            }).then((fee) => {
+                overrides["fee"] = fee;
+                return wallet.getTransferTransactionRequest(walletAirDrop.address, value, overrides).then((tx) => {
+                    return wallet.sign(tx, overrides);
+                }).then((signedTransaction) => {
+                    return providerConnection.sendTransaction(signedTransaction, overrides);
+                }).then((response) => {
+                    return providerConnection.waitForTransaction(response.hash);
+                }).then((receipt) => {
+                    expect(receipt).to.exist;
+                    if (!silent) console.log(indent, "transfer.receipt:", JSON.stringify(receipt));
+                });
+            });
+        });
+
         it("Transfer but not enough balance for fee", function () {
             return walletAirDrop.getBalance().then((balance) => {
                 expect(balance).to.exist;

@@ -1,4 +1,4 @@
-import { Provider, TokenAccountState } from './providers/abstract-provider';
+import { Provider, TokenAccountState, TransactionRequest } from './providers/abstract-provider';
 import { Signer } from './abstract-signer';
 import { TransactionReceipt, TransactionResponse, BlockTag, TokenState } from './providers/abstract-provider';
 import { BigNumberish, BigNumber } from './utils';
@@ -120,6 +120,7 @@ export declare class FungibleToken {
      * @param overrides options
      */
     transfer(toAddressOrName: string | Promise<string>, value: BigNumberish, overrides?: any): Promise<TransactionResponse | TransactionReceipt>;
+    getTransferTransactionRequest(toAddressOrName: string | Promise<string>, value: BigNumberish, overrides?: any): Promise<TransactionRequest>;
     /**
      * Mint token by owner
      * @param toAddressOrName receiver address
@@ -127,23 +128,27 @@ export declare class FungibleToken {
      * @param overrides options
      */
     mint(toAddressOrName: string | Promise<string>, value: BigNumberish, overrides?: any): Promise<TransactionResponse | TransactionReceipt>;
+    getMintTransactionRequest(toAddressOrName: string | Promise<string>, value: BigNumberish, overrides?: any): Promise<TransactionRequest>;
     /**
      * Burn token by wallet
      * @param value number of token to burn
      * @param overrides options
      */
     burn(value: BigNumberish, overrides?: any): Promise<TransactionResponse | TransactionReceipt>;
+    getBurnTransactionRequest(value: BigNumberish, overrides?: any): Promise<TransactionRequest>;
     /**
      * Transfer token ownership
      * @param addressOrName new owner address
      * @param overrides options
      */
-    transferOwnership(addressOrName: string | Promise<string>, overrides?: any): Promise<TransactionReceipt>;
+    transferOwnership(addressOrName: string | Promise<string>, overrides?: any): Promise<TransactionResponse | TransactionReceipt>;
+    getTransferOwnershipTransactionRequest(addressOrName: string | Promise<string>, overrides?: any): Promise<TransactionRequest>;
     /**
      * Accept ownership by new owner
      * @param overrides options
      */
     acceptOwnership(overrides?: any): Promise<TransactionResponse | TransactionReceipt>;
+    getAcceptOwnershipTransactionRequest(overrides?: any): Promise<TransactionRequest>;
     /**
      * Load token instance by symbol
      * @param symbol token symbol
@@ -158,6 +163,7 @@ export declare class FungibleToken {
      * @param overrides options
      */
     static create(properties: FungibleTokenProperties, signer: Signer, overrides?: any): Promise<TransactionResponse | FungibleToken>;
+    static getCreateTransactionRequest(properties: FungibleTokenProperties, signer: Signer, overrides?: any): Promise<TransactionRequest>;
     /**
      * Sign fungible token status transaction by issuer
      * @param transaction fungible token status transaction
@@ -178,14 +184,16 @@ export declare class FungibleToken {
      * @param signer signer wallet
      * @param overrides options
      */
-    static sendFungibleTokenStatusTransaction(transaction: FungibleTokenStatusTransaction, signer: Signer, overrides?: any): Promise<TransactionReceipt>;
+    static sendFungibleTokenStatusTransaction(transaction: FungibleTokenStatusTransaction, signer: Signer, overrides?: any): Promise<TransactionResponse | TransactionReceipt>;
+    static getFungibleTokenStatusTransactionRequest(transaction: FungibleTokenStatusTransaction, signer: Signer, overrides?: any): Promise<TransactionRequest>;
     /**
      * Send fungible token account status transaction by middleware
      * @param transaction fungible token account status transaction
      * @param signer signer wallet
      * @param overrides options
      */
-    static sendFungibleTokenAccountStatusTransaction(transaction: FungibleTokenAccountStatusTransaction, signer: Signer, overrides?: any): Promise<TransactionReceipt>;
+    static sendFungibleTokenAccountStatusTransaction(transaction: FungibleTokenAccountStatusTransaction, signer: Signer, overrides?: any): Promise<TransactionResponse | TransactionReceipt>;
+    static getFungibleTokenAccountStatusTransactionRequest(transaction: FungibleTokenAccountStatusTransaction, signer: Signer, overrides?: any): Promise<TransactionRequest>;
     /**
      * Approve fungible token by provider
      * @param symbol fungible token symbol

@@ -4,7 +4,7 @@ import { defineReadOnly, resolveProperties } from './utils/properties';
 import * as errors from './errors';
 
 // Imported Abstracts
-import { Provider } from './providers/abstract-provider';
+import { Provider, TransactionRequest } from './providers/abstract-provider';
 import { Signer } from './abstract-signer';
 
 import {
@@ -49,7 +49,6 @@ export class NonFungibleTokenItem {
         } else {
             errors.throwError('invalid signer or provider', errors.INVALID_ARGUMENT, { arg: 'signerOrProvider', value: signerOrProvider });
         }
-
     }
 
     get state() { return this._state; }
@@ -140,7 +139,27 @@ export class NonFungibleTokenItem {
      * @param overrides options
      */
     transfer(toAddressOrName: string | Promise<string>, overrides?: any): Promise<TransactionResponse | TransactionReceipt> {
+        return this.getTransferTransactionRequest(toAddressOrName, overrides).then((tx) => {
+            return this.signer.sendTransaction(tx, overrides).then((response) => {
+                if (overrides && overrides.sendOnly) {
+                    return response;
+                }
+                let confirmations = (overrides && overrides.confirmations) ? Number(overrides.confirmations) : null;
 
+                return this.signer.provider.waitForTransaction(response.hash, confirmations).then((receipt) => {
+                    if (1 == receipt.status) {
+                        return receipt;
+                    }
+                    throw this.signer.provider.checkTransactionReceipt(receipt, errors.CALL_EXCEPTION, "transfer non fungible token item failed", {
+                        method: "nonFungible-transferNonFungibleToken",
+                        receipt
+                    });
+                });
+            });
+        });
+    }
+
+    getTransferTransactionRequest(toAddressOrName: string | Promise<string>, overrides?: any): Promise<TransactionRequest> {
         if (!this.signer) {
             errors.throwError('transfer non fungible token ownership require signer', errors.NOT_INITIALIZED, { arg: 'signer' });
         }
@@ -151,31 +170,16 @@ export class NonFungibleTokenItem {
             }
 
             return this.signer.provider.resolveName(toAddressOrName).then((toAddress) => {
-                let transaction = this.signer.provider.getTransactionRequest("nonFungible", "transferNonFungibleItem", {
+                let tx = this.signer.provider.getTransactionRequest("nonFungible", "transferNonFungibleItem", {
                     symbol: this.symbol,
                     from: signerAddress,
                     to: toAddress,
                     itemID: this.itemID,
                     memo: (overrides && overrides.memo) ? overrides.memo : ""
                 });
-                transaction.fee = (overrides && overrides.fee) ? overrides.fee : this.signer.provider.getTransactionFee(undefined, undefined, { tx: transaction });
+                tx.fee = (overrides && overrides.fee) ? overrides.fee : this.signer.provider.getTransactionFee(undefined, undefined, { tx });
 
-                return this.signer.sendTransaction(transaction, overrides).then((response) => {
-                    if (overrides && overrides.sendOnly) {
-                        return response;
-                    }
-                    let confirmations = (overrides && overrides.confirmations) ? Number(overrides.confirmations) : null;
-
-                    return this.signer.provider.waitForTransaction(response.hash, confirmations).then((receipt) => {
-                        if (1 == receipt.status) {
-                            return receipt;
-                        }
-                        throw this.signer.provider.checkTransactionReceipt(receipt, errors.CALL_EXCEPTION, "transfer non fungible token item failed", {
-                            method: "nonFungible-transferNonFungibleToken",
-                            receipt
-                        });
-                    });
-                });
+                return tx;
             });
         });
     }
@@ -185,25 +189,8 @@ export class NonFungibleTokenItem {
     * @param overrides options
     */
     endorse(overrides?: any): Promise<TransactionResponse | TransactionReceipt> {
-
-        if (!this.signer) {
-            errors.throwError('endorse non fungible token item require signer', errors.NOT_INITIALIZED, { arg: 'signer' });
-        }
-
-        return resolveProperties({ address: this.signer.getAddress() }).then(({ address }) => {
-            if (!address) {
-                return errors.throwError('endorse non fungible token item require signer address', errors.MISSING_ARGUMENT, { arg: 'signerAddress' });
-            }
-
-            let transaction = this.signer.provider.getTransactionRequest("nonFungible", "endorsement", {
-                symbol: this.symbol,
-                from: address,
-                itemID: this.itemID,
-                memo: (overrides && overrides.memo) ? overrides.memo : ""
-            });
-            transaction.fee = (overrides && overrides.fee) ? overrides.fee : this.signer.provider.getTransactionFee(undefined, undefined, { tx: transaction });
-
-            return this.signer.sendTransaction(transaction, overrides).then((response) => {
+        return this.getEndorseTransactionRequest().then((tx) => {
+            return this.signer.sendTransaction(tx, overrides).then((response) => {
                 if (overrides && overrides.sendOnly) {
                     return response;
                 }
@@ -222,31 +209,36 @@ export class NonFungibleTokenItem {
         });
     }
 
+    getEndorseTransactionRequest(overrides?: any): Promise<TransactionRequest> {
+        if (!this.signer) {
+            errors.throwError('endorse non fungible token item require signer', errors.NOT_INITIALIZED, { arg: 'signer' });
+        }
+
+        return resolveProperties({ address: this.signer.getAddress() }).then(({ address }) => {
+            if (!address) {
+                return errors.throwError('endorse non fungible token item require signer address', errors.MISSING_ARGUMENT, { arg: 'signerAddress' });
+            }
+
+            let tx = this.signer.provider.getTransactionRequest("nonFungible", "endorsement", {
+                symbol: this.symbol,
+                from: address,
+                itemID: this.itemID,
+                memo: (overrides && overrides.memo) ? overrides.memo : ""
+            });
+            tx.fee = (overrides && overrides.fee) ? overrides.fee : this.signer.provider.getTransactionFee(undefined, undefined, { tx });
+
+            return tx;
+        });
+    }
+
     /**
     * Update token item metadata
     * @param metadata metadata to update
     * @param overrides options
     */
     updateMetadata(metadata?: string, overrides?: any): Promise<TransactionResponse | TransactionReceipt> {
-
-        if (!this.signer) {
-            errors.throwError('update non fungible token item metadata require signer', errors.NOT_INITIALIZED, { arg: 'signer' });
-        }
-
-        return resolveProperties({ address: this.signer.getAddress() }).then(({ address }) => {
-            if (!address) {
-                return errors.throwError('update non fungible token item metadata require signer address', errors.MISSING_ARGUMENT, { arg: 'signerAddress' });
-            }
-
-            let transaction = this.signer.provider.getTransactionRequest("nonFungible", "updateItemMetadata", {
-                symbol: this.symbol,
-                from: address,
-                itemID: this.itemID,
-                metadata
-            });
-            transaction.fee = (overrides && overrides.fee) ? overrides.fee : this.signer.provider.getTransactionFee(undefined, undefined, { tx: transaction });
-
-            return this.signer.sendTransaction(transaction, overrides).then((response) => {
+        return this.getUpdateMetadataTransactionRequest(metadata, overrides).then((tx) => {
+            return this.signer.sendTransaction(tx, overrides).then((response) => {
                 if (overrides && overrides.sendOnly) {
                     return response;
                 }
@@ -265,28 +257,35 @@ export class NonFungibleTokenItem {
         });
     }
 
-    /**
-  * Burn non-fungible token item
-  * @param overrides options
-  */
-    burn(overrides?: any) {
+    getUpdateMetadataTransactionRequest(metadata?: string, overrides?: any): Promise<TransactionRequest> {
         if (!this.signer) {
-            errors.throwError('burn non fungible token item require signer', errors.NOT_INITIALIZED, { arg: 'signer' });
+            errors.throwError('update non fungible token item metadata require signer', errors.NOT_INITIALIZED, { arg: 'signer' });
         }
 
         return resolveProperties({ address: this.signer.getAddress() }).then(({ address }) => {
             if (!address) {
-                return errors.throwError('burn non fungible token item require signer address', errors.MISSING_ARGUMENT, { arg: 'signerAddress' });
+                return errors.throwError('update non fungible token item metadata require signer address', errors.MISSING_ARGUMENT, { arg: 'signerAddress' });
             }
 
-            let transaction = this.signer.provider.getTransactionRequest("nonFungible", "burnNonFungibleItem", {
+            let tx = this.signer.provider.getTransactionRequest("nonFungible", "updateItemMetadata", {
                 symbol: this.symbol,
-                itemID: this.itemID,
                 from: address,
+                itemID: this.itemID,
+                metadata
             });
-            transaction.fee = (overrides && overrides.fee) ? overrides.fee : this.signer.provider.getTransactionFee(undefined, undefined, { tx: transaction });
+            tx.fee = (overrides && overrides.fee) ? overrides.fee : this.signer.provider.getTransactionFee(undefined, undefined, { tx });
 
-            return this.signer.sendTransaction(transaction, overrides).then((response) => {
+            return tx;
+        });
+    }
+
+    /**
+     * Burn non-fungible token item
+     * @param overrides options
+     */
+    burn(overrides?: any): Promise<TransactionResponse | TransactionReceipt> {
+        return this.getBurnTransactionRequest(overrides).then((tx) => {
+            return this.signer.sendTransaction(tx, overrides).then((response) => {
                 if (overrides && overrides.sendOnly) {
                     return response;
                 }
@@ -302,6 +301,27 @@ export class NonFungibleTokenItem {
                     });
                 });
             });
+        });
+    }
+
+    getBurnTransactionRequest(overrides?: any): Promise<TransactionRequest> {
+        if (!this.signer) {
+            errors.throwError('burn non fungible token item require signer', errors.NOT_INITIALIZED, { arg: 'signer' });
+        }
+
+        return resolveProperties({ address: this.signer.getAddress() }).then(({ address }) => {
+            if (!address) {
+                return errors.throwError('burn non fungible token item require signer address', errors.MISSING_ARGUMENT, { arg: 'signerAddress' });
+            }
+
+            let tx = this.signer.provider.getTransactionRequest("nonFungible", "burnNonFungibleItem", {
+                symbol: this.symbol,
+                itemID: this.itemID,
+                from: address,
+            });
+            tx.fee = (overrides && overrides.fee) ? overrides.fee : this.signer.provider.getTransactionFee(undefined, undefined, { tx });
+
+            return tx;
         });
     }
 }
