@@ -287,13 +287,13 @@ export function getTransactionRequest(route: string, transactionType: string, ov
                 let params: {
                     owner: string,
                     groupAddress: string,
-                    threshold: BigNumber,
+                    threshold: number,
                     signers: any,
                     memo: string,
                 } = checkFormat({
                     owner: checkAddress,
                     groupAddress: checkAddress,
-                    threshold: checkBigNumber,
+                    threshold: checkNumber,
                     signers: checkAny,
                     memo: allowNullOrEmpty(checkString)
                 }, overrides);
