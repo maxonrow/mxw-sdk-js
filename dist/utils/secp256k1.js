@@ -27,6 +27,7 @@ function getCurve() {
 function hash(algorithm, data) {
     return crypto_1.createHash(algorithm).update(data).digest();
 }
+exports.hash = hash;
 class KeyPair {
     constructor(privateKey) {
         let keyPair = getCurve().keyFromPrivate(bytes_1.arrayify(privateKey));

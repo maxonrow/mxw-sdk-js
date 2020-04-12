@@ -50,6 +50,7 @@ const address_1 = require("./address");
 exports.getAddress = address_1.getAddress;
 exports.getHash = address_1.getHash;
 exports.deriveAddress = address_1.deriveAddress;
+exports.getMultiSigAddress = address_1.getMultiSigAddress;
 const hash_1 = require("./hash");
 exports.hashMessage = hash_1.hashMessage;
 exports.id = hash_1.id;

@@ -34,6 +34,7 @@ export declare class Wallet extends AbstractSigner {
     getHexAddress(): Promise<string>;
     getPublicKeyType(): Promise<string>;
     getCompressedPublicKey(): Promise<string>;
+    getNonce(): BigNumber;
     clearNonce(): void;
     sendTransaction(transaction: TransactionRequest, overrides?: any): Promise<TransactionResponse>;
     sign(transaction: TransactionRequest, overrides?: any): Promise<string>;

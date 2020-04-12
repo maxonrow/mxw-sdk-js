@@ -101,7 +101,7 @@ class JsonRpcProvider extends base_provider_1.BaseProvider {
                             return result;
                         }
                     }
-                    throw this.checkResponseLog(method, result, null);
+                    throw this.checkResponseLog(method, result, null, undefined, { method, params });
                 });
             case 'sendTransactionAsync':
                 return this.send('encode_and_broadcast_tx_async', [params.signedTransaction]).then((result) => {
@@ -111,7 +111,7 @@ class JsonRpcProvider extends base_provider_1.BaseProvider {
                             return result;
                         }
                     }
-                    throw this.checkResponseLog(method, result, null);
+                    throw this.checkResponseLog(method, result, null, undefined, { method, params });
                 });
             case 'getTransaction':
             case 'getTransactionReceipt':
@@ -338,6 +338,42 @@ class JsonRpcProvider extends base_provider_1.BaseProvider {
                 });
             case 'getAliasState':
                 return this.send('abci_query', ["/custom/nameservice/pending/" + params.address, "", params.blockTag, null]).then(result => {
+                    if (result && result.response) {
+                        if (result.response.value) {
+                            try {
+                                let value = utf8_1.toUtf8String(base64_1.decode(result.response.value));
+                                return JSON.parse(value);
+                            }
+                            catch (error) {
+                            }
+                        }
+                    }
+                    let error = this.checkResponseLog(method, result, null);
+                    if (error && errors.NOT_FOUND == error.code) {
+                        return null;
+                    }
+                    throw error;
+                });
+            case 'getMultiSigAccountState':
+                return this.send('abci_query', ["/custom/auth/get_multisig_acc/" + params.address, "", params.blockTag, null]).then(result => {
+                    if (result && result.response) {
+                        if (result.response.value) {
+                            try {
+                                let value = utf8_1.toUtf8String(base64_1.decode(result.response.value));
+                                return JSON.parse(value);
+                            }
+                            catch (error) {
+                            }
+                        }
+                    }
+                    let error = this.checkResponseLog(method, result, null);
+                    if (error && errors.NOT_FOUND == error.code) {
+                        return null;
+                    }
+                    throw error;
+                });
+            case 'getMultiSigPendingTx':
+                return this.send('abci_query', ["/custom/auth/get_multisig_pending_tx/" + params.address + "/" + params.txID, "", params.blockTag, null]).then(result => {
                     if (result && result.response) {
                         if (result.response.value) {
                             try {

@@ -6,6 +6,7 @@ const keccak256_1 = require("./keccak256");
 const errors = require("../errors");
 const sha2_1 = require("./sha2");
 const misc_1 = require("./misc");
+const secp256k1_1 = require("./secp256k1");
 function getChecksum(address) {
     if (typeof (address) !== 'string') {
         errors.throwError('invalid address', errors.INVALID_ARGUMENT, { arg: 'address', value: address });
@@ -100,4 +101,19 @@ function deriveAddress(from, nonce) {
     return getChecksum(value);
 }
 exports.deriveAddress = deriveAddress;
+function getMultiSigAddress(from, nonce) {
+    if (!from) {
+        throw new Error('missing from address');
+    }
+    if (!nonce) {
+        throw new Error('missing nonce');
+    }
+    let hexAddress = bytes_1.isHexString(from) ? from : secp256k1_1.computeHexAddress(from);
+    let value = sha2_1.sha256(bytes_1.concat([
+        hexAddress, bytes_1.stripZeros(bytes_1.hexlify(nonce))
+    ]));
+    let bytes = bytes_1.hexlify(secp256k1_1.hash('ripemd160', Buffer.from(value.substring(2), 'hex')));
+    return secp256k1_1.computeAddress(bytes);
+}
+exports.getMultiSigAddress = getMultiSigAddress;
 //# sourceMappingURL=address.js.map

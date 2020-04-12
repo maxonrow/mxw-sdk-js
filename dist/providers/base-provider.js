@@ -660,6 +660,28 @@ class BaseProvider extends abstract_provider_1.Provider {
             });
         });
     }
+    getMultiSigPendingTx(addressOrName, txID, blockTag) {
+        return this.ready.then(() => {
+            return properties_1.resolveProperties({ addressOrName: addressOrName, txID, blockTag: blockTag }).then(({ addressOrName, blockTag }) => {
+                return this.resolveName(addressOrName).then((address) => {
+                    let params = {
+                        address: address,
+                        txID: txID,
+                        blockTag: checkBlockTag(blockTag)
+                    };
+                    return this.perform('getMultiSigPendingTx', params).then((result) => {
+                        if (result) {
+                            result = properties_1.camelize(misc_1.checkFormat({
+                                type: misc_1.checkString,
+                                value: misc_1.checkAny
+                            }, result));
+                        }
+                        return result;
+                    });
+                });
+            });
+        });
+    }
     getAccountNumber(addressOrName, blockTag) {
         return this.ready.then(() => {
             return this.getAccountState(addressOrName, blockTag).then((result) => {

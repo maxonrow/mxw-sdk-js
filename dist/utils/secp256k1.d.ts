@@ -1,4 +1,6 @@
+/// <reference types="node" />
 import { Arrayish, Signature } from './bytes';
+export declare function hash(algorithm: string, data: string | Buffer): Buffer;
 export declare class KeyPair {
     readonly privateKey: string;
     readonly publicKey: string;

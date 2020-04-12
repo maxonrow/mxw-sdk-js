@@ -11,6 +11,7 @@ import * as nameService from './name-service';
 import * as utils from './utils';
 import * as providers from './providers';
 import * as wordlists from './wordlists';
+import * as MultiSig from './multisig';
 declare let version: any;
 declare function getDefaultProvider(network?: utils.Network | string): providers.BaseProvider;
-export { Signer, Wallet, Kyc, KycKeyComponent, KycData, KycTransaction, KycRevoke, KycRevokeTransaction, KycSignature, auth, token, nonFungibleToken, nonFungibleTokenItem, nameService, wordlists, getDefaultProvider, providers, constants, errors, utils, version, };
+export { Signer, Wallet, MultiSig, Kyc, KycKeyComponent, KycData, KycTransaction, KycRevoke, KycRevokeTransaction, KycSignature, auth, token, nonFungibleToken, nonFungibleTokenItem, nameService, wordlists, getDefaultProvider, providers, constants, errors, utils, version, };

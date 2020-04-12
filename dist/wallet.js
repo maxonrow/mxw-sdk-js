@@ -81,6 +81,9 @@ class Wallet extends abstract_signer_1.Signer {
     getCompressedPublicKey() {
         return Promise.resolve(this.compressedPublicKey);
     }
+    getNonce() {
+        return this.nonce;
+    }
     clearNonce() {
         this.nonce = undefined;
     }
@@ -121,24 +124,33 @@ class Wallet extends abstract_signer_1.Signer {
             if (!tx.value.fee) {
                 tx.value.fee = tx.fee;
             }
+            let accountNumber = tx.accountNumber;
+            let sequence = tx.nonce;
+            // Cater for MultiSig signature for internal transaction
+            if (overrides && !misc_1.isUndefinedOrNullOrEmpty(overrides.accountNumber) && !misc_1.isUndefinedOrNullOrEmpty(overrides.nonce)) {
+                accountNumber = overrides.accountNumber;
+                sequence = overrides.nonce;
+            }
+            else {
+                // Control the nonce to cater bulk transaction submission
+                if (overrides && overrides.bulkSend) {
+                    if (undefined !== this.nonce) {
+                        if (this.nonce.gte(tx.nonce)) {
+                            tx.nonce = this.nonce.add(1);
+                        }
+                    }
+                }
+                this.nonce = tx.nonce;
+                sequence = tx.nonce.toString();
+            }
             let payload = {
-                account_number: tx.accountNumber.toString() || '0',
+                account_number: accountNumber.toString() || '0',
                 chain_id: tx.chainId,
                 fee: tx.fee,
                 memo: tx.value.memo,
                 msgs: tx.value.msg,
-                sequence: '0'
+                sequence: sequence.toString() || '0'
             };
-            // Control the nonce to cater bulk transaction submission
-            if (overrides && overrides.bulkSend) {
-                if (undefined !== this.nonce) {
-                    if (this.nonce.gte(tx.nonce)) {
-                        tx.nonce = this.nonce.add(1);
-                    }
-                }
-            }
-            this.nonce = tx.nonce;
-            payload.sequence = tx.nonce.toString();
             // Convert number and big number to string
             payload = misc_1.iterate(payload, function (key, value, type) {
                 switch (type) {

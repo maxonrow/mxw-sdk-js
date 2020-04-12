@@ -167,6 +167,12 @@ class BigNumber {
         let str = _bnify(this).toString(10);
         return str;
     }
+    toJSON() {
+        return this.toString();
+    }
+    valueOf() {
+        return this.toString();
+    }
     toHexString() {
         return this._hex;
     }
