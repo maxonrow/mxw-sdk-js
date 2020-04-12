@@ -230,7 +230,7 @@ export function populateTransaction(transaction: any, provider: Provider, from: 
     checkTransaction(transaction);
 
     let tx = shallowCopy(transaction);
-    
+
     if (null == tx.fee) {
         errors.throwError("missing fee", errors.MISSING_FEES, {});
     }
@@ -323,11 +323,13 @@ export function getTransactionRequest(route: string, transactionType: string, ov
                 let params: {
                     groupAddress: string,
                     from: string,
-                    to: string
+                    to: string,
+                    memo: string
                 } = checkFormat({
                     groupAddress: checkAddress,
                     from: checkAddress,
-                    to: checkAddress
+                    to: checkAddress,
+                    memo: allowNullOrEmpty(checkString)
                 }, overrides);
 
                 transaction = {
@@ -342,7 +344,8 @@ export function getTransactionRequest(route: string, transactionType: string, ov
                                     newOwner: params.to
                                 }
                             }
-                        ]
+                        ],
+                        memo: params.memo ? params.memo : ""
                     },
                     fee: null
                 };
@@ -422,11 +425,13 @@ export function getTransactionRequest(route: string, transactionType: string, ov
                 let params: {
                     groupAddress: string,
                     txID: BigNumberish,
-                    sender: string
+                    sender: string,
+                    memo: string
                 } = checkFormat({
                     groupAddress: checkAddress,
                     txID: checkBigNumber,
-                    sender: checkAddress
+                    sender: checkAddress,
+                    memo: allowNullOrEmpty(checkString)
                 }, overrides);
 
                 transaction = {
@@ -441,7 +446,8 @@ export function getTransactionRequest(route: string, transactionType: string, ov
                                     sender: params.sender
                                 }
                             }
-                        ]
+                        ],
+                        memo: params.memo ? params.memo : ""
                     },
                     fee: null
                 };
