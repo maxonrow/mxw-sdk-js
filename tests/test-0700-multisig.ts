@@ -4,8 +4,6 @@ import { describe, it } from 'mocha';
 import { expect } from 'chai';
 import { mxw, MultiSig } from '../src.ts/index';
 import { nodeProvider } from "./env";
-import { bigNumberify } from '../src.ts/utils';
-import { smallestUnitName } from '../src.ts/utils/units';
 
 let indent = "     ";
 let silent = true;
@@ -32,7 +30,7 @@ let defaultOverrides = {
     }
 }
 
-describe('Suite: MultiSignature Wallet', function () {
+describe('Suite: MultiSig Wallet', function () {
     this.slow(slowThreshold); // define the threshold for slow indicator
 
     if (silent) { silent = nodeProvider.trace.silent; }
@@ -69,94 +67,73 @@ describe('Suite: MultiSignature Wallet', function () {
         middleware = mxw.Wallet.fromMnemonic(nodeProvider.fungibleToken.middleware).connect(providerConnection);
         expect(middleware).to.exist;
         if (!silent) console.log(indent, "Middleware:", JSON.stringify({ address: middleware.address, mnemonic: middleware.mnemonic }));
-
-        if (!silent) console.log(indent, "Fee collector:", JSON.stringify({ address: nodeProvider.fungibleToken.feeCollector }));
     });
-});
 
-
-describe('Suite: MultiSig - Create ', function () {
-    this.slow(slowThreshold); // define the threshold for slow indicator
     it("Create", function () {
+        this.slow(slowThreshold); // define the threshold for slow indicator
         let signers = [wallet.address, issuer.address, middleware.address];
 
         multiSigWalletProperties = {
-            owner: wallet.address,
             threshold: 2,
             signers: signers,
         };
 
-        return MultiSig.MultiSigWallet.create(multiSigWalletProperties, wallet, defaultOverrides).then((multiSigWalletRes) => {
-            expect(multiSigWalletRes).to.exist;
-            console.log(multiSigWalletRes);
-            multiSigWallet = multiSigWalletRes as MultiSig.MultiSigWallet;
+        return MultiSig.MultiSigWallet.create(multiSigWalletProperties, wallet, defaultOverrides).then((instance) => {
+            expect(instance).to.exist;
+            multiSigWallet = instance as MultiSig.MultiSigWallet;
+            if (!silent) console.log(indent, "Created multiSigWallet:", multiSigWallet.address);
         });
     });
 
-    it("Query", function () {
-        return MultiSig.MultiSigWallet.fromGroupAddress(multiSigWallet.groupAddress, wallet).then((res) => {
-            console.log(indent, "Created MultiSigWallet:", JSON.stringify(res.multisigAccountState));
-            multiSigWallet = res
+    it("Load from group address", function () {
+        return MultiSig.MultiSigWallet.fromGroupAddress(multiSigWallet.address, wallet).then((instance) => {
+            expect(instance).to.exist;
+            multiSigWallet = instance;
+            if (!silent) console.log(indent, "Loaded multiSigWallet:", JSON.stringify(multiSigWallet.multisigAccountState));
         });
     });
 
-    it("Multisig account Update", function () {
-
+    it("Update account", function () {
         let signers = [wallet.address, issuer.address, middleware.address];
         updateMultiSigWalletProperties = {
             owner: wallet.address,
-            groupAddress: multiSigWallet.groupAddress.toString(),
-            threshold: bigNumberify(3),
+            groupAddress: multiSigWallet.address,
+            threshold: signers.length,
             signers: signers,
         };
-        return MultiSig.MultiSigWallet.update(updateMultiSigWalletProperties, wallet).then((txReceipt) => {
-            expect(txReceipt).to.exist;
+        return MultiSig.MultiSigWallet.update(updateMultiSigWalletProperties, wallet).then((receipt) => {
+            expect(receipt).to.exist;
+            if (!silent) console.log(indent, "update.receipt:", JSON.stringify(receipt));
         });
-
     });
 
-
-    it("Transfer to group account", function () {
-        let value = mxw.utils.parseMxw("100");
+    it("Receive balance", function () {
+        let value = mxw.utils.parseMxw("10");
         let overrides = {
-            logSignaturePayload: defaultOverrides.logSignaturePayload,
-            logSignedTransaction: defaultOverrides.logSignedTransaction,
-            memo: "Hello Blockchain!"
-        }
-        return wallet.provider.getTransactionFee("bank", "bank-send", {
-            from: wallet.address,
-            to: multiSigWallet.groupAddress,
-            value,
-            memo: overrides.memo
-        }).then((fee) => {
-            overrides["fee"] = fee;
-            return wallet.transfer(multiSigWallet.groupAddress, value, overrides).then((receipt) => {
-                expect(receipt).to.exist;
-                if (!silent) console.log(indent, "transfer.receipt:", JSON.stringify(receipt));
-            });
+            memo: "Hello MultiSig!"
+        };
+        return wallet.transfer(multiSigWallet.address, value, overrides).then((receipt) => {
+            expect(receipt).to.exist;
+            if (!silent) console.log(indent, "transfer.receipt:", JSON.stringify(receipt));
+        }).then(() => {
+            return multiSigWallet.getBalance().then((balance) => {
+                expect(balance.toString()).to.eq(value.toString());
+                if (!silent) console.log(indent, "Received balance:", balance);
+            })
         });
     });
 
-    it("Multisig create Transfer", function () {
-        let transaction = providerConnection.getTransactionRequest("bank", "bank-send", {
-            from: multiSigWallet.groupAddress,
-            to: wallet.address,
-            value: mxw.utils.parseMxw("1"),
-            memo: "pipipapipu",
-            denom: smallestUnitName
-        });
-        return providerConnection.getTransactionFee(undefined, undefined, { tx: transaction }).then((fee) => {
-            transaction["fee"] = fee;
-            return multiSigWallet.sendTransaction(transaction).then((txReceipt) => {
-                expect(txReceipt).to.exist;
-                let anotherSigner = new MultiSig.MultiSigWallet(multiSigWallet.groupAddress, issuer)
-                anotherSigner.refresh();
-                return anotherSigner.sendConfirmTransaction(0).then((respond) => {
-                    expect(respond).to.exist;
-                });
-            });
+    it("Transfer balance", function () {
+        return multiSigWallet.transfer(wallet.address, mxw.utils.parseMxw("1")).then((receipt) => {
+            expect(receipt).to.exist;
+            if (!silent) console.log(indent, "transfer.receipt:", JSON.stringify(receipt));
+        }).then(() => {
+
         });
     });
 
+    it("Clean up", function () {
+        providerConnection.removeAllListeners();
+    });
 
 });
