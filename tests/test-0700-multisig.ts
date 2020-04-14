@@ -115,11 +115,13 @@ describe('Suite: MultiSig Wallet', function () {
         return wallet.transfer(multiSigWallet.address, value, overrides).then((receipt) => {
             expect(receipt).to.exist;
             if (!silent) console.log(indent, "transfer.receipt:", JSON.stringify(receipt));
-        }).then(() => {
-            return multiSigWallet.getBalance().then((balance) => {
-                expect(balance.toString()).to.eq(value.toString());
-                if (!silent) console.log(indent, "Received balance:", balance);
-            })
+        });
+    });
+
+    it("Check receive balance", function () {
+        return multiSigWallet.getBalance().then((balance) => {
+            expect(balance.gt(0)).to.eq(true);
+            if (!silent) console.log(indent, "Received balance:", balance);
         });
     });
 
