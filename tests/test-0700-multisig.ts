@@ -4,6 +4,7 @@ import { describe, it } from 'mocha';
 import { expect } from 'chai';
 import { mxw, MultiSig } from '../src.ts/index';
 import { nodeProvider } from "./env";
+import { bigNumberify, randomBytes, hexlify } from '../src.ts/utils';
 
 let indent = "     ";
 let silent = true;
@@ -129,8 +130,29 @@ describe('Suite: MultiSig Wallet', function () {
         return multiSigWallet.transfer(wallet.address, mxw.utils.parseMxw("1")).then((receipt) => {
             expect(receipt).to.exist;
             if (!silent) console.log(indent, "transfer.receipt:", JSON.stringify(receipt));
-        }).then(() => {
+        });
+    });
 
+    it("Create transaction - fungible token", function () {
+        let symbol = "FIX" + hexlify(randomBytes(4)).substring(2);
+        let properties = {
+            name: "MY " + symbol,
+            symbol: symbol,
+            decimals: 18,
+            fixedSupply: true,
+            maxSupply: bigNumberify("100000000000000000000000000"),
+            fee: {
+                to: nodeProvider.fungibleToken.feeCollector,
+                value: bigNumberify("1")
+            },
+            metadata: ""
+        };
+
+        return mxw.token.FungibleToken.getCreateTransactionRequest(properties, multiSigWallet).then((transaction) => {
+            return multiSigWallet.createTransaction(transaction).then((receipt) => {
+                expect(receipt).to.exist;
+                if (!silent) console.log(indent, "createFungibleToken.receipt:", JSON.stringify(receipt));
+            });
         });
     });
 
