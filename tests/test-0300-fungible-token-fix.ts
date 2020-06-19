@@ -88,7 +88,7 @@ if ("" != nodeProvider.fungibleToken.middleware) {
                     maxSupply: bigNumberify("100000000000000000000000000"),
                     fee: {
                         to: nodeProvider.fungibleToken.feeCollector,
-                        value: bigNumberify("1")
+                        value: bigNumberify("0")
                     },
                     metadata: ""
                 };
