@@ -547,9 +547,6 @@ class FungibleToken {
                     value: misc_1.checkBigNumber
                 }
             }, properties);
-            if (utils_1.bigNumberify(fungibleToken.fee.value).lte(0)) {
-                errors.throwError('create fungible token transaction require non-zero application fee', errors.MISSING_FEES, { value: fungibleToken });
-            }
             let tx = signer.provider.getTransactionRequest("token", "token-createFungibleToken", {
                 appFeeTo: fungibleToken.fee.to,
                 appFeeValue: fungibleToken.fee.value.toString(),
