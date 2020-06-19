@@ -49,7 +49,7 @@ Create a new file name `flight-ticket.ts` in folder [`/flight-ticket-tutorial/sr
 
 **2. Create NFT**
 *****************
-First, we need to create a NFT. In this case, the airline are responsible to create the NTF.
+First, we need to create a NFT. In this case, the airline are responsible to create the NFT.
 
 .. code-block:: javascript
 
@@ -74,7 +74,7 @@ First, we need to create a NFT. In this case, the airline are responsible to cre
 
 **3. Query NFT**
 ****************
-After the NTF is created we can use ``fromSymbol()`` method to query the NTF, and get its details.
+After the NFT is created we can use ``fromSymbol()`` method to query the NFT, and get its details.
 
 .. code-block:: javascript
 
@@ -86,7 +86,7 @@ After the NTF is created we can use ``fromSymbol()`` method to query the NTF, an
 
 **3. Authorise NFT**
 ********************
-Before the NTF can be use inside Maxonrow blockchain, it have to be authorized by three parties
+Before the NFT can be use inside Maxonrow blockchain, it have to be authorized by three parties
 (provider, issuer and middleware). 
 
 .. code-block:: javascript
@@ -137,7 +137,7 @@ After the NFT is authorized, the owner(airline) can start to mint items (print o
 
 **5. Transfer NFT item**
 ************************
-After the item is created, it will be owned by the NTF owner. So we have to transfer it to the passenger's wallet.
+After the item is created, it will be owned by the NFT owner. So we have to transfer it to the passenger's wallet.
 
 .. code-block:: javascript
 
@@ -162,7 +162,7 @@ has been on the plane.
 
 **7. Overwrite the metadata**
 *****************************
-As we mentioned earlier, both metadata of the NTF and item can be change by using ``updateMetadata()`` method.
+As we mentioned earlier, both metadata of the NFT and item can be change by using ``updateMetadata()`` method.
 For this case we will overwrite the item metadata. 
 
 .. code-block:: javascript
@@ -346,7 +346,7 @@ load an instance of the wallet that we just created.
    }
 
    
-If we want to check on the course details, we can use the symbol to query the NTF.
+If we want to check on the course details, we can use the symbol to query the NFT.
    
 .. code-block:: javascript
 
