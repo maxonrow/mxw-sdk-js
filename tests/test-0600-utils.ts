@@ -66,6 +66,14 @@ describe('Suite: Utils', function () {
         expect(converted).to.equal("12345678.9");
     });
 
+    it("Validate address", function () {
+        let address = "mxw15f3aw83y2hgzzs6hk6utputr2xchwe5x745l9s";
+
+        let hexAddress = utils.computeHexAddress(address);
+        expect(hexAddress).to.be.equal("0xa263D71e2455d0214357B6b8B0F16351b1776686");
+        if (!silent) console.log(indent, "Hex Address:", hexAddress);
+    });
+
     it("Normalize bech32 address", function () {
         let address = "mxw15f3aw83y2hgzzs6hk6utputr2xchwe5x745l9s";
         let normalized = utils.getAddress(address);
