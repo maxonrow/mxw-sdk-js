@@ -11,7 +11,7 @@ Getting Started
 Setup
 #####
 
-How to setup environment & create project
+Learn how to set up environment & create project.
 
 Installing in Node.js
 ---------------------
@@ -67,8 +67,8 @@ Including in Web Applications
 """""""""""""""""""""""""""""
 
 For security purposes, it is usually best to place a **copy** of `this script`_ on
-the application's server, but for a quick prototype using the Maxonrow CDN (content
-distribution network) should suffice.
+the application's server; but using the Maxonrow content distribution network (CDN) 
+should suffice for a quick prototype.
 
 .. code-block:: html
     :caption: *HTML*

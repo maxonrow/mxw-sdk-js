@@ -11,20 +11,20 @@ If there is a simple recipe you would like to add, please send suggestions to su
 
 **Learning Objectives:**
 
-This tutorial will show you how to create a list of sample methods used in Online Learning application. We'll use TypeScript as the example language. This tutorial assumes some basic understanding of blockchain.
+This tutorial will show you how to create a list of sample methods used in Online Learning application. TypeScript will be usedas the example 
+programming language. This tutorial assumes some basic understanding of blockchain.
 
 -----
 
-**Pre-requisites:**
+**Prerequisites:**
 
-You will need the following installed in order to proceed:
+Before proceeding, make sure you have installed:
 
-| * `VS Code`_ version 1.42 or greater
-| * `Node`_ v10.x or greater 
-| * `npm`_ v6.x or greater (will be installed along node)
+| * `VS Code`_ version 1.42 or newer
+| * `Node.js`_ v10.x or newer 
+| * `npm`_ v6.x or newer (will be installed alongside node)
 
 You can check your installed versions by running the following commands from a terminal:
-
 | ``node --version``
 | ``npm --version``
 
@@ -34,26 +34,26 @@ Flight Ticketing System Tutorial
 ################################
 
 Introduction:
-   This tutorial covers various functionalities in a Flight Ticketing system. 
+   This tutorial shows various basic usage of mxw-sdk-js in creating a flight ticketing system. 
 
 **1. Initial setup**
 ********************
 
-To start with, we'll setup project directory like the following:
+To begin, let's set up project directory such as:
 
 |  /`flight-ticket-tutorial`
 |     /`src`
 |     /`package.json`
 
-Create a new file name `flight-ticket.ts` in folder [`/flight-ticket-tutorial/src/`].
+Create a new file name 'flight-ticket.ts' in folder [`/flight-ticket-tutorial/src/`].
 
 **2. Create NFT**
 *****************
-First, we need to create a NFT. In this case, the airline are responsible to create the NFT.
+Firstly, we need to create an NFT. In this case, the airline is responsible for creating the NFT.
 
 .. code-block:: javascript
 
-   //set nft properties
+   //set NFT properties
    let ntfProperties = {
       name: "my2sgFlightTicket05",
       symbol: "my2sg05",
@@ -65,7 +65,7 @@ First, we need to create a NFT. In this case, the airline are responsible to cre
       metadata: "nothing"
    };
 
-   //create nft token using properties above
+   //create NFT token using properties shown above
    token.NonFungibleToken.create(ntfProperties,issuer).then((token)=>{
       console.log(JSON.stringify(token))
    });
@@ -504,6 +504,6 @@ For complete source code, please download from here `GitHub`_.
 -----
 
 .. _VS Code: https://code.visualstudio.com/
-.. _Node: https://nodejs.org/en/download/
+.. _Node.js: https://nodejs.org/en/download/
 .. _npm: https://nodejs.org/en/download/
 .. _GitHub: https://github.com/GeokTuanTeh/online-learning

@@ -12,7 +12,7 @@ Transactions
 All properties for transaction are optional.
 
 .. code-block:: javascript
-    :caption: *A transaction request for KYC Whitelist Transaction*
+    :caption: *a KYC whitelist transaction request*
 
     {
     "type": "cosmos-sdk/StdTx",
@@ -84,19 +84,19 @@ All properties for transaction are optional.
 Transaction Requests
 ####################
 
-In order to excecute a transaction, a requests must be send. A Transaction Requests will contain following infomation:-
+In order to execute a transaction, a request must be sent. A transaction requests will contain following information:
 
 * Transaction fee
 
 * Transaction memo
-    - Transaction Type(what kind of transaction is involve ex.transfer mxw, send message etc.)
-    - Transaction data or variables involve
+    - Transaction type (type of transaction is involved [e.g., transfer MXW, send message, etc.])
+    - Transaction data or variables involved
 
 * Transaction signature (done by the requester)
 
 Any property which accepts a number may also be specified as a :ref:`BigNumber <bignumber>`
 or :ref:`hex string <hexstring>`. Any property may also be given as a :ref:`Promise <promise>`
-which resolves to the expected type.
+which resolves to the expected transaction type.
 
     .. code-block:: javascript
 
@@ -156,8 +156,8 @@ which resolves to the expected type.
 Transaction Receipts
 ####################
 
-| After every transaction, a receipt will be generated it contains every infomation regarding the transaction.
-| Transaction hash and block number is given, to check the transaction on blockchain.
+| After every transaction, a receipt that contains all every information regarding the transaction will be generated.
+| Transaction hash and block number are givenn to check the transaction in blockchain.
 
 .. code-block:: javascript
 
@@ -168,11 +168,11 @@ Transaction Receipts
         // The block this transaction was validated to
         blockNumber: 350476,    // the block height
         nonce: 265,             // the transaction sequence
-        index: 0,               // the transaction index always set 0 in receipt
+        index: 0,               // the transaction index is always set to "0" in receipt
         
         // Transaction status
-        status: 1,              // 1 indicated successful, 0 indicated failure during execution
-        confirmations: 2        // the number of block from latest block
+        status: 1,              // "1" indicates success, "0" indicates failure during execution
+        confirmations: 2        // the number of block from the latest block
 
         result: {
             events: [
@@ -180,8 +180,8 @@ Transaction Receipts
                     // The transaction event was emitted to
                     address: "mxw1x7tp9tt7mu0jm6qdmljgntvzzp53lrtndr7h8x",  // the event producer
                     event: {
-                        // the event hash for first 20 bytes SHA256 of event identifier
-                        // e.g: SHA256 of Transferred(string,string,bignumber)
+                        // the event hash for the first 20 bytes SHA-256 of event identifier
+                        // e.g., SHA-256 of transferred(string, string, bignumber)
                         hash: "0x2cadcfb0c336769d503d557b26fcf1e91819e7e5",
                         // The parameter of this event
                         params: [
@@ -189,7 +189,7 @@ Transaction Receipts
                             "mxw1j4yh2gfumy8d327n0uvztg9075fjzd59vxf9ae",
                             "100000000000000000000000"
                         ],
-                        transactionIndex: 0,    // the transaction index always set 0 in receipt
+                        transactionIndex: 0,    // the transaction index is always set to "0" in receipt
                         eventIndex: 0           // the event index of this transaction
                     }
                 }
@@ -261,7 +261,7 @@ Block Responses
         blockNumber: 221950,
         // The block timestamp
         blockTime: "2019-08-21T11:11:11.674244178Z",
-        // The block proposer address
+        // The block proposer's address
         proposerAddress: "mxwvaloper1kzzum9s468h2xe9sgasvyqheth4qk3sjh8l8a3",
         // The total committed transactions
         totalTransactions: 1234,
@@ -282,8 +282,8 @@ Block Responses
 
                             // The transaction event was emitted to
                             event: {
-                                // the event hash for first 20 bytes SHA256 of event identifier
-                                // e.g: SHA256 of Transferred(string,string,bignumber)
+                                // the event hash for the first 20 bytes SHA-256 of event identifier
+                                // e.g., SHA-256 of transferred(string, string, bignumber)
                                 hash: "0x2cadcfb0c336769d503d557b26fcf1e91819e7e5",
 
                                 // The parameter of this event
@@ -315,7 +315,7 @@ Block Responses
 
 .. _kyc-data:
 .. code-block:: javascript
-    :caption: *the properties for kyc data*
+    :caption: *the properties of KYC data*
 
     {
         kyc: {
@@ -334,7 +334,7 @@ Block Responses
 
 .. _kyc-transaction:
 .. code-block:: javascript
-    :caption: *the properties for kyc transaction*
+    :caption: *the properties of KYC transaction*
 
     {
         payload: KycData,
@@ -354,7 +354,7 @@ Block Responses
 
 .. _kyc-status-transaction:
 .. code-block:: javascript
-    :caption: *the properties for kyc status transaction*
+    :caption: *the properties of KYC transaction status*
 
     {
         kyc: {
