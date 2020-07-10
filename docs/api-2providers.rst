@@ -6,7 +6,7 @@
 Network Provider
 ****************
 
-A network provider extracts a connection to the blockchain, for issuing queries
+A network provider is an abstracts connection to the blockchain, for issuing queries
 and sending signed state-changing transactions.
 
 The *JsonRpcProvider* allows you to connect to blockchain nodes that you
@@ -75,7 +75,7 @@ new :sup:`mxw . providers` . JsonRpcProvider( [ urlOrInfo :sup:`= "http://localh
 
 
 .. code-block:: javascript
-    :caption: *connect to private, trusted node*
+    :caption: *connect to private trusted node*
 
     let provider = new mxw.providers.JsonRpcProvider({
         url: "https://x.x.x.x",
@@ -84,7 +84,7 @@ new :sup:`mxw . providers` . JsonRpcProvider( [ urlOrInfo :sup:`= "http://localh
 
 
 .. code-block:: javascript
-    :caption: *connect to private, customized node*
+    :caption: *connect to private customized node*
 
     let provider = new mxw.providers.JsonRpcProvider({
         url: "https://x.x.x.x",
