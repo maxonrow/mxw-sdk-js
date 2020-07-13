@@ -67,11 +67,19 @@ describe('Suite: Utils', function () {
     });
 
     it("Validate address", function () {
-        let address = "mxw15f3aw83y2hgzzs6hk6utputr2xchwe5x745l9s";
+        let address = "mxw1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqgcpfl3";
 
         let hexAddress = utils.computeHexAddress(address);
-        expect(hexAddress).to.be.equal("0xa263D71e2455d0214357B6b8B0F16351b1776686");
+        expect(hexAddress).to.be.equal("0x0000000000000000000000000000000000000000");
         if (!silent) console.log(indent, "Hex Address:", hexAddress);
+    });
+
+    it("Convert hex address", function () {
+        let hexAddress = "0x0000000000000000000000000000000000000000";
+
+        let address = utils.computeAddress(hexAddress);
+        expect(address).to.be.equal("mxw1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqgcpfl3");
+        if (!silent) console.log(indent, "Address:", address);
     });
 
     it("Normalize bech32 address", function () {
