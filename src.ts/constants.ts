@@ -8,7 +8,7 @@ const ValOperatorAddressPrefix = 'mxwvaloper';
 const KycAddressPrefix = 'kyc';
 
 // Do we have a zero address?
-const AddressZero = 'mxw000000000000000000000000000000000000000';
+const AddressZero = 'mxw1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqgcpfl3';
 const HashZero = '0x0000000000000000000000000000000000000000000000000000000000000000';
 
 const ZeroFee = {
