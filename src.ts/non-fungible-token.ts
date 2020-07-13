@@ -452,6 +452,54 @@ export class NonFungibleToken {
     }
 
     /**
+     * Update non-fungible token endorser list
+     * @param endorsers new endorsers
+     * @param overrides options
+     */
+    updateEndorserList(endorsers: string[], overrides?: any): Promise<TransactionResponse | TransactionReceipt> {
+        return this.getUpdateEndorserListTransactionRequest(endorsers, overrides).then((tx) => {
+            return this.signer.sendTransaction(tx, overrides).then((response) => {
+                if (overrides && overrides.sendOnly) {
+                    return response;
+                }
+                let confirmations = (overrides && overrides.confirmations) ? Number(overrides.confirmations) : null;
+
+                return this.signer.provider.waitForTransaction(response.hash, confirmations).then((receipt) => {
+                    if (1 == receipt.status) {
+                        return receipt;
+                    }
+                    throw this.signer.provider.checkTransactionReceipt(receipt, errors.CALL_EXCEPTION, "update non fungible token item metadata failed", {
+                        method: "nonfungible-updateEndorserList",
+                        receipt
+                    });
+                });
+            });
+        });
+    }
+
+    getUpdateEndorserListTransactionRequest(endorsers: string[], overrides?: any): Promise<TransactionRequest> {
+        if (!this.signer) {
+            errors.throwError('update non fungible token item metadata require signer', errors.NOT_INITIALIZED, { arg: 'signer' });
+        }
+
+        return resolveProperties({ address: this.signer.getAddress() }).then(({ address }) => {
+            if (!address) {
+                return errors.throwError('update non fungible token endorser list require signer address', errors.MISSING_ARGUMENT, { arg: 'signerAddress' });
+            }
+
+            let tx = this.signer.provider.getTransactionRequest("nonFungible", "updateNFTEndorserList", {
+                symbol: this.symbol,
+                from: address,
+                endorsers: endorsers
+            });
+            tx.fee = (overrides && overrides.fee) ? overrides.fee : this.signer.provider.getTransactionFee(undefined, undefined, { tx });
+
+            return tx;
+        });
+    }
+
+
+    /**
     * Mint NFT item
     * @param toAddressOrName receiver address
     * @param item item to mint
