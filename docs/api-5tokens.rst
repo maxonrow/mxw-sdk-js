@@ -10,27 +10,27 @@ Fungible Token
 
 Creating Instances
 ##################
-Create fungible token required approval from authorities.
+Creating fungible token requires approval from authorities.
 
 :sup:`FungibleToken` . create ( properties, signerOrProvider ) |nbsp| `=> Promise<FungibleToken>`
-    Creates a new instance reference from *signerOrProvider* and send fungible token creation transaction to network
+    Creates a new instance reference from *signerOrProvider*, then sends fungible token creation transaction to the network
     and returns a :ref:`Promise <promise>` that resolves to a FungibleToken instance.
 
     The valid fungible token properties are:
 
-        - **name :** *string* name for the token
-        - **symbol :** *string* symbol for the token
-        - **decimals :** ref:`*BigNumber* <bignumber>` the number of decimals for balance
-        - **fixedSupply :** *bool* the supply mechanisms type (``true``: fixed, ``false``: dynamic)
-        - **maxSupply :** ref:`*BigNumber* <bignumber>` the maximum supply, set to 0 for unlimited supply (only applied to dynamic supply type)
-        - **fee :** *int* application fee
-        - **owner :** the owner of the token (default to wallet creator)
-        - **metadata :** *string* remarks (optional)
+        - **name:** *string* name for the token
+        - **symbol:** *string* symbol for the token
+        - **decimals:** ref:`*BigNumber* <bignumber>` the number of decimals for balance
+        - **fixedSupply:** *bool* the supply mechanisms type (``true``: fixed, ``false``: dynamic)
+        - **maxSupply:** ref:`*BigNumber* <bignumber>` the maximum supply, set to 0 for unlimited supply (only applicable to dynamic supply type)
+        - **fee:** *int* application fee
+        - **owner:** the owner of the token (default to wallet creator)
+        - **metadata:** *string* remarks (optional)
 
-    .. note:: name and symbol should be unique
+    .. note:: name and symbol should be unique.
 
 .. code-block:: javascript
-    :caption: Create Fungible Token
+    :caption: create fungible token
 
     let provider = new mxw.Wallet(0x00000000000000000000000000000000000000000000000070726f7669646572);
     let fungibleTokenProperties = {
@@ -43,7 +43,7 @@ Create fungible token required approval from authorities.
             to: "address",
             value: bigNumberify("1")
         },
-        metadata: ["Wallet able to manage their own metadata"]
+        metadata: ["Wallet is able to manage their own metadata"]
     };
 
     var FungibleToken = new FungibleToken("symbol", provider);
@@ -53,11 +53,11 @@ Create fungible token required approval from authorities.
 
 
 :sup:`FungibleToken` . fromSymbol ( symbol, signerOrProvider ) |nbsp| `=> Promise<FungibleToken>`
-    Query fungible token by symbol from network and returns a :ref:`Promise <promise>` that 
+    Queries fungible token by symbol from network and returns a :ref:`Promise <promise>` that 
     resolves to a FungibleToken instance.
 
 .. code-block:: javascript
-    :caption: Check on token state
+    :caption: check token state
 
         mxw.token.FungibleToken.fromSymbol("symbol","issuer address").then((token)=>{
             console.log(JSON.stringify(token));
@@ -70,41 +70,41 @@ Prototype
 
 :sup:`prototype` . state |nbsp| `=> TokenState`
 
-    | (Read Only)
-    | The valid token state are:
+    | (Read-only)
+    | The valid token states are:
 
-        - **type** --- the token type (fungible, or non-fungible)
-        - **name** --- the unique token name
-        - **symbol** --- the unique token symbol
-        - **decimals** --- the number of decimals for balance
-        - **fixedSupply** --- the supply mechanisms type (``true``: fixed, ``false``: dynamic)
-        - **totalSupply** --- the total current supply for the token
-        - **maxSupply** --- the maximum supply for the token
-        - **approved** --- the approval status
-        - **frozen** --- the frozen status
-        - **owner** --- the token owner address
-        - **metadata** --- optional
-        - **burnable** --- the token balance allow to be burn or not. This will be always true for dynamic supply token.
+        - **type** — token type (fungible or non-fungible)
+        - **name** — unique token name
+        - **symbol** — unique token symbol
+        - **decimals** — number of decimals for balance
+        - **fixedSupply** — supply mechanism types (``true``: fixed, ``false``: dynamic)
+        - **totalSupply** — total current supply for the token
+        - **maxSupply** — maximum supply for the token
+        - **approved** — approval status
+        - **frozen** — frozen status
+        - **owner** — token owner's address
+        - **metadata** — optional
+        - **burnable** — whether the token balance can be burned, this will be always true for token with dynamic supply
 
 :sup:`prototype` . getBalance ( ) |nbsp| `=> Promise<BigNumber>`
     Returns a :ref:`Promise <promise>` that resolves to the fungible token balance
-    (as a :ref:`BigNumber <bignumber>`) of the wallet. Be aware of the number of decimals applied for the token.
-    The balance can be convert to a human readable format by :ref:`formatUnits <formatUnits>`,
+    (as a :ref:`BigNumber <bignumber>`) of the wallet. Be aware of the number of decimals applied to the token.
+    The balance can be converted to a human-readable format by :ref:`formatUnits <formatUnits>`,
     versa :ref:`parseUnits <parseUnits>`.
 
 :sup:`prototype` . transfer ( :ref:`AddressOrName <addressOrName>`, value ) |nbsp| `=> Promise<TransactionReceipt>`
     Sends the *transfer fungible token transaction* to the network and returns a :ref:`Promise <promise>` that resolves to a
     :ref:`Transaction Receipt <transaction-receipt>`.
 
-    The :ref:`AddressOrName <addressOrName>` can be set to recipient alias or wallet address. The ``value`` is the number of *fungible token*
-    (as a :ref:`BigNumber <bignumber>`) that transfers to recipient. Be aware of the number of decimals applied for the token.
+    The :ref:`AddressOrName <addressOrName>` can be set to recipient's alias or wallet address. The ``value`` is the number of *fungible token*
+    (as a :ref:`BigNumber <bignumber>`) that is being transferred to recipient. Be aware of the number of decimals applied to the token.
 
 :sup:`prototype` . mint ( :ref:`AddressOrName <addressOrName>`, value ) |nbsp| `=> Promise<TransactionReceipt>`
     Sends the *mint fungible token transaction* to the network and returns a :ref:`Promise <promise>` that resolves to a
     :ref:`Transaction Receipt <transaction-receipt>`.
 
-    The :ref:`AddressOrName <addressOrName>` can be set to recipient alias or wallet address. The ``value`` is the number of *fungible token*
-    (as a :ref:`BigNumber <bignumber>`) that mint to recipient. Be aware of the number of decimals applied for the token.
+    The :ref:`AddressOrName <addressOrName>` can be set to recipient's alias or wallet address. The ``value`` is the number of *fungible token*
+    (as a :ref:`BigNumber <bignumber>`) that is being minedted to recipient. Be aware of the number of decimals applied to the token.
 
 .. note:: Only fungible token owner is allowed to sign ``mint`` transaction.
 
@@ -113,8 +113,8 @@ Prototype
     Sends the *burn fungible token transaction* to the network and returns a :ref:`Promise <promise>` that resolves to a
     :ref:`Transaction Receipt <transaction-receipt>`.
 
-    The ``value`` is the number of *fungible token* (as a :ref:`BigNumber <bignumber>`) that to be burned.
-    Be aware of the number of decimals applied for the token.
+    The ``value`` is the number of *fungible token* (as a :ref:`BigNumber <bignumber>`) to be burned.
+    Be aware of the number of decimals applied to the token.
 
 .. code-block:: javascript
     :caption: *burn a fungible token*
@@ -128,7 +128,7 @@ Prototype
     Sends the *freeze fungible token transaction* to the network and returns a :ref:`Promise <promise>` that resolves to a
     :ref:`Transaction Receipt <transaction-receipt>`.
 
-    The :ref:`AddressOrName <addressOrName>` can be set to target holder alias or wallet address that to be freeze.
+    The :ref:`AddressOrName <addressOrName>` can be set to target token holder's alias or wallet address of which is to be frozen.
 
 .. note:: Only fungible token middleware is allowed to sign ``freeze`` transaction.
 
@@ -151,7 +151,7 @@ Prototype
     Sends the *unfreeze fungible token transaction* to the network and returns a :ref:`Promise <promise>` that resolves to a
     :ref:`Transaction Receipt <transaction-receipt>`.
 
-    The :ref:`AddressOrName <addressOrName>` can be set to target holder alias or wallet address that to be unfreeze.
+    The :ref:`AddressOrName <addressOrName>` can be set to target token holder's alias or wallet address of which is to be unfrozen.
 
 .. note:: Only fungible token middleware is allowed to sign ``unfreeze`` transaction.
 

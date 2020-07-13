@@ -5,15 +5,15 @@ Utilities
 *********
 
 The utility functions provide a large assortment of common utility functions
-required to write dapps, process user input and format data.
+required to write dapps, process user input, and format data.
 
 -----
 
 Addresses
 #########
 
-Wallet address is using the bech32 format (`BIP-173`_). There are several formats
-available to represent wallet addresses and various ways they are determined.
+Wallet address is uses Bech32 format (`BIP-173`_). There are several formats
+available to represent wallet addresses and they can be determined in various ways.
 
 .. _utils-get-address:
 
@@ -31,7 +31,7 @@ available to represent wallet addresses and various ways they are determined.
     Convert the hash to checksum hex-format.
 
 .. code-block:: javascript
-    :caption: *convert between address formats*
+    :caption: *convert to address formats*
 
     let address = "mxw1x7tp9tt7mu0jm6qdmljgntvzzp53lrtndr7h8x";
 
@@ -56,11 +56,11 @@ available to represent wallet addresses and various ways they are determined.
 Arrayish
 ########
 
-An arrayish object is used to describe binary data and has the following conditions met:
+An arrayish object is used to describe binary data and has met the following conditions met:
 
     - has a *length* property
     - has a value for each index from 0 up to (but excluding) *length*
-    - has a valid byte for each value; a byte is an integer in the range [0, 255]
+    - has a valid byte for each value; a byte is an integer in the range of 0 to 255
     - is **not** a string
 
 **Examples:** ``Buffer``, ``[ 1, 2, 3 ]``, ``Uint8Array``
@@ -72,10 +72,10 @@ An arrayish object is used to describe binary data and has the following conditi
     Returns a Uint8Array of a hex string, BigNumber or of an `Arrayish`_ object.
 
 :sup:`utils` . concat ( arrayOfHexStringsAndArrayish ) |nbsp| `=> Uint8Array`
-    Return a Uint8Array of all *arrayOfHexStringsAndArrayish* concatenated.
+    Returns a Uint8Array of all *arrayOfHexStringsAndArrayish* concatenated.
 
 :sup:`utils` . padZeros ( typedUint8Array, length ) |nbsp| `=> Uint8Array`
-    Return a Uint8Array of *typedUint8Array* with zeros prepended to *length* bytes.
+    Returns a Uint8Array of *typedUint8Array* with zeros prepended to *length* bytes.
 
 :sup:`utils` . stripZeros ( hexStringOrArrayish ) |nbsp| `=> Uint8Array`
     Returns a Uint8Array with all leading zero **bytes** striped.
@@ -87,65 +87,65 @@ An arrayish object is used to describe binary data and has the following conditi
 Big Numbers
 ###########
 
-A BigNumber is an immutable object which allow accurate math operations
+A BigNumber is an immutable object which allows accurate math operations
 on values larger than :ref:`JavaScript can accurately handle <ieee754>`
-can safely handle. Also see: :ref:`Constants <constants>`
+to be safely handled. See also: :ref:`Constants <constants>`
 
 :sup:`prototype` . add ( otherValue ) |nbsp| `=> BigNumber`
-    Return a new BigNumber of this plus *otherValue*.
+    Returns a new BigNumber of this plus *otherValue*.
 
 :sup:`prototype` . sub ( otherValue ) |nbsp| `=> BigNumber`
-    Return a new BigNumber of this minus *otherValue*.
+    Returns a new BigNumber of this minus *otherValue*.
 
 :sup:`prototype` . mul ( otherValue ) |nbsp| `=> BigNumber`
-    Return a new BigNumber of this times *otherValue*.
+    Returns a new BigNumber of this times *otherValue*.
 
 :sup:`prototype` . div ( otherValue ) |nbsp| `=> BigNumber`
-    Return a new BigNumber of this divided by *otherValue*.
+    Returns a new BigNumber of this divided by *otherValue*.
 
 :sup:`prototype` . mod ( otherValue ) |nbsp| `=> BigNumber`
-    Return a new BigNumber of this modulo *otherValue*.
+    Returns a new BigNumber of this modulo *otherValue*.
 
 :sup:`prototype` . maskn ( bits ) |nbsp| `=> BigNumber`
-    Return a new BigNumber with the number of *bits* masked.
+    Returns a new BigNumber with the number of *bits* masked.
 
 :sup:`prototype` . eq ( otherValue ) |nbsp| `=> boolean`
-    Return true if this is equal to *otherValue*.
+    Returns true if this is equal to *otherValue*.
 
 :sup:`prototype` . lt ( otherValue ) |nbsp| `=> boolean`
-    Return true if this is less than *otherValue*.
+    Returns true if this is less than *otherValue*.
 
 :sup:`prototype` . lte ( otherValue ) |nbsp| `=> boolean`
-    Return true if this is less or equal to *otherValue*.
+    Returns true if this is less than or equal to *otherValue*.
 
 :sup:`prototype` . gt ( otherValue ) |nbsp| `=> boolean`
-    Return true if this is greater than *otherValue*.
+    Returns true if this is greater than *otherValue*.
 
 :sup:`prototype` . gte ( otherValue ) |nbsp| `=> boolean`
-    Return true if this is greater than or equal to *otherValue*.
+    Returns true if this is greater than or equal to *otherValue*.
 
 :sup:`prototype` . isZero ( ) |nbsp| `=> boolean`
-    Return true if this is equal to zero.
+    Returns true if this is equal to zero.
 
 :sup:`prototype` . toNumber ( ) |nbsp| `=> number`
-    Return a JavaScript number of the value.
+    Returns a JavaScript number of the value.
 
     An error is thrown if the value is outside the safe range for JavaScript
     IEEE 754 64-bit floating point numbers (over 53 bits of mantissa).
 
 :sup:`prototype` . toString () |nbsp| `=> string`
-    Return a decimal string representation.
+    Returns a decimal string representation.
 
 :sup:`prototype` . toHexString ( ) |nbsp| `=> hex`
-    Return a hexstring representation of the value.
+    Returns a hex string representation of the value.
 
 
 Creating Instances
 ******************
 
 :sup:`utils` . bigNumberify ( value ) |nbsp| :sup:`=> BigNumber`
-    Returns a BigNumber instance of *value*. The *value* may be anything that can
-    reliably be converted into a BigNumber:
+    Returns a BigNumber instance of *value*. The *value* may be anything that can be
+    reliably converted into a BigNumber:
 
     ============================ ======================= =================================
     Type                         Examples                Notes
@@ -168,7 +168,7 @@ Creating Instances
     // Final value: 37037036703703703670000000
 
     console.log("Number: " + finalValue.toNumber());
-    // throws an Error, the value is too large for JavaScript to handle safely
+    // throws an error, the value is too large for JavaScript to handle safely
 
 -----
 
@@ -245,16 +245,18 @@ Elliptic Curve
 :sup:`utils` . computeAddress ( publicOrPrivateKey ) |nbsp| `=> Address`
     Computes the address given a public key or private key.
 
+:sup:`utils` . computeHexAddress ( address ) |nbsp| `=> Address`
+    Convert the supported address-format to checksum hex-format.
+
+.. _utils-get-hash:
+
 :sup:`utils` . computePublicKey ( publicOrPrivateKey [ , compressed :sup:`= false` ] ) |nbsp| `=> hex`
-    Compute the public key for *publicOrPrivateKey*, optionally *compressed*. If
+    Computes the public key for *publicOrPrivateKey*, optionally *compressed*. If
     *publicOrPrivateKey* is a public key, it may be either compressed or uncompressed.
 
 :sup:`utils` . recoverAddress ( digest , signature [ , recoveryParam ] ) |nbsp| `=> Address`
     Returns the address by using ecrecover with the *digest* for the
     *signature*.
-
-:sup:`utils` . recoverPublicKey ( digest , signature [ , recoveryParam ] ) |nbsp| `=> hex`
-    Returns the public key by using ecrecover with the *digest* for the *signature*.
 
 :sup:`utils` . recoverPublicKey ( digest , signature [ , recoveryParam ] ) |nbsp| `=> hex`
     Returns the public key by using ecrecover with the *digest* for the *signature*.
@@ -283,7 +285,7 @@ Hash Functions
 **************
 
 :sup:`utils` . sha256 ( hexStringOrArrayish ) |nbsp| `=> hex`
-    Compute the SHA2-256 cryptographic hash of a value, returned as a hex string.
+    Computes the SHA2-256 cryptographic hash of a value, returned as a hex string.
 
 .. code-block:: javascript
     :caption: *hashing binary data*
@@ -299,13 +301,13 @@ Hash Function Helpers
 *********************
 
 :sup:`utils` . hashMessage ( stringOrArrayish ) |nbsp| `=> hex`
-    Compute the SHA2-256 value by converting the message to bytes (as necessary).
+    Computes the SHA2-256 value by converting the message to bytes (as necessary).
 
 :sup:`utils` . id ( utf8String ) |nbsp| `=> hex`
-    Compute the SHA2-256 cryptographic hash of a UTF-8 string, returned as a hex string.
+    Computes the SHA2-256 cryptographic hash of a UTF-8 string, returned as a hex string.
 
 .. code-block:: javascript
-    :caption: *hashing utf-8 strings*
+    :caption: *hashing UTF-8 strings*
 
     // Convert the string to binary data
     let message = "Hello Blockchain!";
@@ -323,7 +325,7 @@ Key Derivation
 .. _pbkdf2:
 
 :sup:`utils` . pbkdf2 ( password , salt , iterations , keylen , hashAlgorithm )
-    Return the pbkdf2 derived key from *password* and *salt* with *iterations* of
+    Returns the PBKDF2-derived key from *password* and *salt* with *iterations* of
     *length* using the *hashAlgorithm*. The supported hash algorithms are ``sha256``
     and ``sha512``.
 
@@ -331,7 +333,7 @@ Random
 ******
 
 :sup:`utils` . randomBytes ( length ) |nbsp| `=> Uint8Array`
-    Return a Uint8Array of cryptographically secure random bytes
+    Returns a Uint8Array of cryptographically secure random bytes.
 
 .. code-block:: javascript
     :caption: *generate random bytes*
@@ -352,39 +354,39 @@ Random
     // BigNumber { _hex: 0x5de9cfc233211c316be4a1eb0fd6d9f8244386a704681310a8f59a4b7cebe2a5 }
 
 
-Mxw Strings and Cin
+MXW Strings and Cin
 ###################
 
 .. _parseMxw:
 
 :sup:`utils` . parseMxw ( mxwString ) |nbsp| `=> BigNumber`
-    Parse the *mxwString* representation of mxw into a BigNumber instance
+    Parses the *mxwString* representation of MXW into a BigNumber instance
     of the amount of cin.
 
 .. _formatMxw:
 
 :sup:`utils` . formatMxw ( cin ) |nbsp| `=> string`
-    Format an amount of *cin* into a decimal string representing the amount of mxw.
+    Formats an amount of *cin* into a decimal string representing the amount of MXW.
     The output will always include at least one whole number and at least one decimal
     place, otherwise leading and trailing 0's will be trimmed.
 
 .. _parseUnits:
 
 :sup:`utils` . parseUnits ( valueString , decimalsOrUnitName ) |nbsp| `=> BigNumber`
-    Parse the *valueString* representation of units into a BigNumber.
-    The *decimalsOrUnitsName* may be a number of decimals between 3 and 18 (multiple of 3).
+    Parses the *valueString* representation of units into a BigNumber.
+    The *decimalsOrUnitsName* may be a number of decimals between 3 and 18 (multiplication of 3).
 
 .. _formatUnits:
 
 :sup:`utils` . formatUnits ( value , decimalsOrUnitName ) |nbsp| `=> string`
-    Format an amount into a decimal string representing the amount of units. 
+    Formats an amount of cin into a decimal string representing the amount of units. 
     The output will always include at least one whole number and at least one decimal place,
     otherwise leading and trailing 0's will be trimmed. The *decimalsOrUnitsName*
-    may be a number of decimals between 3 and 18 (multiple of 3).
+    may be a number of decimals between 3 and 18 (multiplication of 3).
 
 :sup:`utils` . commify ( numberOrString ) |nbsp|  `=> string`
     Returns *numberOrString* with commas placed at every third position within the whole
-    component. If *numberOrString* contains a decimal point, the output will as well with
+    component. If *numberOrString* contains a decimal point, the output will also contain
     at least one digit for both the whole and decimal components. If there no decimal,
     then the output will also not contain a decimal.
 
@@ -415,30 +417,25 @@ Hex Strings
 ###########
 
 A hex string is **always** prefixed with "0x" and consists of the characters
-0 -- 9 and a -- f. It is always returned lower case with even-length, but any hex
-string passed into a function may be any case and may be odd-length.
+0-9 and a-f. It is always returned lowercase with even length, but any hex
+string passed into a function may be any case and may be odd length.
 
 :sup:`utils` . hexlify ( numberOrBigNumberOrHexStringOrArrayish ) |nbsp| `=> hex`
-    Converts any number, :ref:`BigNumber <bignumber>`, hex string or
-    `Arrayish`_ to a hex string. (otherwise, throws an error)
+    Converts any number, :ref:`BigNumber <bignumber>`, hex string, or
+    `Arrayish`_ to a hex string. (Otherwise, throws an error)
 
 :sup:`utils` . isHexString ( value ) |nbsp| `=> boolean`
     Returns true if *value* is a valid hexstring.
 
 :sup:`utils` . hexDataLength ( hexString ) |nbsp| `=> number`
-    Returns the length (in bytes) of *hexString* if it is a valid data hexstring (even length).
-
-:sup:`utils` . hexDataSlice ( hexString , offset [ , endOffset ] ) |nbsp| `=> hex`
-    Returns a string for the subdata of *hexString* from *offset* **bytes**
-    (each byte is two nibbled) to *endOffset* **bytes**. If no *endOffset* is
-    specified, the result is to the end of the *hexString* is used. Each byte is two nibbles.
+    Returns the length (in bytes) of *hexString* if it is a valid data hex string data (even length).
 
 :sup:`utils` . hexStripZeros ( hexString ) |nbsp| `=> hex`
     Returns *hexString* with all leading zeros removed, but retaining at least
-    one nibble, even if zero (e.g. ``0x0``). This may return an odd-length string.
+    one nibble, even if zero (e.g., ``0x0``). This may return an odd length string.
 
 :sup:`utils` . hexZeroPad ( hexString , length ) |nbsp| `=> hex`
-    Returns *hexString* padded (on the left) with zeros to length **bytes** (each
+    Returns *hexString* padded (on the left) with zeros to length of **bytes** (each
     byte is two nibbles).
 
 -----
@@ -448,13 +445,13 @@ string passed into a function may be any case and may be odd-length.
 Signatures
 ##########
 
-There are two common formats for signatures in Ethereum. The **flat-format**, which
-is a hexstring with 65 bytes (with recoveryParam); or a hexstring with 64 bytes
-(without recoveryParam); or an **expanded-format**, which is an object with the properties:
+There are two common formats for signatures in Maxonrow. The **flat-format**, which
+is a hex string with 65 bytes (with recoveryParam); or 64 bytes
+(without recoveryParam); or an **expanded-format**, which is an object with the following properties:
 
     - **r** and **s** --- the (r, s) public point of a signature
     - **recoveryParam** --- the recovery parameter of a signautre (either ``0`` or ``1``)
-    - **v** --- the recovery param nomalized (either ``27`` or ``28``)
+    - **v** --- the recovery parameter nomalized (either ``27`` or ``28``)
 
 :sup:`utils` . splitSignature ( hexStringOrArrayishOrSignature ) |nbsp| `=> Signature`
     Returns an expanded-format signature object for *hexStringOrArrayishOrSignature*.
@@ -464,12 +461,12 @@ is a hexstring with 65 bytes (with recoveryParam); or a hexstring with 64 bytes
 :sup:`utils` . joinSignature ( signature [ , includeRecoveryParam ] ) |nbsp| `=> hex`
     Returns the flat-format signature hexstring of *signature*. The final *v*
     byte will always be normalized to ``0x1b`` of ``0x1c``. Optionally to include
-    recovery param.
+    recovery parameter.
 
 .. code-block:: javascript
-    :caption: *To Expanded-Format*
+    :caption: *to expanded-format*
 
-    // Flat-format; this is the format provided by JSON-RPC responses
+    // Flat-format: this is the format provided by JSON-RPC responses
     let flat = "0xd26c2cd5c6adb03046ac99e5d9badb798ca9b09f995191b5b906d6c26f8983e4" +
                  "1b7116df50a27a8c9e52fae512728ef75623da13320ca9b2e62ece0dcdd409e9" +
                  "1b";
@@ -483,9 +480,9 @@ is a hexstring with 65 bytes (with recoveryParam); or a hexstring with 64 bytes
     // }
 
 .. code-block:: javascript
-    :caption: *To Flat-Format*
+    :caption: *to flat-format*
 
-    // Expanded-format; this is the format and other tools often require
+    // Expanded-format: this is the format and other tools often require
     let expanded = {
         r: "0xd26c2cd5c6adb03046ac99e5d9badb798ca9b09f995191b5b906d6c26f8983e4",
         s: "0x1b7116df50a27a8c9e52fae512728ef75623da13320ca9b2e62ece0dcdd409e9",
@@ -516,7 +513,7 @@ UTF-8 Strings
     Converts a hex-encoded string or array to its UTF-8 representation.
 
 .. code-block:: javascript
-    :caption: *To UTF-8 Bytes*
+    :caption: *to UTF-8 bytes*
 
     let text = "Hello Blockchain!";
     let bytes = utils.toUtf8Bytes(text);
@@ -525,7 +522,7 @@ UTF-8 Strings
     // Uint8Array [ 72, 101, 108, 108, 111, 32, 66, 108, 111, 99, 107, 99, 104, 97, 105, 110, 33 ]
 
 .. code-block:: javascript
-    :caption: *To UTF-8 String*
+    :caption: *to UTF-8 string*
 
     let array = [ 72, 101, 108, 108, 111, 32, 66, 108, 111, 99, 107, 99, 104, 97, 105, 110, 33 ];
     let stringFromArray = utils.toUtf8String(array);

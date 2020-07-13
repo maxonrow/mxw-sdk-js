@@ -9,7 +9,7 @@ import time
 # -- Project information -----------------------------------------------------
 
 project = 'mxw-sdk-js'
-copyright = '2019-'+ time.strftime("%Y")+', Maxonrow'
+copyright = '2019–'+ time.strftime("%Y")+', Maxonrow'
 author = 'Jean Soon'
 
 # The short X.Y version

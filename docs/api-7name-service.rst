@@ -2,30 +2,30 @@
 
 .. _api-name-service:
 
-************
-Name Service
-************
+*************
+Alias Service
+*************
 
-The `Alias Service` allows easy to remember and use names to be
-assigned to wallet addresses. Any provider operation which takes an address
+The `Alias Service` allows alias to be assigned to wallet address, making wallet 
+addresses easy to remember. Any provider operation that takes an address
 may also take an alias.
 
-Alias also provides the ability for a reverse lookup, which determines the name
-for an address if it has been configured.
+Alias also provides the ability for a reverse lookup that determines the alias of 
+an address (if it was configured).
 
-Create alias required authorities approval and verification, and small fees will be charge.
-Once the application is approved, alias will be recorded into blockchain.
+Creating alias requires authorities approval and verification from authorities, some small fees will also be charged.
+Once the application to create an alias is approved, alias will be recorded into blockchain.
 
 Querying
 ########
 
 :sup:`provider` . resolveName ( name ) |nbsp| `=> Promise<Address>`
-    Returns a :ref:`Promise <promise>` which resolves to the address of that the *alias*
-    resolves to (or *null* is not registered).
+    Returns a :ref:`Promise <promise>` that resolves to the address that the *alias*
+    resolves to (or *null* is unregistered).
 
 :sup:`provider` . lookupAddress ( address ) |nbsp| `=> Promise<string>`
-    Returns a :ref:`Promise <promise>` which resolves to the alias that *address* resolves
-    to (or *null* if not registered).
+    Returns a :ref:`Promise <promise>` that resolves to the alias that the *address* resolves
+    to (or *null* if unregistered).
 
 .. code-block:: javascript
     :caption: *resolve an alias to an address*

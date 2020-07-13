@@ -3,11 +3,11 @@
 .. _api-nft:
 
 ******************
-Non-fungible Token
+Non-Fungible Token
 ******************
 
-A non-fungible token(NFT) is a special type of cryptographic token which represents something unique; non-fungible 
-token are thus not mutually interchangeable by their individual specification. This is in contrast to 
+A non-fungible token (NFT) is a special type of cryptographic token which represents something unique; non-fungible 
+tokens are thus not mutually interchangeable by their individual specification. This is in contrast with 
 cryptocurrencies like Zcash, and many network or utility tokens that are fungible in nature.
 
 -----
@@ -17,33 +17,33 @@ General Workflow
 
 .. image:: ../docs/images/NFT.jpg
 
-First, a non-fungible token must be created. It can be created by any wallet, but
-it have to be authorize by undergo a KYC process for further use.
+Firstly, a non-fungible token must be created. It can be created by any wallet, but
+it has to be authorized through a KYC process before it can be used.
 
-*Authorization might get rejected*
+*Authorization might get rejected.*
 
 Creating Instances
 ##################
-Create non fungible token required approval from authorities
+Creating non-fungible token requires approval from authorities.
 
 :sup:`NonFungibleToken` . create ( nonFungibleTokenProperties, signerOrProvider ) |nbsp| `=> Promise<NonFungibleToken>`
-    Creates a new instance reference from *signerOrProvider* and send non fungible token creation transaction to network
+    Creates a new instance reference from *signerOrProvider*, then sends non fungible token creation transaction to network
     and returns a :ref:`Promise <promise>` that resolves to a NonFungibleToken instance.
 
     The valid non-fungible token properties are:
 
-        - **name :** *string* (name of the token)
-        - **symbol :** *string* (symbol for the token)
-        - **fee :** *int* (application fee)
-        - **properties :** *string* (properties of the token)
-        - **metadata :** *string* (remarks) 
+        - **name:** *string* (name of the token)
+        - **symbol:** *string* (symbol of the token)
+        - **fee:** *int* (application fee)
+        - **properties:** *string* (properties of the token)
+        - **metadata:** *string* (remarks) 
 
     .. note:: 
-        | name and symbol must be unique, 
-        | metadata can be change after the token is created, but properties can't
+        | Token name and symbol must be unique; 
+        | metadata can be changed after the token is created, but not properties.
 
 .. code-block:: javascript
-    :caption: Create Non-fungible Token
+    :caption: create non-fungible token
 
     let provider = new mxw.Wallet(0x00000000000000000000000000000000000000000000000070726f7669646572);
     let nonFungibleTokenProperties: NonFungibleTokenProperties;
@@ -64,11 +64,11 @@ Create non fungible token required approval from authorities
     });
 
 :sup:`NonFungibleToken` . fromSymbol ( symbol, signerOrProvider ) |nbsp| `=> Promise<NonFungibleToken>`
-    Query non-fungible token by symbol from network and returns a :ref:`Promise <promise>` that 
+    Queries non-fungible token by symbol from network and returns a :ref:`Promise <promise>` that 
     resolves to a NonFungibleToken instance.
 
 .. code-block:: javascript
-    :caption: Check on token state
+    :caption: check token state
 
         mxw.nonFungibleToken.NonFungibleToken.fromSymbol("symbol","issuer address").then((token)=>{
             console.log(JSON.stringify(token));
@@ -81,24 +81,24 @@ Prototype
 
 :sup:`prototype` . state |nbsp| `=> NFTokenState`
 
-    | (Read Only)
-    | The valid token state are:
+    | (Read-only)
+    | The valid token states are:
 
-        - **flags** -- *uint* (number)
-        - **name** --- *string* (the unique token name)
-        - **symbol** ---*string* (the unique token symbol)
-        - **owner** --- *sting* (address of owner of the token)
-        - **newOwner** --- *string* (address of receiver of token)
-        - **metadata** --- *string* (metadata / remarks of token) 
-        - **mintLimit** --- *BigNumber* (maximum mint limit of token)
-        - **transferLimit** --- *BigNumber* (maximum limit of the token can be transfer)
-        - **endorserList** --- *string[]* list of endorser 
-        - **totalSupply** --- *BigNumber* (total item had been minted by the token)
+        - **flags** --- *uint* (number)
+        - **name** --- *string* (unique token name)
+        - **symbol** ---*string* (unique token symbol)
+        - **owner** --- *sting* (token owner's address)
+        - **newOwner** --- *string* (token receiver's address)
+        - **metadata** --- *string* (metadata/remarks of token) 
+        - **mintLimit** --- *BigNumber* (token's maximum mint limit of token)
+        - **transferLimit** --- *BigNumber* (token's maximum transfer limit)
+        - **endorserList** --- *string[]* list of endorsers 
+        - **totalSupply** --- *BigNumber* (total items minted by the token)
 
-.. note:: All token must be authorities, before it can use to mint item or transfer ownership. All token state must be assigned.
+.. note:: All token must be authorized, before it can use to mint item or transfer ownership. All token state must be assigned.
 
 .. code-block:: javascript
-    :caption: authorities token
+    :caption: authorize token
 
         let provider = new mxw.Wallet(0x00000000000000000000000000000000000000000000000070726f7669646572);
         let issuer = new mxw.Wallet(0x0000000000000000000000000000000000000000000000000000697373756572);
@@ -146,10 +146,10 @@ Prototype
     Sends the *mint non-fungible token transaction* to the network and returns a :ref:`Promise <promise>` that resolves to a
     :ref:`Transaction Receipt <transaction-receipt>`.
 
-    The :ref:`AddressOrName <addressOrName>` can be set to recipient alias or wallet address. 
+    The :ref:`AddressOrName <addressOrName>` can be set to recipient's alias or wallet address. 
 
 .. code-block:: javascript
-    :caption: *mint a non-fungible token item*
+    :caption: *mint an NFT item*
 
         let issuer : mxw.Wallet;
         let item = {
@@ -165,13 +165,13 @@ Prototype
             console.log(JSON.stringify(receipt));
         });
 
-.. note:: symbol of the minted item must be the same as the token symbol
+.. note:: Symbol of the minted item must be the same as the token symbol.
 
 :sup:`prototype` . updateMetadata(*string* metadata) |nbsp| `=> Promise<TransactionReceipt>`
-    Update the *metadata of non-fungible token item* to the network and returns a :ref:`Promise <promise>`
+    Update the *metadata of NFT or NFT item* to the network and returns a :ref:`Promise <promise>`.
 
 .. code-block:: javascript
-    :caption: *update metadata of a non-fungible token*
+    :caption: *update metadata of an NFT*
 
     let provider = new mxw.Wallet(0x00000000000000000000000000000000000000000000000070726f7669646572);
     let nonFungibleTokenProperties: NonFungibleTokenProperties;
@@ -182,7 +182,7 @@ Prototype
             to: nodeProvider.nonFungibleToken.feeCollector,
             value: bigNumberify("1")
         },
-        metadata: ["Wallet able to manage their own metadata"],
+        metadata: ["Wallet is able to manage their own metadata"],
         properties:["Decentralised identifier"]
     };
 
@@ -195,15 +195,15 @@ Prototype
 
     //adding new info into the token metadata
     let nftItemStatus = nftInstance.getState();
-    nftInstance.updateMetadata(nftItemStatus.metadata + "overwite").then((receipt) => {
+    nftInstance.updateMetadata(nftItemStatus.metadata + "overwrite").then((receipt) => {
             console.log(JSON.stringify(receipt));
     });
 
 -----
 
-Additional Action
-*****************
-Freeze and unfreeze item
+Additional Actions
+******************
+Freeze and unfreeze an item.
 
 .. code-block:: javascript
     :caption: freeze item
@@ -239,39 +239,39 @@ Freeze and unfreeze item
 
 Item
 ####
-Creating an item instance, three components must be included(symbol, itemId and address of).
+Create an item instance, three components must be included: symbol, itemId, and address of issuer.
 
 :sup:`prototype`. getState() |nbsp| `=> NFTokenState`
     Returns to the state of Non-fungible Token Item status
 
-    | (Read Only)
+    | (Read-only)
     | The valid token state are:
 
-        - **symbol** -- symbol of the non-fungible token item
-        - **itemID** -- ID of the non-fungible token item
-        - **properties** -- properties of the non- fungible token item
-        - **metadata** -- metadata of the non-fungible token item
+        - **symbol** --- symbol of the NFT item
+        - **itemID** --- ID of the NFT item
+        - **properties** --- properties of the NFT item
+        - **metadata** --- metadata of the NFT item
 
 .. code-block:: javascript
-    :caption: Get item status
+    :caption: get item status
 
         nftInstance.getState().then((result)=>{
             console.log(JSON.stringify(result));
         });
 
-:sup:`NonFungibleTokenItem` . fromSymbol ( symbol,itemID, signerOrProvider ) |nbsp| `=> Promise<NonFungibleToken>`
-    Query non-fungible token by symbol from network and returns a :ref:`Promise <promise>` that 
+:sup:`NonFungibleTokenItem` . fromSymbol ( symbol, itemID, signerOrProvider ) |nbsp| `=> Promise<NonFungibleToken>`
+    Queries NFT item by symbol from network and returns a :ref:`Promise <promise>` that 
     resolves to a NonFungibleToken instance.
 
 .. code-block:: javascript
-    :caption: Check on item state
+    :caption: check on item state
 
         mxw.nonFungibleToken.NonFungibleToken.fromSymbol("symbol","itemID","issuer address").then((token)=>{
             console.log(JSON.stringify(token))
         });  
 
 .. code-block:: javascript
-    :caption: Get the state of token that minted this item
+    :caption: get the state of token that minted this item
 
         mxw.nonFungibleToken.NonFungibleToken.fromSymbol("symbol","itemID","issuer address").then((token)=>{
             console.log(JSON.stringify(token))
@@ -282,13 +282,13 @@ Creating an item instance, three components must be included(symbol, itemId and 
 
 :sup:`prototype` . burn () |nbsp| `=> Promise<TransactionReceipt>`
     Sends the *burn non-fungible token transaction* to the network and returns a :ref:`Promise <promise>` that resolves to a
-    :ref:`Transaction Receipt <transaction-receipt>`. To burn item, the token burn flag must be true.
+    :ref:`Transaction Receipt <transaction-receipt>`. To burn item, the burn token flag must be true.
 
-    The ``value`` is the number of *non-fungible token* (as a :ref:`BigNumber <bignumber>`) that to be burned.
-    Be aware of the number of decimals applied for the token.
+    The ``value`` is the number of *non-fungible token* (as a :ref:`BigNumber <bignumber>`) to be burned.
+    Be aware of the number of decimals applied to the token.
 
 .. code-block:: javascript
-    :caption: *burn a non-fungible token item*
+    :caption: *burn an NFT item*
 
         let nftInstance = new NonFungibleTokenItem(symbol, itemID, address);
         nftInstance.burn().then((receipt) => {
@@ -296,10 +296,10 @@ Creating an item instance, three components must be included(symbol, itemId and 
         });
 
 :sup:`prototype` . endorse( ) |nbsp| `=> Promise<TransactionReceipt>`
-    Perform endorsement by endorser
+    Sign/approves endorsement by an endorser
 
 .. code-block:: javascript
-    :caption: *endorse a non-fungible token item*
+    :caption: *endorse an NFT item*
 
     let nftInstance = new NonFungibleTokenItem("symbol", "itemID", "address");
     nftInstance.endorse().then((receipt) => {
@@ -307,21 +307,21 @@ Creating an item instance, three components must be included(symbol, itemId and 
     });
 
 :sup:`prototype` . updateItemMetadata(metadata) |nbsp| `=> Promise<TransactionReceipt>`
-    Update the *metadata of non-fungible token item* to the network and returns a :ref:`Promise <promise>`
+    Updates the *metadata of NFT item* to the network and returns a :ref:`Promise <promise>`.
 
 .. code-block:: javascript
-    :caption: *update metadata of a non-fungible token item*
+    :caption: *update metadata of an NFT item*
 
     let nftInstance = new NonFungibleTokenItem("symbol", "itemID", "address");
 
-    //overwrite the item metadata with string "overwrite"
+    //overwrite the NFT item metadata with string "overwrite"
     nftInstance.updateItemMetadata("overwite").then((receipt) => {
             console.log(receipt);
     });
 
     //adding new info into the item metadata
     let nftItemStatus = nftInstance.getState(0);
-    nftInstance.updateItemMetadata(nftItemStatus.metadata + "overwite").then((receipt) => {
+    nftInstance.updateItemMetadata(nftItemStatus.metadata + "overwrite").then((receipt) => {
             console.log(receipt);
     });
 

@@ -8,10 +8,10 @@ Wallets & Signer
 
 .. image:: ../docs/images/Wallet.jpg
 
-The main function for **Wallet** are:-
- - manage key, which will use during encryption and decryption
- - signing, encrypt transaction or message before send through network provider
- - send request via network provider to blockchain
+**Wallet's** main functions are to:
+ - Manage key, which will be used for encryption and decryption
+ - Sign, encrypt transaction or message before it is sent through network provider
+ - Send request to blockchain via network provider
 
 
 -----
@@ -21,22 +21,22 @@ The main function for **Wallet** are:-
 Wallet
 ######
 
-The **Wallet** implements the :ref:`Signer API <signer>` and can be used anywhere a *Signer*
+The **wallet** implements the :ref:`Signer API <signer>` that can be used anywhere a *Signer*
 is expected and has all the required properties.
 
 Create Wallet
 *************
 
 :sup:`Wallet` . createRandom ( [ options ] ) |nbsp| `=> Wallet`
-    | Creates a new random wallet then generate mnemonic and an encrypted JSON file.
-    | Ensure these infomation is stored somewhere safe, if lost there is **NO way to recover it**. 
+    | Creates a new random wallet, then generate mnemonic phrases and an encrypted JSON file.
+    | Ensure this infomation is stored somewhere safe, there is **NO way to recover it** if lost. 
 
 
-    | Parameters can be use are:-
+    | Parameters can be use are:
     
-        - **entropyLength :** *int* (from 16 to 32 & mutiple of 4 - higher value means greater security)
-        - **path :** *string* (directory to store mnemonic)
-        - **locale :** *string* (worldlists)
+        - **entropyLength:** *int* (from 16 to 32 & mutiplications of 4—higher value means greater security)
+        - **path:** *string* (directory to store mnemonic)
+        - **locale:** *string* (wordlists)
 
         The current supported wordlists are:
 
@@ -54,11 +54,11 @@ Create Wallet
     ===================== ===========================
 
 .. warning:: 
-        Highly recommend to show mnemonic of the wallet to the user, and advise them to write it down
-        because there is **no way to recover** the wallet back.
+        It is highly recommended to show mnemonic of the wallet to the users and advise them to write it down
+        because there is **no way to recover** their wallet without the mnemonic phrases.
 
 .. code-block:: javascript
-    :caption: *create a new wallet using random generated private key*
+    :caption: *create a new wallet using randomly generated private key*
 
     //By default, the wallet is created by 16 hexadecimal digits private key, 
     //and will generate mnemonic using wordlists.en
@@ -66,7 +66,7 @@ Create Wallet
     console.log("Address:", randomWallet.address);
 
     //expected result:
-    //a random string, it will looks something like this
+    //a random string, it will look something like this
     //mxw1duct5rv3wan3vpdk3ms6kgn0j8h905kqvccw4r
 
 .. code-block:: javascript
@@ -84,27 +84,27 @@ Create Wallet
 .. code-block:: javascript
     :caption: *create a new wallet randomly and generate mnemonic using different wordlist*
 
-    // Create a wallet and generate mnemonic using worldlists.zh
+    // Create a wallet and generate mnemonic using wordlists.zh
     let randomWallet = mxw.Wallet.createRandom({
         locale: mxw.wordlists.zh
     });
     console.log("Mnemonic:", randomWallet.mnemonic);
     //expected result:
-    //Mnemonic: "follow by 12 random chinese word"
+    //Mnemonic: "followed by 12 random Chinese words"
 
-.. note:: there is no way to differentiate or know the wallet is created using how many digits
+.. note:: There is no way to differentiate or know how many digits are used to create the wallet.
 
 Create Instance of Existing Wallet
 ==================================
 
-There is 3 ways to load a wallet, private key, mnemonic and JSON file. If user doesn't have any
-one of this, it is **impossible** to recover the wallet back.
+There are 3 ways to load a wallet: private key, mnemonic, and JSON file. If a user doesn't have any
+one of these, it is **impossible** to recover the wallet.
 
 new :sup:`Wallet` ( privateKey [ , provider ] )
-    Creating a new instance of exisiting wallet from *privateKey* and optionally connect a provider
+    Creating a new instance of existing wallet from *private key* and connect a provider (optional).
 
 .. code-block:: javascript
-    :caption: *load wallet using private key and connect it to provider*
+    :caption: *load wallet using private key and connect to provider*
 
     //connect wallet to localnet
     let privateKey = "0x0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef";
@@ -114,10 +114,10 @@ new :sup:`Wallet` ( privateKey [ , provider ] )
 .. _wallet-connect:
 
 :sup:`prototype` . connect ( provider ) |nbsp| `=> Wallet`
-    Creates a new Wallet instance from an existing instance, connected to a new *provider*.
+    Creates a new wallet instance from an existing instance, connect to a new *provider*.
 
 .. code-block:: javascript
-    :caption: *load wallet using private key then connect to provider*
+    :caption: *load wallet using private key and connect to provider*
 
     //load wallet using private key
     let privateKey = "0x0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef";
@@ -130,7 +130,7 @@ new :sup:`Wallet` ( privateKey [ , provider ] )
 .. _fromEncryptedJson:
 
 :sup:`Wallet` . fromEncryptedJson ( json, password [ , progressCallback ] ) |nbsp| `=> Wallet`
-    Creating a new instance of exisiting wallet by decrypt an encrypted Secret Storage `JSON Wallet`_ (from created using *prototype.encrypt* )
+    Creating a new instance of existing wallet by decrypting an encrypted Secret Storage `JSON Wallet`_ (from created from *prototype.encrypt*).
 
 .. code-block:: javascript
     :caption: *load wallet using an encrypted JSON*
@@ -176,7 +176,7 @@ new :sup:`Wallet` ( privateKey [ , provider ] )
 
 
 :sup:`Wallet` . fromMnemonic ( mnemonic [ , path :sup:`= "m/44'/376'/0'/0/0"` [ , wordlist ] ] ) |nbsp| `=> Wallet`
-    Generate a `BIP-039`_ + `BIP-044`_ wallet from *mnemonic* deriving *path* using
+    Generates a `BIP-039`_ + `BIP-044`_ wallet from *mnemonic* deriving *path* using
     the *wordlist*. The default language is English (en).
 
 .. code-block:: javascript
@@ -212,11 +212,11 @@ Prototype Variables
 These are the variables you can get from wallet.
 
 :sup:`prototype` . address
-    | Returns public address of a wallet
+    | Returns public address of a wallet.
     | *data type: string*
 
 :sup:`prototype` . privateKey
-    | Returns private key of a wallet; always keep this secret
+    | Returns private key of a wallet; always keep this secret.
     | *data type: hex string*
 
 :sup:`prototype` . provider
@@ -224,8 +224,9 @@ These are the variables you can get from wallet.
     connect to the blockchain network to query its state and send transactions, 
     or null if no provider is connected.
 
-    To change the provider, use the :ref:`connect <wallet-connect>` method, which will returns
-    a **new instance** of the Wallet connected to the provider.  
+    To change the provider, use the :ref:`connect <wallet-connect>` method, which will return
+    a **new instance** of the wallet connected to the provider.
+
     | *data type: string*
 
 :sup:`prototype` . mnemonic
@@ -242,12 +243,12 @@ Signers
 #######
 
 
-Signer is required in a transaction, it is to add a layer of security. Ensure no one can manipulate other's wallet 
+Signer is required to add a layer of security in a transaction, ensuring no one can manipulate other's wallet 
 
 Signing
 *******
-An encrypting process by using own private key, 
-if sending to another wallet, it will encrypt again with their public key.
+An encryption process using user's own private key. When sending message or transaction to
+another wallet, it will be encryted again using their public key. 
 
 :sup:`prototype` . signMessage ( message ) |nbsp| `=> Promise<string>`
     Signs *message* and returns a :ref:`Promise <promise>` that resolves to
@@ -257,7 +258,7 @@ if sending to another wallet, it will encrypt again with their public key.
     preserved as a binary representation of the :ref:`Arrayish <arrayish>` data.
 
 .. code-block:: javascript
-    :caption: *signing text messages*
+    :caption: *sign text messages*
 
     let privateKey = "0xca250aeca008d36b4b4ff83709343c9e4c4ea461e5aa5fa51d57a0fe11eb045e";
     let wallet = new mxw.Wallet(privateKey);
@@ -283,12 +284,12 @@ if sending to another wallet, it will encrypt again with their public key.
     });
 
 .. code-block:: javascript
-    :caption: *signing binary messages*
+    :caption: *sign binary messages*
 
     let privateKey = "0xca250aeca008d36b4b4ff83709343c9e4c4ea461e5aa5fa51d57a0fe11eb045e";
     let wallet = new mxw.Wallet(privateKey);
 
-    // The 66 character hex string MUST be converted to a 32-byte array first!
+    // The 66-character hex string MUST be converted to a 32-byte array first!
     let hash = "0x48656c6c6f20426c6f636b636861696e21";
     let binaryData = mxw.utils.arrayify(hash);
 
@@ -302,7 +303,7 @@ if sending to another wallet, it will encrypt again with their public key.
         let address = mxw.utils.verifyMessage(binaryData, signature);
         console.log(address);
         // expected result:
-        // Should be equal to signer wallet address mxw1x7tp9tt7mu0jm6qdmljgntvzzp53lrtndr7h8x
+        // Should be equal to the signer's wallet address: mxw1x7tp9tt7mu0jm6qdmljgntvzzp53lrtndr7h8x
     });
 
 
@@ -313,10 +314,10 @@ if sending to another wallet, it will encrypt again with their public key.
     In general, the `sendTransaction`_ method is preferred to ``sign``, as it can automatically
     populate values asynchronously.
 
-    Check on :ref:`Transaction <transaction>` and :ref:`Transaction reciept <transaction-receipt>` for more details.
+    Check out :ref:`Transactions <transaction>` and :ref:`Transaction Reciepts <transaction-receipt>` for more details.
 
 .. code-block:: javascript
-    :caption: *signing transactions*
+    :caption: *sign transactions*
 
     let privateKey = "0xca250aeca008d36b4b4ff83709343c9e4c4ea461e5aa5fa51d57a0fe11eb045e";
     let networkProvider = mxw.getDefaultProvider("localnet");
@@ -355,7 +356,7 @@ if sending to another wallet, it will encrypt again with their public key.
     wallet.sign(transaction).then((signedTransaction) => {
 
         console.log(signedTransaction);
-        // Should be base64 encoded string
+        // Should be Base64 encoded string
 
         provider.sendTransaction(signedTransaction).then((tx) => {
 
@@ -378,22 +379,23 @@ if sending to another wallet, it will encrypt again with their public key.
 Cryptographic Functions
 ***********************
 
-Share secret is used when two parties are agree on sharing their asset inside a blockchain.
-After a share secret is computed, it will return as a hexstring. The hexstring can be use for 
-authentication purpose of any operations involved their shared asset.
+Shared secret is used when two parties agree on sharing their asset inside a blockchain.
+After a shared secret is computed, it will return as a hex string. The hex string can be used for 
+authentication purpose of any operations involved in their asset sharing.
 
-:sup:`prototype` . computeSharedSecret ( otherPublicKey ) |nbsp| `=> hexstring`
-    Compute the *shared secret* by using other wallet's public key and returns as a :ref:`hex string <hexstring>`.
-    In general, the shared secret should not dirly uses as encryption key. Instead of derive it using :ref:`pbkdf2 <pbkdf2>`.
+:sup:`prototype` . computeSharedSecret ( otherPublicKey ) |nbsp| `=> hex string`
+    Computes the *shared secret* by using receiving wallet's public key and return it as a :ref:`hex string <hexstring>`.
+    In general, the shared secret should not be used directly as encryption key. Instead, it can be derived it using 
+    Password-Based Key Derivation Function 2 :ref:`(PBKDF2) <pbkdf2>`.
 
 .. code-block:: javascript
-    :caption: compute shared secret using own private key and other public key
+    :caption: compute shared secret using sender's own private key and receiving wallet's public key
 
     let wallet = mxw.Wallet.createRandom();
     let otherWallet = mxw.Wallet.createRandom();
     console.log(wallet.computeSharedSecret(otherWallet.publicKey));
     //expected result:
-    //a hexstring, something like this
+    //a hex string, something like this
     //0xcdfa6c550d930fa45b9f938a96a3b76c90e1f90fed7ffd8bbcc6dbd566316e88
     
 -----
@@ -404,9 +406,9 @@ Blockchain Operations
 These operations require wallet to be connected to blockchain by a network provider.
 
 :sup:`prototype` . getBalance ( ) |nbsp| `=> Promise<BigNumber>`
-    Returns a :ref:`Promise <promise>` that resolves to the balance (as a :ref:`BigNumber <bignumber>`,
-    in **cin**) of the wallet. Be aware of the number of decimals for *cin* is 18.
-    The balance can be convert to a human readable format by :ref:`formatMxw <formatMxw>`, versa :ref:`parseMxw <parseMxw>`.
+    Returns a :ref:`Promise <promise>` that resolves to the balance of the wallet (as a :ref:`BigNumber <bignumber>`,
+    in **cin**). Be aware that the number of decimals for *cin* is 18.
+    The balance can be converted to a human-readable format by :ref:`formatMXW <formatMxw>`, versa :ref:`parseMXW <parseMxw>`.
 
 .. code-block:: javascript
     :caption: check wallet balance
@@ -421,7 +423,7 @@ These operations require wallet to be connected to blockchain by a network provi
         // Wallet balance: 0.0
 
 :sup:`prototype` . getTransactionCount ( ) |nbsp| `=> Promise<BigNumber>`
-    Returns a :ref:`Promise <promise>` that resovles to the number of transactions
+    Returns a :ref:`Promise <promise>` that resolves to the number of transactions
     this account has ever sent (as a :ref:`BigNumber <bignumber>`).
 
 .. code-block:: javascript
@@ -449,12 +451,12 @@ These operations require wallet to be connected to blockchain by a network provi
     Sends the *transfer transaction* to the network and returns a :ref:`Promise <promise>` that resolves to a
     :ref:`Transaction Receipt <transaction-receipt>`.
 
-    The :ref:`AddressOrName <addressOrName>` can be set to recipient alias or wallet address. The ``value`` is the number of *cin*
-    (as a :ref:`BigNumber <bignumber>`) that transfers to recipient. Be aware of the number of decimals for *cin*
+    The :ref:`AddressOrName <addressOrName>` can be set to recipient's alias or wallet address. The ``value`` is the number of *cin*
+    (as a :ref:`BigNumber <bignumber>`) that is being transferred to recipient. Be aware that the number of decimals for *cin*
     is 18.
 
 .. code-block:: javascript
-    :caption: *transfer mxw*
+    :caption: *transfer MXW*
 
     // We require a provider to send transactions
     let networkProvider = mxw.getDefaultProvider("localnet");
@@ -463,12 +465,12 @@ These operations require wallet to be connected to blockchain by a network provi
     let wallet = new mxw.Wallet(privateKey, provider);
 
     let to = "mxw1j4yh2gfumy8d327n0uvztg9075fjzd59vxf9ae";
-    // ... or supports Alias names
+    // ... or supports alias names
     // to: "jeansoon",
 
     let amount = mxw.utils.parseMxw("1.0");
-    // We must pass in the amount as cin (1 mxw = 1e18 cin), so we
-    // use this convenience function to convert mxw to cin.
+    // We must pass in the amount as cin (1 MXW = 1e18 cin), so we
+    // use this convenient function to convert MXW to cin.
 
     wallet.transfer(to, amount).then((receipt) => {
          console.log(receipt.status);
@@ -496,7 +498,7 @@ formats and algorithms that are used, all of which are supported to be read.
 Only the secure scrypt variation can be generated.
 
 See :ref:`Wallet.fromEncryptedJson <fromEncryptedJson>` for creating a
-Wallet instance from a JSON wallet.
+wallet instance from a JSON wallet.
 
 :sup:`prototype` . encrypt ( password [ , options [ , progressCallback ] ] ) |nbsp| `=> Promise<string>`
     Encrypts the wallet as an encrypted JSON wallet, with the *password*.
@@ -504,15 +506,15 @@ Wallet instance from a JSON wallet.
     All options are optional. The valid options are:
 
         - **salt** --- the salt to use for scrypt
-        - **iv** --- the initialization vector to use for aes-ctr-128
+        - **iv** --- the initialization vector to use for AES-CTR-128
         - **uuid** --- the UUID to use for the wallet
-        - **scrypt** --- the scrypt parameters to use (N, r and p)
+        - **scrypt** --- the scrypt parameters to use (N, r, and p)
         - **entropy** --- the mnemonic entropy of this wallet; generally you should **not** specify this
         - **mnemonic** --- the mnemonic phrase of this wallet; generally you should **not** specify this
         - **path** --- the mnemonic path of this wallet; generally you should **not** specify this
 
     If the *progressCallback* is specified, it will be called periodically during
-    encryption with a value between 0 and 1, inclusive indicating the progress.
+    encryption with a value between 0 and 1, inclusive of indicating the progress.
 
 
 .. code-block:: javascript
@@ -527,7 +529,7 @@ Wallet instance from a JSON wallet.
     return wallet.encrypt(password, callback).then((json) => {
         console.log(json);
         // expected result:
-        // a JSON text contain address, id and various info of the wallet.
+        // a JSON text contains address, ID, and various info of the wallet.
     });
 
 
@@ -539,10 +541,10 @@ Signer API
 **********
 
 The Signer API is an abstract class which makes it easy to extend and add new signers,
-that can be used by this library and extension libraries. The :ref:`Wallet <wallet>`
+that can be used by this library and extension libraries. The :ref:`wallet <wallet>`
 extends the Signer API.
 
-To implement a Signer, inherit the abstract class *mxw.types.Signer* and implement
+To implement a signer, inherit the abstract class *mxw.types.Signer* and implement
 the following properties:
 
 :sup:`object` . provider
@@ -560,7 +562,7 @@ the following properties:
     preserved as a binary representation of the :ref:`Arrayish <arrayish>` data.
 
 :sup:`object` . sign ( transaction ) |nbsp| `=> Promise<hex>`
-    Returns a :ref:`Promise <promise>` that resolves to the *signed* transaction that ready to send to the network.
+    Returns a :ref:`Promise <promise>` that resolves to the *signed* transaction that is ready to be sent to the network.
 
 :sup:`object` . sendTransaction ( transaction ) |nbsp| `=> Promise<TransactionResponse>`
     Sends the *transaction* (see :ref:`Transaction Requests <transaction-request>`) to
