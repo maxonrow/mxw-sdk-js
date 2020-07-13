@@ -2,6 +2,9 @@
 .toctree-l1{ border-top: solid 1px #1d2972;}
 .toctree-l1:last-child{border-bottom: solid 1px #1d2972;}
 .wy-nav-side{background-color:#000056;}
+.wy-nav-content {
+    max-width: none;
+}
 .wy-menu-vertical a{
                         font-size: 16px;
                         font: bold;
