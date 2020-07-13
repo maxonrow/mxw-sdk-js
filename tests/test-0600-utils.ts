@@ -11,7 +11,7 @@ let silent = true;
 
 describe('Suite: Utils', function () {
     if (silent) { silent = nodeProvider.trace.silent; }
-    
+
     it("Test bytes", function () {
         expect(utils.isHexString("0x01")).to.be.true;
     });
@@ -66,6 +66,14 @@ describe('Suite: Utils', function () {
         expect(converted).to.equal("12345678.9");
     });
 
+    it("Validate address", function () {
+        let address = "mxw15f3aw83y2hgzzs6hk6utputr2xchwe5x745l9s";
+
+        let hexAddress = utils.computeHexAddress(address);
+        expect(hexAddress).to.be.equal("0xa263D71e2455d0214357B6b8B0F16351b1776686");
+        if (!silent) console.log(indent, "Hex Address:", hexAddress);
+    });
+
     it("Normalize bech32 address", function () {
         let address = "mxw15f3aw83y2hgzzs6hk6utputr2xchwe5x745l9s";
         let normalized = utils.getAddress(address);
@@ -89,9 +97,9 @@ describe('Suite: Utils', function () {
         if (!silent) console.log(indent, hash);
         expect("0x6cabdb6b53060a1961f7cceede7e07022505a83870fadb64f9699074150f033e").to.equal(hash);
     });
-        
-    it("Adhoc test", function () {
 
+    it("Adhoc test", function () {
+        
     });
 
 });

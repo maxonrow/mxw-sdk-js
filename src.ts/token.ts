@@ -7,7 +7,7 @@ import { encode as base64Encode } from './utils/base64';
 import * as errors from './errors';
 
 // Imported Abstracts
-import { Provider, TokenAccountState } from './providers/abstract-provider';
+import { Provider, TokenAccountState, TransactionRequest } from './providers/abstract-provider';
 import { Signer } from './abstract-signer';
 
 ///////////////////////////////
@@ -351,6 +351,27 @@ export class FungibleToken {
      * @param overrides options
      */
     transfer(toAddressOrName: string | Promise<string>, value: BigNumberish, overrides?: any): Promise<TransactionResponse | TransactionReceipt> {
+        return this.getTransferTransactionRequest(toAddressOrName, value, overrides).then((tx) => {
+            return this.signer.sendTransaction(tx, overrides).then((response) => {
+                if (overrides && overrides.sendOnly) {
+                    return response;
+                }
+                let confirmations = (overrides && overrides.confirmations) ? Number(overrides.confirmations) : null;
+
+                return this.signer.provider.waitForTransaction(response.hash, confirmations).then((receipt) => {
+                    if (1 == receipt.status) {
+                        return receipt;
+                    }
+                    throw this.signer.provider.checkTransactionReceipt(receipt, errors.CALL_EXCEPTION, "transfer fungible token failed", {
+                        method: "token-transferFungibleToken",
+                        receipt
+                    });
+                });
+            });
+        });
+    }
+
+    getTransferTransactionRequest(toAddressOrName: string | Promise<string>, value: BigNumberish, overrides?: any): Promise<TransactionRequest> {
         if (!this.signer) {
             errors.throwError('transfer fungible token require signer', errors.NOT_INITIALIZED, { arg: 'signer' });
         }
@@ -363,31 +384,16 @@ export class FungibleToken {
             }
 
             return this.provider.resolveName(toAddressOrName).then((toAddress) => {
-                let transaction = this.provider.getTransactionRequest("token", "token-transferFungibleToken", {
+                let tx = this.provider.getTransactionRequest("token", "token-transferFungibleToken", {
                     symbol: this.symbol,
                     from: signerAddress,
                     to: toAddress,
                     value: value.toString(),
                     memo: (overrides && overrides.memo) ? overrides.memo : ""
                 });
-                transaction.fee = (overrides && overrides.fee) ? overrides.fee : this.provider.getTransactionFee(undefined, undefined, { tx: transaction });
+                tx.fee = (overrides && overrides.fee) ? overrides.fee : this.provider.getTransactionFee(undefined, undefined, { tx });
 
-                return this.signer.sendTransaction(transaction, overrides).then((response) => {
-                    if (overrides && overrides.sendOnly) {
-                        return response;
-                    }
-                    let confirmations = (overrides && overrides.confirmations) ? Number(overrides.confirmations) : null;
-
-                    return this.signer.provider.waitForTransaction(response.hash, confirmations).then((receipt) => {
-                        if (1 == receipt.status) {
-                            return receipt;
-                        }
-                        throw this.signer.provider.checkTransactionReceipt(receipt, errors.CALL_EXCEPTION, "transfer fungible token failed", {
-                            method: "token-transferFungibleToken",
-                            receipt
-                        });
-                    });
-                });
+                return tx;
             });
         });
     }
@@ -399,6 +405,27 @@ export class FungibleToken {
      * @param overrides options
      */
     mint(toAddressOrName: string | Promise<string>, value: BigNumberish, overrides?: any): Promise<TransactionResponse | TransactionReceipt> {
+        return this.getMintTransactionRequest(toAddressOrName, value, overrides).then((tx) => {
+            return this.signer.sendTransaction(tx, overrides).then((response) => {
+                if (overrides && overrides.sendOnly) {
+                    return response;
+                }
+                let confirmations = (overrides && overrides.confirmations) ? Number(overrides.confirmations) : null;
+
+                return this.signer.provider.waitForTransaction(response.hash, confirmations).then((receipt) => {
+                    if (1 == receipt.status) {
+                        return receipt;
+                    }
+                    throw this.signer.provider.checkTransactionReceipt(receipt, errors.CALL_EXCEPTION, "mint fungible token failed", {
+                        method: "token-mintFungibleToken",
+                        receipt
+                    });
+                });
+            });
+        });
+    }
+
+    getMintTransactionRequest(toAddressOrName: string | Promise<string>, value: BigNumberish, overrides?: any): Promise<TransactionRequest> {
         if (!this.signer) {
             errors.throwError('mint fungible token require signer', errors.NOT_INITIALIZED, { arg: 'signer' });
         }
@@ -411,31 +438,16 @@ export class FungibleToken {
             }
 
             return this.provider.resolveName(toAddressOrName).then((toAddress) => {
-                let transaction = this.provider.getTransactionRequest("token", "token-mintFungibleToken", {
+                let tx = this.provider.getTransactionRequest("token", "token-mintFungibleToken", {
                     symbol: this.symbol,
                     to: toAddress,
                     value: value.toString(),
                     owner: signerAddress,
                     memo: (overrides && overrides.memo) ? overrides.memo : ""
                 });
-                transaction.fee = (overrides && overrides.fee) ? overrides.fee : this.provider.getTransactionFee(undefined, undefined, { tx: transaction });
+                tx.fee = (overrides && overrides.fee) ? overrides.fee : this.provider.getTransactionFee(undefined, undefined, { tx });
 
-                return this.signer.sendTransaction(transaction, overrides).then((response) => {
-                    if (overrides && overrides.sendOnly) {
-                        return response;
-                    }
-                    let confirmations = (overrides && overrides.confirmations) ? Number(overrides.confirmations) : null;
-
-                    return this.signer.provider.waitForTransaction(response.hash, confirmations).then((receipt) => {
-                        if (1 == receipt.status) {
-                            return receipt;
-                        }
-                        throw this.signer.provider.checkTransactionReceipt(receipt, errors.CALL_EXCEPTION, "mint fungible token failed", {
-                            method: "token-mintFungibleToken",
-                            receipt
-                        });
-                    });
-                });
+                return tx;
             });
         });
     }
@@ -446,26 +458,8 @@ export class FungibleToken {
      * @param overrides options
      */
     burn(value: BigNumberish, overrides?: any): Promise<TransactionResponse | TransactionReceipt> {
-        if (!this.signer) {
-            errors.throwError('burn fungible token require signer', errors.NOT_INITIALIZED, { arg: 'signer' });
-        }
-
-        this.isBurnable; // check token useability and burnable, otherwise throw error
-
-        return resolveProperties({ signerAddress: this.signer.getAddress() }).then(({ signerAddress }) => {
-            if (!signerAddress) {
-                return errors.throwError('burn fungible token require signer address', errors.MISSING_ARGUMENT, { arg: 'signerAddress' });
-            }
-
-            let transaction = this.provider.getTransactionRequest("token", "token-burnFungibleToken", {
-                symbol: this.symbol,
-                from: signerAddress,
-                value: value.toString(),
-                memo: (overrides && overrides.memo) ? overrides.memo : ""
-            });
-            transaction.fee = (overrides && overrides.fee) ? overrides.fee : this.provider.getTransactionFee(undefined, undefined, { tx: transaction });
-
-            return this.signer.sendTransaction(transaction, overrides).then((response) => {
+        return this.getBurnTransactionRequest(value, overrides).then((tx) => {
+            return this.signer.sendTransaction(tx, overrides).then((response) => {
                 if (overrides && overrides.sendOnly) {
                     return response;
                 }
@@ -484,12 +478,59 @@ export class FungibleToken {
         });
     }
 
+    getBurnTransactionRequest(value: BigNumberish, overrides?: any): Promise<TransactionRequest> {
+        if (!this.signer) {
+            errors.throwError('burn fungible token require signer', errors.NOT_INITIALIZED, { arg: 'signer' });
+        }
+
+        this.isBurnable; // check token useability and burnable, otherwise throw error
+
+        return resolveProperties({ signerAddress: this.signer.getAddress() }).then(({ signerAddress }) => {
+            if (!signerAddress) {
+                return errors.throwError('burn fungible token require signer address', errors.MISSING_ARGUMENT, { arg: 'signerAddress' });
+            }
+
+            let tx = this.provider.getTransactionRequest("token", "token-burnFungibleToken", {
+                symbol: this.symbol,
+                from: signerAddress,
+                value: value.toString(),
+                memo: (overrides && overrides.memo) ? overrides.memo : ""
+            });
+            tx.fee = (overrides && overrides.fee) ? overrides.fee : this.provider.getTransactionFee(undefined, undefined, { tx });
+
+            return tx;
+        });
+    }
+
     /**
      * Transfer token ownership
      * @param addressOrName new owner address
      * @param overrides options
      */
-    transferOwnership(addressOrName: string | Promise<string>, overrides?: any) {
+    transferOwnership(addressOrName: string | Promise<string>, overrides?: any): Promise<TransactionResponse | TransactionReceipt> {
+        return this.getTransferOwnershipTransactionRequest(addressOrName, overrides).then((tx) => {
+            return this.signer.sendTransaction(tx, overrides).then((response) => {
+                if (overrides && overrides.sendOnly) {
+                    return response;
+                }
+                let confirmations = (overrides && overrides.confirmations) ? Number(overrides.confirmations) : null;
+
+                return this.signer.provider.waitForTransaction(response.hash, confirmations).then((receipt) => {
+                    if (1 == receipt.status) {
+                        return this.getState(null, overrides).then(() => {
+                            return receipt;
+                        });
+                    }
+                    throw this.signer.provider.checkTransactionReceipt(receipt, errors.CALL_EXCEPTION, "transfer fungible token ownership failed", {
+                        method: "token-transferFungibleTokenOwnership",
+                        receipt
+                    });
+                });
+            });
+        });
+    }
+
+    getTransferOwnershipTransactionRequest(addressOrName: string | Promise<string>, overrides?: any): Promise<TransactionRequest> {
         if (!this.signer) {
             errors.throwError('transfer fungible token ownership require signer', errors.NOT_INITIALIZED, { arg: 'signer' });
         }
@@ -502,32 +543,15 @@ export class FungibleToken {
             }
 
             return this.provider.resolveName(addressOrName).then((toAddress) => {
-                let transaction = this.provider.getTransactionRequest("token", "token-transferFungibleTokenOwnership", {
+                let tx = this.provider.getTransactionRequest("token", "token-transferFungibleTokenOwnership", {
                     symbol: this.symbol,
                     from: signerAddress,
                     to: toAddress,
                     memo: (overrides && overrides.memo) ? overrides.memo : ""
                 });
-                transaction.fee = (overrides && overrides.fee) ? overrides.fee : this.provider.getTransactionFee(undefined, undefined, { tx: transaction });
+                tx.fee = (overrides && overrides.fee) ? overrides.fee : this.provider.getTransactionFee(undefined, undefined, { tx });
 
-                return this.signer.sendTransaction(transaction, overrides).then((response) => {
-                    if (overrides && overrides.sendOnly) {
-                        return response;
-                    }
-                    let confirmations = (overrides && overrides.confirmations) ? Number(overrides.confirmations) : null;
-
-                    return this.signer.provider.waitForTransaction(response.hash, confirmations).then((receipt) => {
-                        if (1 == receipt.status) {
-                            return this.getState(null, overrides).then(() => {
-                                return receipt;
-                            });
-                        }
-                        throw this.signer.provider.checkTransactionReceipt(receipt, errors.CALL_EXCEPTION, "transfer fungible token ownership failed", {
-                            method: "token-transferFungibleTokenOwnership",
-                            receipt
-                        });
-                    });
-                });
+                return tx;
             });
         });
     }
@@ -537,25 +561,8 @@ export class FungibleToken {
      * @param overrides options
      */
     acceptOwnership(overrides?: any): Promise<TransactionResponse | TransactionReceipt> {
-        if (!this.signer) {
-            errors.throwError('accept fungible token ownership require signer', errors.NOT_INITIALIZED, { arg: 'signer' });
-        }
-
-        this.isUsable; // check token useability, otherwise throw error
-
-        return resolveProperties({ signerAddress: this.signer.getAddress() }).then(({ signerAddress }) => {
-            if (!signerAddress) {
-                return errors.throwError('accept fungible token ownership require signer address', errors.MISSING_ARGUMENT, { required: 'signerAddress' });
-            }
-
-            let transaction = this.provider.getTransactionRequest("token", "token-acceptFungibleTokenOwnership", {
-                symbol: this.symbol,
-                from: signerAddress,
-                memo: (overrides && overrides.memo) ? overrides.memo : ""
-            });
-            transaction.fee = (overrides && overrides.fee) ? overrides.fee : this.provider.getTransactionFee(undefined, undefined, { tx: transaction });
-
-            return this.signer.sendTransaction(transaction, overrides).then((response) => {
+        return this.getAcceptOwnershipTransactionRequest(overrides).then((tx) => {
+            return this.signer.sendTransaction(tx, overrides).then((response) => {
                 if (overrides && overrides.sendOnly) {
                     return response;
                 }
@@ -574,6 +581,29 @@ export class FungibleToken {
                     });
                 });
             });
+        });
+    }
+
+    getAcceptOwnershipTransactionRequest(overrides?: any): Promise<TransactionRequest> {
+        if (!this.signer) {
+            errors.throwError('accept fungible token ownership require signer', errors.NOT_INITIALIZED, { arg: 'signer' });
+        }
+
+        this.isUsable; // check token useability, otherwise throw error
+
+        return resolveProperties({ signerAddress: this.signer.getAddress() }).then(({ signerAddress }) => {
+            if (!signerAddress) {
+                return errors.throwError('accept fungible token ownership require signer address', errors.MISSING_ARGUMENT, { required: 'signerAddress' });
+            }
+
+            let tx = this.provider.getTransactionRequest("token", "token-acceptFungibleTokenOwnership", {
+                symbol: this.symbol,
+                from: signerAddress,
+                memo: (overrides && overrides.memo) ? overrides.memo : ""
+            });
+            tx.fee = (overrides && overrides.fee) ? overrides.fee : this.provider.getTransactionFee(undefined, undefined, { tx });
+
+            return tx;
         });
     }
 
@@ -597,6 +627,27 @@ export class FungibleToken {
      * @param overrides options
      */
     static create(properties: FungibleTokenProperties, signer: Signer, overrides?: any): Promise<TransactionResponse | FungibleToken> {
+        return this.getCreateTransactionRequest(properties, signer, overrides).then((tx) => {
+            return signer.sendTransaction(tx, overrides).then((response) => {
+                if (overrides && overrides.sendOnly) {
+                    return response;
+                }
+                let confirmations = (overrides && overrides.confirmations) ? Number(overrides.confirmations) : null;
+
+                return signer.provider.waitForTransaction(response.hash, confirmations).then((receipt) => {
+                    if (1 == receipt.status) {
+                        return this.fromSymbol(properties.symbol, signer, overrides);
+                    }
+                    throw signer.provider.checkTransactionReceipt(receipt, errors.CALL_EXCEPTION, "create fungible token failed", {
+                        method: "token-createFungibleToken",
+                        receipt
+                    });
+                });
+            });
+        });
+    }
+
+    static getCreateTransactionRequest(properties: FungibleTokenProperties, signer: Signer, overrides?: any): Promise<TransactionRequest> {
         if (!Signer.isSigner(signer)) {
             errors.throwError('create fungible token transaction require signer', errors.MISSING_ARGUMENT, { arg: 'signer' });
         }
@@ -635,11 +686,8 @@ export class FungibleToken {
                     value: checkBigNumber
                 }
             }, properties);
-            if (bigNumberify(fungibleToken.fee.value).lte(0)) {
-                errors.throwError('create fungible token transaction require non-zero application fee', errors.MISSING_FEES, { value: fungibleToken });
-            }
 
-            let transaction = signer.provider.getTransactionRequest("token", "token-createFungibleToken", {
+            let tx = signer.provider.getTransactionRequest("token", "token-createFungibleToken", {
                 appFeeTo: fungibleToken.fee.to,
                 appFeeValue: fungibleToken.fee.value.toString(),
                 name: fungibleToken.name,
@@ -651,24 +699,9 @@ export class FungibleToken {
                 symbol: fungibleToken.symbol,
                 maxSupply: fungibleToken.maxSupply
             });
-            transaction.fee = signer.provider.getTransactionFee(undefined, undefined, { tx: transaction });
+            tx.fee = signer.provider.getTransactionFee(undefined, undefined, { tx });
 
-            return signer.sendTransaction(transaction, overrides).then((response) => {
-                if (overrides && overrides.sendOnly) {
-                    return response;
-                }
-                let confirmations = (overrides && overrides.confirmations) ? Number(overrides.confirmations) : null;
-
-                return signer.provider.waitForTransaction(response.hash, confirmations).then((receipt) => {
-                    if (1 == receipt.status) {
-                        return this.fromSymbol(properties.symbol, signer, overrides);
-                    }
-                    throw signer.provider.checkTransactionReceipt(receipt, errors.CALL_EXCEPTION, "create fungible token failed", {
-                        method: "token-createFungibleToken",
-                        receipt
-                    });
-                });
-            });
+            return tx;
         });
     }
 
@@ -760,22 +793,8 @@ export class FungibleToken {
      * @param signer signer wallet
      * @param overrides options
      */
-    static sendFungibleTokenStatusTransaction(transaction: FungibleTokenStatusTransaction, signer: Signer, overrides?: any) {
-        if (!Signer.isSigner(signer)) {
-            errors.throwError('send fungible token status transaction require signer', errors.MISSING_ARGUMENT, { arg: 'signer' });
-        }
-        checkProperties(transaction, { payload: true, signatures: true });
-        transaction = checkFungibleTokenStatus(transaction);
-
-        return resolveProperties({ signerAddress: signer.getAddress() }).then(({ signerAddress }) => {
-            let tx = signer.provider.getTransactionRequest("token", "token-setFungibleTokenStatus", {
-                payload: transaction.payload,
-                signatures: transaction.signatures,
-                owner: signerAddress,
-                memo: (overrides && overrides.memo) ? overrides.memo : "",
-            });
-            tx.fee = signer.provider.getTransactionFee(undefined, undefined, { tx });
-
+    static sendFungibleTokenStatusTransaction(transaction: FungibleTokenStatusTransaction, signer: Signer, overrides?: any): Promise<TransactionResponse | TransactionReceipt> {
+        return this.getFungibleTokenStatusTransactionRequest(transaction, signer, overrides).then((tx) => {
             return signer.sendTransaction(tx, overrides).then((response) => {
                 if (overrides && overrides.sendOnly) {
                     return response;
@@ -795,21 +814,15 @@ export class FungibleToken {
         });
     }
 
-    /**
-     * Send fungible token account status transaction by middleware
-     * @param transaction fungible token account status transaction
-     * @param signer signer wallet
-     * @param overrides options
-     */
-    static sendFungibleTokenAccountStatusTransaction(transaction: FungibleTokenAccountStatusTransaction, signer: Signer, overrides?: any) {
+    static getFungibleTokenStatusTransactionRequest(transaction: FungibleTokenStatusTransaction, signer: Signer, overrides?: any): Promise<TransactionRequest> {
         if (!Signer.isSigner(signer)) {
             errors.throwError('send fungible token status transaction require signer', errors.MISSING_ARGUMENT, { arg: 'signer' });
         }
         checkProperties(transaction, { payload: true, signatures: true });
-        transaction = checkFungibleTokenAccountStatus(transaction);
+        transaction = checkFungibleTokenStatus(transaction);
 
         return resolveProperties({ signerAddress: signer.getAddress() }).then(({ signerAddress }) => {
-            let tx = signer.provider.getTransactionRequest("token", "token-setFungibleTokenAccountStatus", {
+            let tx = signer.provider.getTransactionRequest("token", "token-setFungibleTokenStatus", {
                 payload: transaction.payload,
                 signatures: transaction.signatures,
                 owner: signerAddress,
@@ -817,6 +830,18 @@ export class FungibleToken {
             });
             tx.fee = signer.provider.getTransactionFee(undefined, undefined, { tx });
 
+            return tx;
+        });
+    }
+
+    /**
+     * Send fungible token account status transaction by middleware
+     * @param transaction fungible token account status transaction
+     * @param signer signer wallet
+     * @param overrides options
+     */
+    static sendFungibleTokenAccountStatusTransaction(transaction: FungibleTokenAccountStatusTransaction, signer: Signer, overrides?: any): Promise<TransactionResponse | TransactionReceipt> {
+        return this.getFungibleTokenAccountStatusTransactionRequest(transaction, signer, overrides).then((tx) => {
             return signer.sendTransaction(tx, overrides).then((response) => {
                 if (overrides && overrides.sendOnly) {
                     return response;
@@ -833,6 +858,26 @@ export class FungibleToken {
                     });
                 });
             });
+        });
+    }
+
+    static getFungibleTokenAccountStatusTransactionRequest(transaction: FungibleTokenAccountStatusTransaction, signer: Signer, overrides?: any): Promise<TransactionRequest> {
+        if (!Signer.isSigner(signer)) {
+            errors.throwError('send fungible token status transaction require signer', errors.MISSING_ARGUMENT, { arg: 'signer' });
+        }
+        checkProperties(transaction, { payload: true, signatures: true });
+        transaction = checkFungibleTokenAccountStatus(transaction);
+
+        return resolveProperties({ signerAddress: signer.getAddress() }).then(({ signerAddress }) => {
+            let tx = signer.provider.getTransactionRequest("token", "token-setFungibleTokenAccountStatus", {
+                payload: transaction.payload,
+                signatures: transaction.signatures,
+                owner: signerAddress,
+                memo: (overrides && overrides.memo) ? overrides.memo : "",
+            });
+            tx.fee = signer.provider.getTransactionFee(undefined, undefined, { tx });
+
+            return tx;
         });
     }
 

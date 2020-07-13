@@ -42,12 +42,17 @@ export declare class Wallet extends AbstractSigner {
     getAccountNumber(blockTag?: BlockTag): Promise<BigNumber>;
     getTransactionCount(blockTag?: BlockTag): Promise<BigNumber>;
     transfer(addressOrName: string | Promise<string>, value: BigNumberish, overrides?: any): Promise<TransactionResponse | TransactionReceipt>;
+    getTransferTransactionRequest(addressOrName: string | Promise<string>, value: BigNumberish, overrides?: any): Promise<TransactionRequest>;
     isWhitelisted(blockTag?: BlockTag): Promise<Boolean>;
     getKycAddress(blockTag?: BlockTag): Promise<string>;
     createAlias(name: string | Promise<string>, appFee: {
         to: string;
         value: BigNumberish;
     }, overrides?: any): Promise<TransactionResponse | TransactionReceipt>;
+    getCreateAliasTransactionRequest(name: string | Promise<string>, appFee: {
+        to: string;
+        value: BigNumberish;
+    }, overrides?: any): Promise<TransactionRequest>;
     encrypt(password: Arrayish | string, options?: any, progressCallback?: ProgressCallback): Promise<string>;
     /**
      *  Static methods to create Wallet instances.

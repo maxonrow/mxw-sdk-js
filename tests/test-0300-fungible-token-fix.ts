@@ -88,7 +88,7 @@ if ("" != nodeProvider.fungibleToken.middleware) {
                     maxSupply: bigNumberify("100000000000000000000000000"),
                     fee: {
                         to: nodeProvider.fungibleToken.feeCollector,
-                        value: bigNumberify("1")
+                        value: bigNumberify("0")
                     },
                     metadata: ""
                 };
@@ -99,9 +99,15 @@ if ("" != nodeProvider.fungibleToken.middleware) {
                 });
             });
 
-            it("Create - checkDuplication", function () {
-                return token.FungibleToken.create(fungibleTokenProperties, issuer).then((token) => {
-                    expect(token).is.not.exist;
+            it("Create - checkDuplication with manual broadcast", function () {
+                return token.FungibleToken.getCreateTransactionRequest(fungibleTokenProperties, issuer, defaultOverrides).then((transaction) => {
+                    return issuer.sign(transaction);
+                }).then((signedTransaction) => {
+                    return providerConnection.sendTransaction(signedTransaction, defaultOverrides);
+                }).then((response) => {
+                    return providerConnection.waitForTransaction(response.hash);
+                }).then((receipt) => {
+                    return token.FungibleToken.fromSymbol(fungibleTokenProperties.symbol, issuer, defaultOverrides);
                 }).catch(error => {
                     expect(error.code).to.equal(errors.EXISTS);
                 });

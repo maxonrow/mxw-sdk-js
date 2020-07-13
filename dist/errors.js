@@ -1,6 +1,6 @@
 'use strict';
 Object.defineProperty(exports, "__esModule", { value: true });
-const _version_1 = require("./_version");
+const mxw_1 = require("./mxw");
 // Object not initialized
 exports.NOT_INITIALIZED = 'NOT_INITIALIZED';
 // Transaction not found
@@ -116,7 +116,7 @@ function createError(message, code, params) {
             messageDetails.push(key + '=' + JSON.stringify(params[key].toString()));
         }
     });
-    messageDetails.push("version=" + _version_1.version);
+    messageDetails.push("version=" + mxw_1.version);
     let reason = message;
     if (messageDetails.length) {
         message += ' (' + messageDetails.join(', ') + ')';

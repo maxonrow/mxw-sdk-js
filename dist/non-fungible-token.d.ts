@@ -1,4 +1,4 @@
-import { Provider } from './providers/abstract-provider';
+import { Provider, TransactionRequest } from './providers/abstract-provider';
 import { Signer } from './abstract-signer';
 import { TransactionReceipt, TransactionResponse, BlockTag, NFTokenState } from './providers/abstract-provider';
 import { BigNumber } from './utils';
@@ -111,12 +111,14 @@ export declare class NonFungibleToken {
     * @param addressOrName new owner address
     * @param overrides options
     */
-    transferOwnership(addressOrName: string | Promise<string>, overrides?: any): Promise<TransactionReceipt>;
+    transferOwnership(addressOrName: string | Promise<string>, overrides?: any): Promise<TransactionResponse | TransactionReceipt>;
+    getTransferOwnershipTransactionRequest(addressOrName: string | Promise<string>, overrides?: any): Promise<TransactionRequest>;
     /**
     * Accept ownership by new owner
     * @param overrides options
     */
     acceptOwnership(overrides?: any): Promise<TransactionResponse | TransactionReceipt>;
+    getAcceptOwnershipTransactionRequest(overrides?: any): Promise<TransactionRequest>;
     /**
      * Load token instance by symbol
      * @param symbol token symbol
@@ -131,12 +133,14 @@ export declare class NonFungibleToken {
      * @param overrides options
      */
     static create(tokenProperties: NonFungibleTokenProperties, signer: Signer, overrides?: any): Promise<TransactionResponse | NonFungibleToken>;
+    static getCreateTransactionRequest(tokenProperties: NonFungibleTokenProperties, signer: Signer, overrides?: any): Promise<TransactionRequest>;
     /**
-   * Update non-fungible token metadata
-   * @param metadata new metadata
-   * @param overrides options
-   */
+     * Update non-fungible token metadata
+     * @param metadata new metadata
+     * @param overrides options
+     */
     updateMetadata(metadata?: string, overrides?: any): Promise<TransactionResponse | TransactionReceipt>;
+    getUpdateMetadataTransactionRequest(metadata?: string, overrides?: any): Promise<TransactionRequest>;
     /**
     * Mint NFT item
     * @param toAddressOrName receiver address
@@ -144,6 +148,7 @@ export declare class NonFungibleToken {
     * @param overrides options
     */
     mint(toAddressOrName: string | Promise<string>, item: NonFungibleTokenItem, overrides?: any): Promise<TransactionResponse | TransactionReceipt>;
+    getMintTransactionRequest(toAddressOrName: string | Promise<string>, item: NonFungibleTokenItem, overrides?: any): Promise<TransactionRequest>;
     /**
      * Sign non fungible token status transaction by issuer
      * @param transaction non fungible token status transaction
@@ -206,14 +211,16 @@ export declare class NonFungibleToken {
      * @param signer signer wallet
      * @param overrides options
      */
-    static sendNonFungibleTokenStatusTransaction(transaction: NonFungibleTokenStatusTransaction, signer: Signer, overrides?: any): Promise<TransactionReceipt>;
+    static sendNonFungibleTokenStatusTransaction(transaction: NonFungibleTokenStatusTransaction, signer: Signer, overrides?: any): Promise<TransactionResponse | TransactionReceipt>;
+    static getNonFungibleTokenStatusTransactionRequest(transaction: NonFungibleTokenStatusTransaction, signer: Signer, overrides?: any): Promise<TransactionRequest>;
     /**
      * Send non fungible token item status transaction by middleware
      * @param transaction non fungible token status transaction
      * @param signer signer wallet
      * @param overrides options
      */
-    static sendNonFungibleTokenItemStatusTransaction(transaction: NonFungibleTokenItemStatusTransaction, signer: Signer, overrides?: any): Promise<TransactionReceipt>;
+    static sendNonFungibleTokenItemStatusTransaction(transaction: NonFungibleTokenItemStatusTransaction, signer: Signer, overrides?: any): Promise<TransactionResponse | TransactionReceipt>;
+    static getNonFungibleTokenItemStatusTransactionRequest(transaction: NonFungibleTokenItemStatusTransaction, signer: Signer, overrides?: any): Promise<TransactionRequest>;
     /**
      * Freeze NFT item by provider
      * @param symbol token item symbol

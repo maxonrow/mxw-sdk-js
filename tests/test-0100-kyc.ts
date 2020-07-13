@@ -204,6 +204,29 @@ if ("" != nodeProvider.kyc.middleware) {
             });
         });
 
+        it("Whitelist - checkDuplication with manual broadcast", function () {
+            return auth.Kyc.create(middleware).then(async (kyc) => {
+                for (let kycTransaction of kycTransactions) {
+                    let overrides = {
+                        logSignaturePayload: defaultOverrides.logSignaturePayload,
+                        logSignedTransaction: defaultOverrides.logSignedTransaction
+                    };
+                    try {
+                        let request = await kyc.getWhitelistTransactionRequest(kycTransaction, overrides);
+                        let signedTransaction = await middleware.sign(request, overrides);
+                        let response = await providerConnection.sendTransaction(signedTransaction, overrides);
+                        let receipt = await providerConnection.waitForTransaction(response.hash);
+
+                        expect(receipt).to.exist;
+                        expect(receipt.status).to.equal(0);
+                    }
+                    catch (error) {
+                        expect(error.code).to.equal(errors.EXISTS);
+                    }
+                }
+            });
+        });
+
         it("Check whitelist status", async function () {
             for (let wallet of wallets) {
                 let whitelisted = await wallet.isWhitelisted();
