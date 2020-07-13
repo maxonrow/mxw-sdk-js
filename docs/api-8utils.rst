@@ -211,7 +211,7 @@ Constants
 #########
 
 :sup:`mxw . constants` . AddressZero
-    The address ``mxw000000000000000000000000000000000000000``.
+    The address ``mxw1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqgcpfl3``.
 
 :sup:`mxw . constants` . HashZero
     The bytes32 ``0x0000000000000000000000000000000000000000000000000000000000000000``.
