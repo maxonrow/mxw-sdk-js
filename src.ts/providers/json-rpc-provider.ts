@@ -535,6 +535,10 @@ function checkResponseLog(self: JsonRpcProvider, method: string, result: any, de
                         return errors.createError('invalid token owner', errors.NOT_ALLOWED, { operation: method, info, response: result, params });
                     case 2104: // Transfer token ownership approved
                         return errors.createError('Token ownership is already approved', errors.EXISTS, { operation: method, info, response: result, params });
+                    case 2105:
+                        return errors.createError('Token item id is in used', errors.EXISTS, { operation: method, info, response: result, params });
+                    case 2106:
+                        return errors.createError('Token item endorser invalid', errors.EXISTS, { operation: method, info, response: result, params });
 
                     case 3001: // Fee setting not found
                         return errors.createError('fee setting not found', errors.MISSING_FEES, { operation: method, info, response: result, params });

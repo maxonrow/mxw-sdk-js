@@ -276,7 +276,7 @@ if ("" != nodeProvider.nonFungibleToken.middleware) {
                 });
 
                 it("Update NFT endorsers", function () {
-                    let endorsers = [wallet.address, provider.address, issuer.address]
+                    let endorsers = [wallet.address, provider.address]
                     return nonFungibleToken.updateEndorserList(endorsers).then((receipt) => {
                         expect(receipt.status).to.equal(1);
                         return refresh(nonFungibleTokenProperties.symbol).then(() => {
@@ -369,6 +369,15 @@ if ("" != nodeProvider.nonFungibleToken.middleware) {
                     let nftItemInstance = new NonFungibleTokenItem(symbol, itemId, wallet);
                     return nftItemInstance.endorse().then((receipt) => {
                         expect(receipt.status).to.equal(1);
+                    });
+                });
+
+                it("Endorse - not in endorser list", function () {
+                    let nftItemInstance = new NonFungibleTokenItem(symbol, itemId, issuer);
+                    return nftItemInstance.endorse().then((receipt) => {
+                        expect(receipt).is.not.exist
+                    }).catch(error => {
+                     expect(error.code).to.equal(errors.EXISTS);
                     });
                 });
 
