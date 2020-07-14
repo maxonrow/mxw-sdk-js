@@ -376,14 +376,46 @@ if ("" != nodeProvider.nonFungibleToken.middleware) {
 
                 it("Endorse", function () {
                     let nftItemInstance = new NonFungibleTokenItem(symbol, itemId, wallet);
-                    return nftItemInstance.endorse().then((receipt) => {
+                    return nftItemInstance.endorse("abc").then((receipt) => {
                         expect(receipt.status).to.equal(1);
+                    });
+                });
+
+                it("Endorse - challenge metatdata length of chinese word(85*3 one chinese word = 3 length)", function () {
+                    let nftItemInstance = new NonFungibleTokenItem(symbol, itemId, wallet);
+                    return nftItemInstance.endorse("跳跳跳跳跳跳跳跳跳跳跳跳跳跳跳跳跳跳跳跳跳跳跳跳跳跳跳跳跳跳跳跳跳跳跳跳跳跳跳跳跳跳跳跳跳跳跳跳跳跳跳跳跳跳跳跳跳跳跳跳跳跳跳跳跳跳跳跳跳跳跳跳跳跳跳跳跳跳跳跳跳跳跳跳跳").then((receipt) => {
+                        expect(receipt.status).to.equal(1);
+                    });
+                });
+
+                it("Endorse - challenge metadata length of chinese word(86*3 one chinese word = 3 length)", function () {
+                    let nftItemInstance = new NonFungibleTokenItem(symbol, itemId, wallet);
+                    return nftItemInstance.endorse("跳跳跳跳跳跳跳跳跳跳跳跳跳跳跳跳跳跳跳跳跳跳跳跳跳跳跳跳跳跳跳跳跳跳跳跳跳跳跳跳跳跳跳跳跳跳跳跳跳跳跳跳跳跳跳跳跳跳跳跳跳跳跳跳跳跳跳跳跳跳跳跳跳跳跳跳跳跳跳跳跳跳跳跳跳跳跳").then((receipt) => {
+                        expect(receipt).is.not.exist
+                    }).catch(error => {
+                        expect(error.code).to.equal(errors.UNEXPECTED_RESULT);
+                    });
+                });
+
+                it("Endorse - challenge length(256) of metadata", function () {
+                    let nftItemInstance = new NonFungibleTokenItem(symbol, itemId, wallet);
+                    return nftItemInstance.endorse("aabbccddeeffggghhiijjkkllmmnnnooppqqrrssttuuvvwwwxxyyzzaabbccddeeffggghhiijjkkllmmnnnooppqqrrssttuuvvwwwxxyyzzaabbccddeeffggghhiijjkkllmmnnnooppqqrrssttuuvvwwwxxyyzzaabbccddeeffggghhiijjkkllmmnnnooppqqrrssttuuvvwwwxxyyzzaabbccddeeffggghhiijjkkllmmnnnooppqq").then((receipt) => {
+                        expect(receipt.status).to.equal(1);
+                    });
+                });
+
+                it("Endorse - challenge length(257) of metadata", function () {
+                    let nftItemInstance = new NonFungibleTokenItem(symbol, itemId, wallet);
+                    return nftItemInstance.endorse("aabbccddeeffggghhiijjkkllmmnnnooppqqrrssttuuvvwwwxxyyzzaabbccddeeffggghhiijjkkllmmnnnooppqqrrssttuuvvwwwxxyyzzaabbccddeeffggghhiijjkkllmmnnnooppqqrrssttuuvvwwwxxyyzzaabbccddeeffggghhiijjkkllmmnnnooppqqrrssttuuvvwwwxxyyzzaabbccddeeffggghhiijjkkllmmnnnooppqqA").then((receipt) => {
+                        expect(receipt).is.not.exist
+                    }).catch(error => {
+                        expect(error.code).to.equal(errors.UNEXPECTED_RESULT);
                     });
                 });
 
                 it("Endorse - not in endorser list", function () {
                     let nftItemInstance = new NonFungibleTokenItem(symbol, itemId, issuer);
-                    return nftItemInstance.endorse().then((receipt) => {
+                    return nftItemInstance.endorse("abc").then((receipt) => {
                         expect(receipt).is.not.exist
                     }).catch(error => {
                         expect(error.code).to.equal(errors.NOT_ALLOWED);
