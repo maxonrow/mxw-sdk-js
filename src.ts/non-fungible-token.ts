@@ -469,7 +469,7 @@ export class NonFungibleToken {
                     if (1 == receipt.status) {
                         return receipt;
                     }
-                    throw this.signer.provider.checkTransactionReceipt(receipt, errors.CALL_EXCEPTION, "update non fungible token item metadata failed", {
+                    throw this.signer.provider.checkTransactionReceipt(receipt, errors.CALL_EXCEPTION, "update non fungible token endorser list failed", {
                         method: "nonfungible-updateEndorserList",
                         receipt
                     });
@@ -480,7 +480,7 @@ export class NonFungibleToken {
 
     getUpdateEndorserListTransactionRequest(endorsers: string[], overrides?: any): Promise<TransactionRequest> {
         if (!this.signer) {
-            errors.throwError('update non fungible token item metadata require signer', errors.NOT_INITIALIZED, { arg: 'signer' });
+            errors.throwError('update non fungible token endorser list require signer', errors.NOT_INITIALIZED, { arg: 'signer' });
         }
 
         return resolveProperties({ address: this.signer.getAddress() }).then(({ address }) => {
