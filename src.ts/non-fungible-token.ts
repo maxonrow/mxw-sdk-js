@@ -443,7 +443,8 @@ export class NonFungibleToken {
             let tx = this.signer.provider.getTransactionRequest("nonFungible", "updateNFTMetadata", {
                 symbol: this.symbol,
                 from: address,
-                metadata
+                metadata,
+                memo: (overrides && overrides.memo) ? overrides.memo : ""
             });
             tx.fee = (overrides && overrides.fee) ? overrides.fee : this.signer.provider.getTransactionFee(undefined, undefined, { tx });
 
@@ -490,7 +491,8 @@ export class NonFungibleToken {
             let tx = this.signer.provider.getTransactionRequest("nonFungible", "updateNFTEndorserList", {
                 symbol: this.symbol,
                 from: address,
-                endorsers: endorsers
+                endorsers: endorsers,
+                memo: (overrides && overrides.memo) ? overrides.memo : ""
             });
             tx.fee = (overrides && overrides.fee) ? overrides.fee : this.signer.provider.getTransactionFee(undefined, undefined, { tx });
 
