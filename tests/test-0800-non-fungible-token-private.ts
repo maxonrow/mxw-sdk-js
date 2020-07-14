@@ -119,6 +119,15 @@ if ("" != nodeProvider.nonFungibleToken.middleware) {
                     });
                 });
 
+                it("Challenge Update NFT endorsers before token being approve", function () {
+                    let endorsers = [wallet.address, provider.address]
+                    return nonFungibleToken.updateEndorserList(endorsers).then((receipt) => {
+                        expect(receipt.status).is.not.exist
+                    }).catch(error => {
+                        expect(error.code).to.equal(errors.NOT_AVAILABLE);
+                    });
+                });
+
                 it("Approve - challenge wrong fee setting", function () {
 
                     let overrides = {
@@ -273,6 +282,18 @@ if ("" != nodeProvider.nonFungibleToken.middleware) {
                         });
                     });
                 });
+
+                it("Update NFT endorsers", function () {
+                    let endorsers = [wallet.address, provider.address]
+                    return nonFungibleToken.updateEndorserList(endorsers).then((receipt) => {
+                        expect(receipt.status).to.equal(1);
+                        return refresh(nonFungibleTokenProperties.symbol).then(() => {
+                            expect(nonFungibleToken).to.exist;
+                            if (!silent) console.log(indent, "Updated Token Endorser list:", JSON.stringify(nonFungibleToken.state));
+                        });
+                    });
+                });
+
                 // let issuer be a nftMinter
                 let nftMinter: token.NonFungibleToken;
                 // random item id
@@ -373,6 +394,14 @@ if ("" != nodeProvider.nonFungibleToken.middleware) {
                     });
                 });
 
+                it("Endorse - not in endorser list", function () {
+                    let nftItemInstance = new NonFungibleTokenItem(symbol, itemId, issuer);
+                    return nftItemInstance.endorse().then((receipt) => {
+                        expect(receipt).is.not.exist
+                    }).catch(error => {
+                        expect(error.code).to.equal(errors.NOT_ALLOWED);
+                    });
+                });
 
                 it("Freeze item", function () {
                     return performNonFungibleTokenItemStatus(nonFungibleTokenProperties.symbol, itemId, token.NonFungibleToken.freezeNonFungibleTokenItem, null).then((receipt) => {
