@@ -119,6 +119,15 @@ if ("" != nodeProvider.nonFungibleToken.middleware) {
                     });
                 });
 
+                it("Challenge Update NFT endorsers before token being approve", function () {
+                    let endorsers = [wallet.address, provider.address]
+                    return nonFungibleToken.updateEndorserList(endorsers).then((receipt) => {
+                        expect(receipt.status).is.not.exist
+                    }).catch(error => {
+                        expect(error.code).to.equal(errors.NOT_AVAILABLE);
+                    });
+                });
+
                 it("Approve - challenge wrong fee setting", function () {
 
                     let overrides = {
@@ -390,7 +399,7 @@ if ("" != nodeProvider.nonFungibleToken.middleware) {
                     return nftItemInstance.endorse().then((receipt) => {
                         expect(receipt).is.not.exist
                     }).catch(error => {
-                        expect(error.code).to.equal(errors.EXISTS);
+                        expect(error.code).to.equal(errors.NOT_ALLOWED);
                     });
                 });
 
