@@ -188,8 +188,8 @@ export class NonFungibleTokenItem {
     * Endorse token item by endorser
     * @param overrides options
     */
-    endorse(overrides?: any): Promise<TransactionResponse | TransactionReceipt> {
-        return this.getEndorseTransactionRequest().then((tx) => {
+    endorse(metadata: string, overrides?: any): Promise<TransactionResponse | TransactionReceipt> {
+        return this.getEndorseTransactionRequest(metadata, overrides).then((tx) => {
             return this.signer.sendTransaction(tx, overrides).then((response) => {
                 if (overrides && overrides.sendOnly) {
                     return response;
@@ -209,7 +209,7 @@ export class NonFungibleTokenItem {
         });
     }
 
-    getEndorseTransactionRequest(overrides?: any): Promise<TransactionRequest> {
+    getEndorseTransactionRequest(metadata: string, overrides?: any): Promise<TransactionRequest> {
         if (!this.signer) {
             errors.throwError('endorse non fungible token item require signer', errors.NOT_INITIALIZED, { arg: 'signer' });
         }
@@ -223,6 +223,7 @@ export class NonFungibleTokenItem {
                 symbol: this.symbol,
                 from: address,
                 itemID: this.itemID,
+                metadata: metadata ? metadata : "",
                 memo: (overrides && overrides.memo) ? overrides.memo : ""
             });
             tx.fee = (overrides && overrides.fee) ? overrides.fee : this.signer.provider.getTransactionFee(undefined, undefined, { tx });
