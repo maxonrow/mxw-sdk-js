@@ -22,6 +22,8 @@ export enum NonFungibleTokenActions {
     burn = "burn",
     transferOwnership = "transferOwnership",
     acceptOwnership = "acceptOwnership",
+    endorse = "endorse",
+    updateNFTEndorserList = "updateNFTEndorserList"
 };
 
 export enum NFTokenStateFlags {

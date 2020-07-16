@@ -135,7 +135,9 @@ if ("" != nodeProvider.nonFungibleToken.middleware) {
                         tokenFees: [
                             { action: NonFungibleTokenActions.transfer, feeName: "anything" },
                             { action: NonFungibleTokenActions.transferOwnership, feeName: "default" },
-                            { action: NonFungibleTokenActions.acceptOwnership, feeName: "default" }
+                            { action: NonFungibleTokenActions.acceptOwnership, feeName: "default" },
+                            { action: NonFungibleTokenActions.endorse, feeName: "default" },
+                            { action: NonFungibleTokenActions.updateNFTEndorserList, feeName: "default" }
                         ],
                         endorserList: [],
                         mintLimit: 1,
@@ -159,7 +161,9 @@ if ("" != nodeProvider.nonFungibleToken.middleware) {
                         tokenFees: [
                             { action: NonFungibleTokenActions.transfer, feeName: "default" },
                             { action: NonFungibleTokenActions.transferOwnership, feeName: "default" },
-                            { action: NonFungibleTokenActions.acceptOwnership, feeName: "default" }
+                            { action: NonFungibleTokenActions.acceptOwnership, feeName: "default" },
+                            { action: NonFungibleTokenActions.endorse, feeName: "default" },
+                            { action: NonFungibleTokenActions.updateNFTEndorserList, feeName: "default" }
                         ],
                         endorserList: [],
                         mintLimit: 1,
@@ -181,7 +185,9 @@ if ("" != nodeProvider.nonFungibleToken.middleware) {
                         tokenFees: [
                             { action: NonFungibleTokenActions.transfer, feeName: "default" },
                             { action: NonFungibleTokenActions.transferOwnership, feeName: "default" },
-                            { action: NonFungibleTokenActions.acceptOwnership, feeName: "default" }
+                            { action: NonFungibleTokenActions.acceptOwnership, feeName: "default" },
+                            { action: NonFungibleTokenActions.endorse, feeName: "default" },
+                            { action: NonFungibleTokenActions.updateNFTEndorserList, feeName: "default" }
                         ],
                         endorserList: [],
                         mintLimit: 1,
