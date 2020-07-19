@@ -106,6 +106,20 @@ describe('Suite: Utils', function () {
         expect("0x6cabdb6b53060a1961f7cceede7e07022505a83870fadb64f9699074150f033e").to.equal(hash);
     });
 
+    it("Verify transaction signature", function () {
+        let encodedPublicKey = "A4Rfxov1OSvWeIZZnLjT5SCa4PQCclSg1/YdwqAqlvt7";
+        let publicKey = utils.base64.decode(encodedPublicKey);
+        let from = utils.computeAddress(publicKey);
+    
+        let signaturePayload = '';
+        let signature = "";
+    
+        if (signaturePayload && signature) {
+            let result = utils.verify(signaturePayload, signature, from);
+            expect(result).to.equal(true);
+        }
+    });
+        
     it("Adhoc test", function () {
         
     });
