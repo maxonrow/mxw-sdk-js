@@ -40,8 +40,8 @@ export declare class NonFungibleTokenItem {
     * Endorse token item by endorser
     * @param overrides options
     */
-    endorse(overrides?: any): Promise<TransactionResponse | TransactionReceipt>;
-    getEndorseTransactionRequest(overrides?: any): Promise<TransactionRequest>;
+    endorse(metadata: string, overrides?: any): Promise<TransactionResponse | TransactionReceipt>;
+    getEndorseTransactionRequest(metadata: string, overrides?: any): Promise<TransactionRequest>;
     /**
     * Update token item metadata
     * @param metadata metadata to update

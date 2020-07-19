@@ -68,29 +68,44 @@ function decrypt(json, password, progressCallback) {
     var data = JSON.parse(json);
     let passwordBytes = getPassword(password);
     var decrypt = function (key, ciphertext) {
-        var cipher = searchPath(data, 'crypto/cipher');
-        if (cipher === 'aes-128-ctr') {
-            var iv = looseArrayify(searchPath(data, 'crypto/cipherparams/iv'));
-            var counter = new aes_js_1.default.Counter(iv);
-            var aesCtr = new aes_js_1.default.ModeOfOperation.ctr(key, counter);
-            return bytes_1.arrayify(aesCtr.decrypt(ciphertext));
-        }
-        return null;
+        var iv = looseArrayify(searchPath(data, 'crypto/cipherparams/iv'));
+        var counter = new aes_js_1.default.Counter(iv);
+        var aesCtr = new aes_js_1.default.ModeOfOperation.ctr(key, counter);
+        return bytes_1.arrayify(aesCtr.decrypt(ciphertext));
     };
     var computeMAC = function (derivedHalf, ciphertext) {
         return sha2_1.sha256(bytes_1.concat([derivedHalf, ciphertext]));
     };
     var getSigningKey = function (key, reject) {
         var ciphertext = looseArrayify(searchPath(data, 'crypto/ciphertext'));
-        var computedMAC = bytes_1.hexlify(computeMAC(key.slice(16, 32), ciphertext)).substring(2);
-        if (computedMAC !== searchPath(data, 'crypto/mac').toLowerCase()) {
-            reject(new Error('invalid password'));
+        var computedMAC;
+        var privateKey;
+        var mnemonicKey;
+        var cipher = searchPath(data, 'crypto/cipher');
+        if (cipher === 'aes-256-ctr') {
+            if (80 !== key.length) {
+                reject(new Error('invalid cipher dk length'));
+                return null;
+            }
+            privateKey = decrypt(key.slice(0, 32), ciphertext);
+            mnemonicKey = key.slice(48, 80);
+            computedMAC = bytes_1.hexlify(computeMAC(key.slice(32, 48), ciphertext)).substring(2);
+        }
+        else if (cipher === 'aes-128-ctr') {
+            if (64 !== key.length) {
+                reject(new Error('invalid cipher dk length'));
+                return null;
+            }
+            privateKey = decrypt(key.slice(0, 16), ciphertext);
+            mnemonicKey = key.slice(32, 64);
+            computedMAC = bytes_1.hexlify(computeMAC(key.slice(16, 32), ciphertext)).substring(2);
+        }
+        else {
+            reject(new Error('unsupported cipher'));
             return null;
         }
-        var privateKey = decrypt(key.slice(0, 16), ciphertext);
-        var mnemonicKey = key.slice(32, 64);
-        if (!privateKey) {
-            reject(new Error('unsupported cipher'));
+        if (computedMAC !== searchPath(data, 'crypto/mac').toLowerCase()) {
+            reject(new Error('invalid password'));
             return null;
         }
         var signingKey = new signing_key_1.SigningKey(privateKey);
@@ -135,14 +150,14 @@ function decrypt(json, password, progressCallback) {
                     return;
                 }
                 var dkLen = parseInt(searchPath(data, 'crypto/kdfparams/dklen'));
-                if (dkLen !== 32) {
+                if (dkLen !== 32 && dkLen !== 48) {
                     reject(new Error('unsupported key-derivation derived-key length'));
                     return;
                 }
                 if (progressCallback) {
                     progressCallback(0);
                 }
-                scrypt_js_1.default(passwordBytes, salt, N, r, p, 64, function (error, progress, key) {
+                scrypt_js_1.default(passwordBytes, salt, N, r, p, dkLen + 32, function (error, progress, key) {
                     if (error) {
                         error.progress = progress;
                         reject(error);
@@ -179,11 +194,11 @@ function decrypt(json, password, progressCallback) {
                 }
                 var c = parseInt(searchPath(data, 'crypto/kdfparams/c'));
                 var dkLen = parseInt(searchPath(data, 'crypto/kdfparams/dklen'));
-                if (dkLen !== 32) {
+                if (dkLen !== 32 && dkLen !== 48) {
                     reject(new Error('unsupported key-derivation derived-key length'));
                     return;
                 }
-                var key = pbkdf2_1.pbkdf2(passwordBytes, salt, c, dkLen, prfFunc);
+                var key = pbkdf2_1.pbkdf2(passwordBytes, salt, c, dkLen + 32, prfFunc);
                 var signingKey = getSigningKey(key, reject);
                 if (!signingKey) {
                     return;
@@ -291,10 +306,10 @@ function encrypt(privateKey, password, options, progressCallback) {
         if (progressCallback) {
             progressCallback(0);
         }
-        // We take 64 bytes:
-        //   - 32 bytes   As normal for the Web3 secret storage (derivedKey, macPrefix)
+        // We take 80 bytes:
+        //   - 48 bytes   As normal for the Web3 secret storage (derivedKey, macPrefix)
         //   - 32 bytes   AES key to encrypt mnemonic with (required here to be MXW Wallet)
-        scrypt_js_1.default(passwordBytes, salt, N, r, p, 64, function (error, progress, key) {
+        scrypt_js_1.default(passwordBytes, salt, N, r, p, 80, function (error, progress, key) {
             if (error) {
                 error.progress = progress;
                 reject(error);
@@ -302,10 +317,10 @@ function encrypt(privateKey, password, options, progressCallback) {
             else if (key) {
                 key = bytes_1.arrayify(key);
                 // This will be used to encrypt the wallet (as per Web3 secret storage)
-                var derivedKey = key.slice(0, 16);
-                var macPrefix = key.slice(16, 32);
+                var derivedKey = key.slice(0, 32);
+                var macPrefix = key.slice(32, 48);
                 // This will be used to encrypt the mnemonic phrase (if any)
-                var mnemonicKey = key.slice(32, 64);
+                var mnemonicKey = key.slice(48, 80);
                 // Get the address for this private key
                 var address = (new signing_key_1.SigningKey(privateKeyBytes)).address;
                 // Encrypt the private key
@@ -320,7 +335,7 @@ function encrypt(privateKey, password, options, progressCallback) {
                     id: uuid_1.default.v4({ random: uuidRandom }),
                     version: 3,
                     Crypto: {
-                        cipher: 'aes-128-ctr',
+                        cipher: 'aes-256-ctr',
                         cipherparams: {
                             iv: bytes_1.hexlify(iv).substring(2),
                         },
@@ -329,7 +344,7 @@ function encrypt(privateKey, password, options, progressCallback) {
                         kdfparams: {
                             salt: bytes_1.hexlify(salt).substring(2),
                             n: N,
-                            dklen: 32,
+                            dklen: 48,
                             p: p,
                             r: r
                         },

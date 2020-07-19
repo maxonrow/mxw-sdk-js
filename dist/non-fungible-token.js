@@ -22,6 +22,8 @@ var NonFungibleTokenActions;
     NonFungibleTokenActions["burn"] = "burn";
     NonFungibleTokenActions["transferOwnership"] = "transferOwnership";
     NonFungibleTokenActions["acceptOwnership"] = "acceptOwnership";
+    NonFungibleTokenActions["endorse"] = "endorse";
+    NonFungibleTokenActions["updateNFTEndorserList"] = "updateNFTEndorserList";
 })(NonFungibleTokenActions = exports.NonFungibleTokenActions || (exports.NonFungibleTokenActions = {}));
 ;
 var NFTokenStateFlags;
@@ -325,7 +327,50 @@ class NonFungibleToken {
             let tx = this.signer.provider.getTransactionRequest("nonFungible", "updateNFTMetadata", {
                 symbol: this.symbol,
                 from: address,
-                metadata
+                metadata,
+                memo: (overrides && overrides.memo) ? overrides.memo : ""
+            });
+            tx.fee = (overrides && overrides.fee) ? overrides.fee : this.signer.provider.getTransactionFee(undefined, undefined, { tx });
+            return tx;
+        });
+    }
+    /**
+     * Update non-fungible token endorser list
+     * @param endorsers new endorsers
+     * @param overrides options
+     */
+    updateEndorserList(endorsers, overrides) {
+        return this.getUpdateEndorserListTransactionRequest(endorsers, overrides).then((tx) => {
+            return this.signer.sendTransaction(tx, overrides).then((response) => {
+                if (overrides && overrides.sendOnly) {
+                    return response;
+                }
+                let confirmations = (overrides && overrides.confirmations) ? Number(overrides.confirmations) : null;
+                return this.signer.provider.waitForTransaction(response.hash, confirmations).then((receipt) => {
+                    if (1 == receipt.status) {
+                        return receipt;
+                    }
+                    throw this.signer.provider.checkTransactionReceipt(receipt, errors.CALL_EXCEPTION, "update non fungible token endorser list failed", {
+                        method: "nonfungible-updateEndorserList",
+                        receipt
+                    });
+                });
+            });
+        });
+    }
+    getUpdateEndorserListTransactionRequest(endorsers, overrides) {
+        if (!this.signer) {
+            errors.throwError('update non fungible token endorser list require signer', errors.NOT_INITIALIZED, { arg: 'signer' });
+        }
+        return properties_1.resolveProperties({ address: this.signer.getAddress() }).then(({ address }) => {
+            if (!address) {
+                return errors.throwError('update non fungible token endorser list require signer address', errors.MISSING_ARGUMENT, { arg: 'signerAddress' });
+            }
+            let tx = this.signer.provider.getTransactionRequest("nonFungible", "updateNFTEndorserList", {
+                symbol: this.symbol,
+                from: address,
+                endorsers: endorsers,
+                memo: (overrides && overrides.memo) ? overrides.memo : ""
             });
             tx.fee = (overrides && overrides.fee) ? overrides.fee : this.signer.provider.getTransactionFee(undefined, undefined, { tx });
             return tx;
