@@ -94,17 +94,12 @@ export function decrypt(json: string, password: Arrayish, progressCallback?: Pro
     let passwordBytes = getPassword(password);
 
     var decrypt = function (key: Uint8Array, ciphertext: Uint8Array): Uint8Array {
-        var cipher = searchPath(data, 'crypto/cipher');
-        if (cipher === 'aes-128-ctr') {
-            var iv = looseArrayify(searchPath(data, 'crypto/cipherparams/iv'))
-            var counter = new aes.Counter(iv);
+        var iv = looseArrayify(searchPath(data, 'crypto/cipherparams/iv'))
+        var counter = new aes.Counter(iv);
 
-            var aesCtr = new aes.ModeOfOperation.ctr(key, counter);
+        var aesCtr = new aes.ModeOfOperation.ctr(key, counter);
 
-            return arrayify(aesCtr.decrypt(ciphertext));
-        }
-
-        return null;
+        return arrayify(aesCtr.decrypt(ciphertext));
     };
 
     var computeMAC = function (derivedHalf: Uint8Array, ciphertext: Uint8Array) {
@@ -114,17 +109,36 @@ export function decrypt(json: string, password: Arrayish, progressCallback?: Pro
     var getSigningKey = function (key: Uint8Array, reject: (error?: Error) => void) {
         var ciphertext = looseArrayify(searchPath(data, 'crypto/ciphertext'));
 
-        var computedMAC = hexlify(computeMAC(key.slice(16, 32), ciphertext)).substring(2);
-        if (computedMAC !== searchPath(data, 'crypto/mac').toLowerCase()) {
-            reject(new Error('invalid password'));
+        var computedMAC;
+        var privateKey;
+        var mnemonicKey;
+
+        var cipher = searchPath(data, 'crypto/cipher');
+        if (cipher === 'aes-256-ctr') {
+            if (80 !== key.length) {
+                reject(new Error('invalid cipher dk length'));
+                return null;
+            }
+            privateKey = decrypt(key.slice(0, 32), ciphertext);
+            mnemonicKey = key.slice(48, 80);
+            computedMAC = hexlify(computeMAC(key.slice(32, 48), ciphertext)).substring(2);
+        }
+        else if (cipher === 'aes-128-ctr') {
+            if (64 !== key.length) {
+                reject(new Error('invalid cipher dk length'));
+                return null;
+            }
+            privateKey = decrypt(key.slice(0, 16), ciphertext);
+            mnemonicKey = key.slice(32, 64);
+            computedMAC = hexlify(computeMAC(key.slice(16, 32), ciphertext)).substring(2);
+        }
+        else {
+            reject(new Error('unsupported cipher'));
             return null;
         }
 
-        var privateKey = decrypt(key.slice(0, 16), ciphertext);
-        var mnemonicKey = key.slice(32, 64);
-
-        if (!privateKey) {
-            reject(new Error('unsupported cipher'));
+        if (computedMAC !== searchPath(data, 'crypto/mac').toLowerCase()) {
+            reject(new Error('invalid password'));
             return null;
         }
 
@@ -160,7 +174,6 @@ export function decrypt(json: string, password: Arrayish, progressCallback?: Pro
         return signingKey;
     }
 
-
     return new Promise(function (resolve, reject) {
         var kdf = searchPath(data, 'crypto/kdf');
         if (kdf && typeof (kdf) === 'string') {
@@ -181,13 +194,13 @@ export function decrypt(json: string, password: Arrayish, progressCallback?: Pro
                 }
 
                 var dkLen = parseInt(searchPath(data, 'crypto/kdfparams/dklen'));
-                if (dkLen !== 32) {
+                if (dkLen !== 32 && dkLen !== 48) {
                     reject(new Error('unsupported key-derivation derived-key length'));
                     return;
                 }
 
                 if (progressCallback) { progressCallback(0); }
-                scrypt(passwordBytes, salt, N, r, p, 64, function (error, progress, key) {
+                scrypt(passwordBytes, salt, N, r, p, dkLen + 32, function (error, progress, key) {
                     if (error) {
                         error.progress = progress;
                         reject(error);
@@ -223,12 +236,12 @@ export function decrypt(json: string, password: Arrayish, progressCallback?: Pro
                 var c = parseInt(searchPath(data, 'crypto/kdfparams/c'));
 
                 var dkLen = parseInt(searchPath(data, 'crypto/kdfparams/dklen'));
-                if (dkLen !== 32) {
+                if (dkLen !== 32 && dkLen !== 48) {
                     reject(new Error('unsupported key-derivation derived-key length'));
                     return;
                 }
 
-                var key = pbkdf2(passwordBytes, salt, c, dkLen, prfFunc);
+                var key = pbkdf2(passwordBytes, salt, c, dkLen + 32, prfFunc);
 
                 var signingKey = getSigningKey(key, reject);
                 if (!signingKey) { return; }
@@ -326,10 +339,10 @@ export function encrypt(privateKey: Arrayish | SigningKey, password: Arrayish | 
     return new Promise(function (resolve, reject) {
         if (progressCallback) { progressCallback(0); }
 
-        // We take 64 bytes:
-        //   - 32 bytes   As normal for the Web3 secret storage (derivedKey, macPrefix)
+        // We take 80 bytes:
+        //   - 48 bytes   As normal for the Web3 secret storage (derivedKey, macPrefix)
         //   - 32 bytes   AES key to encrypt mnemonic with (required here to be MXW Wallet)
-        scrypt(passwordBytes, salt, N, r, p, 64, function (error, progress, key) {
+        scrypt(passwordBytes, salt, N, r, p, 80, function (error, progress, key) {
             if (error) {
                 error.progress = progress;
                 reject(error);
@@ -338,11 +351,11 @@ export function encrypt(privateKey: Arrayish | SigningKey, password: Arrayish | 
                 key = arrayify(key);
 
                 // This will be used to encrypt the wallet (as per Web3 secret storage)
-                var derivedKey = key.slice(0, 16);
-                var macPrefix = key.slice(16, 32);
+                var derivedKey = key.slice(0, 32);
+                var macPrefix = key.slice(32, 48);
 
                 // This will be used to encrypt the mnemonic phrase (if any)
-                var mnemonicKey = key.slice(32, 64);
+                var mnemonicKey = key.slice(48, 80);
 
                 // Get the address for this private key
                 var address = (new SigningKey(privateKeyBytes)).address;
@@ -361,7 +374,7 @@ export function encrypt(privateKey: Arrayish | SigningKey, password: Arrayish | 
                     id: uuid.v4({ random: uuidRandom }),
                     version: 3,
                     Crypto: {
-                        cipher: 'aes-128-ctr',
+                        cipher: 'aes-256-ctr',
                         cipherparams: {
                             iv: hexlify(iv).substring(2),
                         },
@@ -370,7 +383,7 @@ export function encrypt(privateKey: Arrayish | SigningKey, password: Arrayish | 
                         kdfparams: {
                             salt: hexlify(salt).substring(2),
                             n: N,
-                            dklen: 32,
+                            dklen: 48,
                             p: p,
                             r: r
                         },
