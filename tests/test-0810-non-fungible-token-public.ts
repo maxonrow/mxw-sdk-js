@@ -382,7 +382,21 @@ if ("" != nodeProvider.nonFungibleToken.middleware) {
 
                 it("Endorse", function () {
                     let nftItemInstance = new NonFungibleTokenItem(symbol, itemId, wallet);
-                    return nftItemInstance.endorse("abc").then((receipt) => {
+                    return nftItemInstance.endorse().then((receipt) => {
+                        expect(receipt.status).to.equal(1);
+                    });
+                });
+
+                it("Endorse with metadata", function () {
+                    let nftItemInstance = new NonFungibleTokenItem(symbol, itemId, wallet);
+                    return nftItemInstance.endorse("Hello blockchain").then((receipt) => {
+                        expect(receipt.status).to.equal(1);
+                    });
+                });
+
+                it("Endorse with metadata and memo", function () {
+                    let nftItemInstance = new NonFungibleTokenItem(symbol, itemId, wallet);
+                    return nftItemInstance.endorse("Hello Blockchain", { memo: "Hello Signer" }).then((receipt) => {
                         expect(receipt.status).to.equal(1);
                     });
                 });
