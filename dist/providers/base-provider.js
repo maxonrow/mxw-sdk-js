@@ -27,7 +27,7 @@ const abstract_provider_1 = require("./abstract-provider");
 function checkKeyValue(data) {
     return misc_1.checkFormat({
         key: misc_1.checkString,
-        value: misc_1.checkString
+        value: misc_1.allowNullOrEmpty(misc_1.checkString, null)
     }, data);
 }
 function checkTypeAttribute(data) {
