@@ -45,7 +45,7 @@ import { Network, Networkish } from '../utils/networks';
 function checkKeyValue(data: any): KeyValue {
     return checkFormat({
         key: checkString,
-        value: checkString
+        value: allowNullOrEmpty(checkString, null)
     }, data);
 }
 
