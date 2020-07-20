@@ -153,9 +153,12 @@ class NonFungibleTokenItem {
     }
     /**
     * Endorse token item by endorser
-    * @param overrides options
     */
     endorse(metadata, overrides) {
+        if ("object" === typeof metadata) {
+            overrides = metadata;
+            metadata = undefined;
+        }
         return this.getEndorseTransactionRequest(metadata, overrides).then((tx) => {
             return this.signer.sendTransaction(tx, overrides).then((response) => {
                 if (overrides && overrides.sendOnly) {
