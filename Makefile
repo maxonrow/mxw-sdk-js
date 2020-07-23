@@ -1,6 +1,6 @@
 
 ROOT_PATH := $(shell pwd)
-REGISTRY_URL := registry-intl.ap-southeast-3.aliyuncs.com/d_mxw/
+REGISTRY_URL := registry-intl.cn-hongkong.aliyuncs.com/d_mxw/
 
 .PHONY:
 all: install release
