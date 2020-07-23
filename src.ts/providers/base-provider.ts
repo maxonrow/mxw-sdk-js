@@ -727,7 +727,7 @@ export class BaseProvider extends Provider {
                         return result;
                     });
                 });
-            });
+            }); 
         });
     }
 
@@ -768,7 +768,6 @@ export class BaseProvider extends Provider {
             });
         });
     }
-
 
     getAliasState(address: string | Promise<string>, blockTag?: BlockTag | Promise<BlockTag>): Promise<AliasState> {
         return resolveProperties({ address, blockTag }).then(({ address, blockTag }) => {

@@ -1263,40 +1263,40 @@ export function getTransactionRequest(route: string, transactionType: string, ov
             }
             break;
 
-            case "nonFungible/updateNFTEndorserList":
-                {
-                    let params: {
-                        symbol: string,
-                        from: string,
-                        endorsers: string[],
-                        memo: string
-                    } = checkFormat({
-                        symbol: checkString,
-                        from: checkAddress,
-                        endorsers: arrayOf(checkAddress),
-                        memo: allowNullOrEmpty(checkString)
-                    }, overrides);
-    
-                    transaction = {
-                        type: "cosmos-sdk/StdTx",
-                        value: {
-                            msg: [
-                                {
-                                    type: "nonFungible/updateNFTEndorserList",
-                                    value: {
-                                        symbol: params.symbol,
-                                        from: params.from,
-                                        endorsers: params.endorsers
-                                    }
+        case "nonFungible/updateNFTEndorserList":
+            {
+                let params: {
+                    symbol: string,
+                    from: string,
+                    endorsers: string[],
+                    memo: string
+                } = checkFormat({
+                    symbol: checkString,
+                    from: checkAddress,
+                    endorsers: arrayOf(checkAddress),
+                    memo: allowNullOrEmpty(checkString)
+                }, overrides);
+
+                transaction = {
+                    type: "cosmos-sdk/StdTx",
+                    value: {
+                        msg: [
+                            {
+                                type: "nonFungible/updateNFTEndorserList",
+                                value: {
+                                    symbol: params.symbol,
+                                    from: params.from,
+                                    endorsers: params.endorsers
                                 }
-                            ],
-                            memo: params.memo ? params.memo : ""
-                        },
-                        fee: null
-    
-                    }
+                            }
+                        ],
+                        memo: params.memo ? params.memo : ""
+                    },
+                    fee: null
+
                 }
-                break;
+            }
+            break;
 
         case "nonFungible/burnNonFungibleToken":
             {
