@@ -6,7 +6,7 @@
 Non-Fungible Token
 ******************
 
-A non-fungible token (NFT) is a special type of cryptographic token which represents something unique; non-fungible 
+A non-fungible token (NFT) is a representation of an non-monetary assets in the form of cryptographic token; non-fungible 
 tokens are thus not mutually interchangeable by their individual specification. This is in contrast with 
 cryptocurrencies like Zcash, and many network or utility tokens that are fungible in nature.
 
