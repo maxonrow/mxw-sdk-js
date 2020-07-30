@@ -91,7 +91,8 @@ function checkNonFungibleTokenState(data) {
         Properties: misc_1.allowNullOrEmpty(misc_1.checkString),
         TransferLimit: misc_1.checkBigNumber,
         MintLimit: misc_1.checkBigNumber,
-        TotalSupply: misc_1.checkString
+        TotalSupply: misc_1.checkBigNumber,
+        EndorserList: misc_1.allowNullOrEmpty(misc_1.arrayOf(misc_1.checkAddress), [])
     }, data), (key) => {
         switch (key) {
             case "Flags": return "flags";
@@ -104,6 +105,7 @@ function checkNonFungibleTokenState(data) {
             case "TransferLimit": return "transferLimit";
             case "MintLimit": return "mintLimit";
             case "TotalSupply": return "totalSupply";
+            case "EndorserList": return "endorserList";
         }
         return key;
     });
@@ -582,10 +584,25 @@ class BaseProvider extends abstract_provider_1.Provider {
                         if (result) {
                             result = checkTokenAccountState(result);
                         }
+                        else {
+                            result = {
+                                owner: address,
+                                frozen: false,
+                                balance: bignumber_1.bigNumberify(0)
+                            };
+                        }
                         return result;
                     });
                 });
             });
+        });
+    }
+    getTokenAccountBalance(symbol, addressOrName, blockTag) {
+        return this.getTokenAccountState(symbol, addressOrName, blockTag).then((state) => {
+            if (state && state.balance) {
+                return state.balance;
+            }
+            return bignumber_1.bigNumberify(0);
         });
     }
     getNFTokenState(symbol, blockTag) {

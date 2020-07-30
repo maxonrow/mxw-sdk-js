@@ -36,6 +36,7 @@ export declare class BaseProvider extends Provider {
     getTokenState(symbol: string | Promise<string>, blockTag?: BlockTag | Promise<BlockTag>): Promise<TokenState>;
     getTokenList(blockTag?: BlockTag | Promise<BlockTag>): Promise<TokenList>;
     getTokenAccountState(symbol: string | Promise<string>, addressOrName: string | Promise<string>, blockTag?: BlockTag | Promise<BlockTag>): Promise<TokenAccountState>;
+    getTokenAccountBalance(symbol: string | Promise<string>, addressOrName: string | Promise<string>, blockTag?: BlockTag | Promise<BlockTag>): Promise<BigNumber>;
     getNFTokenState(symbol: string | Promise<string>, blockTag?: BlockTag | Promise<BlockTag>): Promise<NFTokenState>;
     getNFTokenItemState(symbol: string | Promise<string>, itemID: string, blockTag?: BlockTag | Promise<BlockTag>): Promise<NFTokenItemState>;
     getAliasState(address: string | Promise<string>, blockTag?: BlockTag | Promise<BlockTag>): Promise<AliasState>;

@@ -9,6 +9,8 @@ exports.NOT_FOUND = 'NOT_FOUND';
 // KYC registration is required
 //   - transaction: the transaction attempted
 exports.KYC_REQUIRED = 'KYC_REQUIRED';
+// Receiver KYC registration is required
+exports.RECEIVER_KYC_REQUIRED = 'RECEIVER_KYC_REQUIRED';
 // Resources not available
 //   - transaction: the transaction attempted
 exports.NOT_AVAILABLE = 'NOT_AVAILABLE';

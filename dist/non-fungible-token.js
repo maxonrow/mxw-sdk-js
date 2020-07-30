@@ -699,11 +699,9 @@ function setNonFungibleTokenStatus(symbol, status, signer, overrides) {
                 }
                 if (overrides.endorserList) {
                     let endorsers = misc_1.checkFormat({
-                        endorserList: misc_1.allowNullOrEmpty(misc_1.arrayOf(misc_1.checkString))
+                        endorserList: misc_1.allowNullOrEmpty(misc_1.arrayOf(misc_1.checkString), null)
                     }, overrides);
                     endorserList = endorsers.endorserList;
-                    if (endorserList.length == 0)
-                        endorserList = null;
                 }
             }
             if (misc_1.isUndefinedOrNullOrEmpty(tokenFees)) {

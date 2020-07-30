@@ -1,6 +1,7 @@
 export declare const NOT_INITIALIZED = "NOT_INITIALIZED";
 export declare const NOT_FOUND = "NOT_FOUND";
 export declare const KYC_REQUIRED = "KYC_REQUIRED";
+export declare const RECEIVER_KYC_REQUIRED = "RECEIVER_KYC_REQUIRED";
 export declare const NOT_AVAILABLE = "NOT_AVAILABLE";
 export declare const NOT_ALLOWED = "NOT_ALLOWED";
 export declare const FORBIDDEN = "FORBIDDEN";

@@ -972,7 +972,7 @@ function getTransactionRequest(route, transactionType, overrides) {
                 let params = misc_1.checkFormat({
                     symbol: misc_1.checkString,
                     from: misc_1.checkAddress,
-                    endorsers: misc_1.arrayOf(misc_1.checkAddress),
+                    endorsers: misc_1.allowNullOrEmpty(misc_1.arrayOf(misc_1.checkAddress), null),
                     memo: misc_1.allowNullOrEmpty(misc_1.checkString)
                 }, overrides);
                 transaction = {

@@ -460,6 +460,8 @@ function checkResponseLog(self, method, result, defaultCode, defaultMessage, par
                         return errors.createError('KYC registration is required', errors.KYC_REQUIRED, { operation: method, info, response: result, params });
                     case 1001: // KYC address duplicated
                         return errors.createError('Duplicated KYC', errors.EXISTS, { operation: method, info, response: result, params });
+                    case 1002: // Receiver KYC is required
+                        return errors.createError('Receiver KYC is required', errors.RECEIVER_KYC_REQUIRED, { operation: method, info, response: result, params });
                     case 2001: // Token already exists
                         return errors.createError('token exists', errors.EXISTS, { operation: method, info, response: result, params });
                     case 2002: // Token does not exists
@@ -489,11 +491,17 @@ function checkResponseLog(self, method, result, defaultCode, defaultMessage, par
                     case 2103: // Invalid token owner
                         return errors.createError('invalid token owner', errors.NOT_ALLOWED, { operation: method, info, response: result, params });
                     case 2104: // Transfer token ownership approved
-                        return errors.createError('Token ownership is already approved', errors.EXISTS, { operation: method, info, response: result, params });
+                        return errors.createError('token ownership is already approved', errors.EXISTS, { operation: method, info, response: result, params });
                     case 2105:
-                        return errors.createError('Token item id is in used', errors.EXISTS, { operation: method, info, response: result, params });
+                        return errors.createError('token item id is in used', errors.EXISTS, { operation: method, info, response: result, params });
                     case 2106:
-                        return errors.createError('Token item endorser invalid', errors.NOT_ALLOWED, { operation: method, info, response: result, params });
+                        return errors.createError('token item endorser invalid', errors.NOT_ALLOWED, { operation: method, info, response: result, params });
+                    case 2107:
+                        return errors.createError('token item frozen', errors.NOT_ALLOWED, { operation: method, info, response: result, params });
+                    case 2108:
+                        return errors.createError('invalid item holder', errors.NOT_ALLOWED, { operation: method, info, response: result, params });
+                    case 2110:
+                        return errors.createError('token item not found', errors.NOT_FOUND, { operation: method, info, response: result, params });
                     case 3001: // Fee setting not found
                         return errors.createError('fee setting not found', errors.MISSING_FEES, { operation: method, info, response: result, params });
                     case 3002: // Token fee setting not found
