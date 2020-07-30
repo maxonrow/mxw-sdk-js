@@ -869,11 +869,10 @@ function setNonFungibleTokenStatus(symbol: string, status: string, signer: Signe
 
                 if (overrides.endorserList) {
                     let endorsers = checkFormat({
-                        endorserList: allowNullOrEmpty(arrayOf(checkString))
+                        endorserList: allowNullOrEmpty(arrayOf(checkString), null)
                     }, overrides);
 
                     endorserList = endorsers.endorserList;
-                    if (endorserList.length == 0) endorserList = null;
                 }
             }
             if (isUndefinedOrNullOrEmpty(tokenFees)) {

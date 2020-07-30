@@ -1272,7 +1272,7 @@ export function getTransactionRequest(route: string, transactionType: string, ov
                 } = checkFormat({
                     symbol: checkString,
                     from: checkAddress,
-                    endorsers: arrayOf(checkAddress),
+                    endorsers: allowNullOrEmpty(arrayOf(checkAddress), null),
                     memo: allowNullOrEmpty(checkString)
                 }, overrides);
 
