@@ -727,7 +727,7 @@ export class BaseProvider extends Provider {
                         return result;
                     });
                 });
-            }); 
+            });
         });
     }
 

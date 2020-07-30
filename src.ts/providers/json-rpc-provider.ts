@@ -494,7 +494,6 @@ function checkResponseLog(self: JsonRpcProvider, method: string, result: any, de
                         return errors.createError('invalid amount', errors.NUMERIC_FAULT, { operation: method, info, response: result, params });
                     case 14: // CodeInsufficientFee
                         return errors.createError('insufficient fees', errors.INSUFFICIENT_FEES, { operation: method, info, response: result, params });
-
                 }
                 break;
 

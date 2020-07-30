@@ -1258,7 +1258,6 @@ export function getTransactionRequest(route: string, transactionType: string, ov
                         memo: params.memo ? params.memo : ""
                     },
                     fee: null
-
                 }
             }
             break;
@@ -1293,7 +1292,6 @@ export function getTransactionRequest(route: string, transactionType: string, ov
                         memo: params.memo ? params.memo : ""
                     },
                     fee: null
-
                 }
             }
             break;
