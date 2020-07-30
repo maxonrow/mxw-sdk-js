@@ -173,7 +173,7 @@ export function notAllowNull(check: CheckFormatFunc): CheckFormatFunc {
 
 export function allowNullOrEmpty(check: CheckFormatFunc, nullValue?: any): CheckFormatFunc {
     return (function (value: any) {
-        if (value == null || '' === value) { return nullValue; }
+        if (value == null || '' === value || (Array.isArray(value) && 0 === value.length)) { return nullValue; }
         return check(value);
     });
 }
