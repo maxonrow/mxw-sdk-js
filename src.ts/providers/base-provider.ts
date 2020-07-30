@@ -739,6 +739,15 @@ export class BaseProvider extends Provider {
         });
     }
 
+    getTokenAccountBalance(symbol: string | Promise<string>, addressOrName: string | Promise<string>, blockTag?: BlockTag | Promise<BlockTag>): Promise<BigNumber> {
+        return this.getTokenAccountState(symbol, addressOrName, blockTag).then((state) => {
+            if (state && state.balance) {
+                return state.balance;
+            }
+            return bigNumberify(0);
+        });
+    }
+
     getNFTokenState(symbol: string | Promise<string>, blockTag?: BlockTag | Promise<BlockTag>): Promise<NFTokenState> {
         return this.ready.then(() => {
             return resolveProperties({ symbol: symbol, blockTag: blockTag }).then(({ symbol, blockTag }) => {
