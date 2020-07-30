@@ -725,6 +725,13 @@ export class BaseProvider extends Provider {
                         if (result) {
                             result = checkTokenAccountState(result);
                         }
+                        else {
+                            result = {
+                                owner: address,
+                                frozen: false,
+                                balance: bigNumberify(0)
+                            }
+                        }
                         return result;
                     });
                 });
