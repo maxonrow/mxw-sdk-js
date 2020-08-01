@@ -246,6 +246,9 @@ export abstract class Provider implements OnceBlockable {
     // // @TODO: This *could* be implemented here, but would pull in events...
     abstract waitForTransaction(transactionHash: string, confirmations?: number): Promise<TransactionReceipt>;
 
+    abstract get pollingInterval(): number;
+    abstract set pollingInterval(value: number);
+
     constructor() {
         setType(this, 'Provider');
     }

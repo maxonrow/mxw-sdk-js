@@ -16,7 +16,8 @@ export type ConnectionInfo = {
     password?: string,
     allowInsecure?: boolean,
     timeout?: number,
-    headers?: { [key: string]: string | number }
+    headers?: { [key: string]: string | number },
+    pollingInterval?: number
 };
 
 export interface OnceBlockable {

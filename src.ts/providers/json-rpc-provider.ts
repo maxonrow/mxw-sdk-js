@@ -76,6 +76,19 @@ export class JsonRpcProvider extends BaseProvider {
         if (!this.connection.timeout || 0 > this.connection.timeout) {
             this.connection.timeout = 60000;
         }
+
+        // Configure polling interval
+        if (this.connection.pollingInterval && 0 < this.connection.pollingInterval) {
+            super.pollingInterval = this.connection.pollingInterval;
+        }
+    }
+
+    get pollingInterval() {
+        return super.pollingInterval;
+    }
+
+    set pollingInterval(value: number) {
+        super.pollingInterval = value;
     }
 
     send(method: string, params: any): Promise<any> {
