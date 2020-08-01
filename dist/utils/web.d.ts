@@ -7,6 +7,7 @@ export declare type ConnectionInfo = {
     headers?: {
         [key: string]: string | number;
     };
+    pollingInterval?: number;
 };
 export interface OnceBlockable {
     once(eventName: "block", handler: () => void): void;
