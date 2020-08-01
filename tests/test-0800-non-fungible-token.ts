@@ -86,6 +86,26 @@ if ("" != nodeProvider.nonFungibleToken.middleware) {
                     describe('Suite: NonFungibleToken - ' + JSON.stringify({ transferable, modifiable, burnable, pub }), function () {
                         this.slow(slowThreshold); // define the threshold for slow indicator
                         let symbol = "NFT" + hexlify(randomBytes(4)).substring(2);
+
+                        it("Create - challenge negative application fee", function () {
+                            let nonFungibleTokenProperties = {
+                                name: "MY" + symbol,
+                                symbol: symbol,
+                                fee: {
+                                    to: nodeProvider.nonFungibleToken.feeCollector,
+                                    value: bigNumberify("-1")
+                                },
+                                metadata: "metadata",
+                                properties: "properties"
+                            };
+
+                            return token.NonFungibleToken.create(nonFungibleTokenProperties, issuer, defaultOverrides).then((token) => {
+                                expect(token).is.not.exist;
+                            }).catch(error => {
+                                expect(error).have.property("code").to.eq(errors.NUMERIC_FAULT);
+                            });
+                        });
+
                         it("Create", function () {
                             nonFungibleTokenProperties = {
                                 name: "MY" + symbol,
