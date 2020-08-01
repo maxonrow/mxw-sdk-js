@@ -89,28 +89,30 @@ if ("" != nodeProvider.kyc.middleware) {
         });
 
         it("Sign kyc address", function () {
-            let promises = [];
+            let promises = Promise.resolve();
 
             for (let wallet of wallets) {
-                promises.push(auth.Kyc.create(wallet).then((kyc) => {
-                    let kycAddress = kyc.getKycAddress({
-                        country: "MY",
-                        idType: "NIC",
-                        id: wallet.address,
-                        idExpiry: 20200101,
-                        dob: 19800101,
-                        seed: utils.getHash(utils.randomBytes(32))
-                    });
+                promises = promises.then(() => {
+                    return auth.Kyc.create(wallet).then((kyc) => {
+                        let kycAddress = kyc.getKycAddress({
+                            country: "MY",
+                            idType: "NIC",
+                            id: wallet.address,
+                            idExpiry: 20200101,
+                            dob: 19800101,
+                            seed: utils.getHash(utils.randomBytes(32))
+                        });
 
-                    return kyc.sign(kycAddress).then((data) => {
-                        expect(data).to.exist;
-                        kycList.push(data);
-                        kycAddresses.push(kycAddress);
-                        if (!silent) console.log(indent, "KYC data:", JSON.stringify(data));
+                        return kyc.sign(kycAddress).then((data) => {
+                            expect(data).to.exist;
+                            kycList.push(data);
+                            kycAddresses.push(kycAddress);
+                            if (!silent) console.log(indent, "KYC data:", JSON.stringify(data));
+                        });
                     });
-                }));
+                });
             }
-            return Promise.all(promises).then(() => {
+            return promises.then(() => {
                 expect(kycList.length).to.equal(wallets.length);
             });
         });
