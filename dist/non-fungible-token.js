@@ -275,8 +275,8 @@ class NonFungibleToken {
                     value: misc_1.checkBigNumber
                 }
             }, tokenProperties);
-            if (utils_1.bigNumberify(nonFungibleToken.fee.value).lte(0)) {
-                errors.throwError('create non fungible token transaction require non-zero application fee', errors.MISSING_FEES, { value: nonFungibleToken });
+            if (utils_1.bigNumberify(nonFungibleToken.fee.value).lt(0)) {
+                errors.throwError('create non fungible token transaction require non-negative application fee', errors.NUMERIC_FAULT, { value: nonFungibleToken });
             }
             let tx = signer.provider.getTransactionRequest("nonFungible", "createNonFungibleToken", {
                 appFeeTo: nonFungibleToken.fee.to,
