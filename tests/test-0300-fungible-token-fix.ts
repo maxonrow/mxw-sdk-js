@@ -78,6 +78,28 @@ if ("" != nodeProvider.fungibleToken.middleware) {
         describe('Suite: FungibleToken - Fixed Supply ' + (burnable ? "(Burnable)" : "(Not Burnable)"), function () {
             this.slow(slowThreshold); // define the threshold for slow indicator
 
+            it("Create - challenge negative application fee", function () {
+                let symbol = "FIX" + hexlify(randomBytes(4)).substring(2);
+                let fungibleTokenProperties = {
+                    name: "MY " + symbol,
+                    symbol: symbol,
+                    decimals: 18,
+                    fixedSupply: true,
+                    maxSupply: bigNumberify("100000000000000000000000000"),
+                    fee: {
+                        to: nodeProvider.fungibleToken.feeCollector,
+                        value: bigNumberify("-1")
+                    },
+                    metadata: ""
+                };
+
+                return token.FungibleToken.create(fungibleTokenProperties, issuer, defaultOverrides).then((token) => {
+                    expect(token).is.not.exist;
+                }).catch(error => {
+                    expect(error).have.property("code").to.eq(errors.NUMERIC_FAULT);
+                });
+            });
+
             it("Create", function () {
                 let symbol = "FIX" + hexlify(randomBytes(4)).substring(2);
                 fungibleTokenProperties = {
