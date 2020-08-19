@@ -688,7 +688,7 @@ export class NonFungibleToken {
      * @param overrides options
      */
     static approveNonFungibleTokenOwnership(symbol: string, signer: Signer, overrides?: any) {
-        return setNonFungibleTokenStatus(symbol, "APPROVE_TRANFER_TOKEN_OWNERSHIP", signer, overrides);
+        return setNonFungibleTokenStatus(symbol, "APPROVE_TRANSFER_TOKEN_OWNERSHIP", signer, overrides);
     }
 
     /**
@@ -698,7 +698,7 @@ export class NonFungibleToken {
      * @param overrides options
      */
     static rejectNonFungibleTokenOwnership(symbol: string, signer: Signer, overrides?: any) {
-        return setNonFungibleTokenStatus(symbol, "REJECT_TRANFER_TOKEN_OWNERSHIP", signer, overrides);
+        return setNonFungibleTokenStatus(symbol, "REJECT_TRANSFER_TOKEN_OWNERSHIP", signer, overrides);
     }
 
     /**
@@ -880,8 +880,8 @@ function setNonFungibleTokenStatus(symbol: string, status: string, signer: Signe
             }
             break;
 
-        case "APPROVE_TRANFER_TOKEN_OWNERSHIP":
-        case "REJECT_TRANFER_TOKEN_OWNERSHIP":
+        case "APPROVE_TRANSFER_TOKEN_OWNERSHIP":
+        case "REJECT_TRANSFER_TOKEN_OWNERSHIP":
         case "REJECT":
         case "FREEZE":
         case "UNFREEZE":
