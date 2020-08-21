@@ -28,6 +28,9 @@ setup-env:
 		./pull-env.sh; \
 	cd ..;
 
+test:
+	@npm run test
+
 build:
 	@npm run build
 	@REGISTRY_URL=$(REGISTRY_URL) make --no-print-directory -C $(ROOT_PATH)/docs build
