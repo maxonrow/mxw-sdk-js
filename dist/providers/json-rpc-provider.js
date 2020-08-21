@@ -509,8 +509,12 @@ function checkResponseLog(self, method, result, defaultCode, defaultMessage, par
                     case 2107:
                         return errors.createError('token item frozen', errors.NOT_ALLOWED, { operation: method, info, response: result, params });
                     case 2108:
-                        return errors.createError('invalid item holder', errors.NOT_ALLOWED, { operation: method, info, response: result, params });
+                        return errors.createError('token item unfrozen', errors.NOT_ALLOWED, { operation: method, info, response: result, params });
+                    case 2109:
+                        return errors.createError('invalid item owner', errors.NOT_ALLOWED, { operation: method, info, response: result, params });
                     case 2110:
+                        return errors.createError('token item not modifiable', errors.NOT_ALLOWED, { operation: method, info, response: result, params });
+                    case 2111:
                         return errors.createError('token item not found', errors.NOT_FOUND, { operation: method, info, response: result, params });
                     case 3001: // Fee setting not found
                         return errors.createError('fee setting not found', errors.MISSING_FEES, { operation: method, info, response: result, params });

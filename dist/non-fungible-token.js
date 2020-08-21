@@ -544,7 +544,7 @@ class NonFungibleToken {
      * @param overrides options
      */
     static approveNonFungibleTokenOwnership(symbol, signer, overrides) {
-        return setNonFungibleTokenStatus(symbol, "APPROVE_TRANFER_TOKEN_OWNERSHIP", signer, overrides);
+        return setNonFungibleTokenStatus(symbol, "APPROVE_TRANSFER_TOKEN_OWNERSHIP", signer, overrides);
     }
     /**
      * Reject fungible token ownership by provider
@@ -553,7 +553,7 @@ class NonFungibleToken {
      * @param overrides options
      */
     static rejectNonFungibleTokenOwnership(symbol, signer, overrides) {
-        return setNonFungibleTokenStatus(symbol, "REJECT_TRANFER_TOKEN_OWNERSHIP", signer, overrides);
+        return setNonFungibleTokenStatus(symbol, "REJECT_TRANSFER_TOKEN_OWNERSHIP", signer, overrides);
     }
     /**
      * Send non fungible token status transaction by middleware
@@ -708,8 +708,8 @@ function setNonFungibleTokenStatus(symbol, status, signer, overrides) {
                 errors.throwError('non fungible token fees are missing', errors.MISSING_ARGUMENT, { arg: 'tokenFees' });
             }
             break;
-        case "APPROVE_TRANFER_TOKEN_OWNERSHIP":
-        case "REJECT_TRANFER_TOKEN_OWNERSHIP":
+        case "APPROVE_TRANSFER_TOKEN_OWNERSHIP":
+        case "REJECT_TRANSFER_TOKEN_OWNERSHIP":
         case "REJECT":
         case "FREEZE":
         case "UNFREEZE":
