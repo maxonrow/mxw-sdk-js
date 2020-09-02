@@ -454,6 +454,15 @@ function checkResponseLog(self, method, result, defaultCode, defaultMessage, par
             case "sdk":
                 switch (info.code) {
                     case 4: // signature verification failed
+                        // Temporary solution for some error codes
+                        if (info.message) {
+                            switch (info.message) {
+                                case "Endorserlist limit exceeded.": // error code 2113
+                                    return errors.createError('token endorserlist limit exceeded', errors.NOT_ALLOWED, { operation: method, info, response: result, params });
+                                case "Endorserlist limit cannot less than or equal 0":
+                                    return errors.createError('token endorserlist limit is not valid', errors.INVALID_ARGUMENT, { operation: method, info, response: result, params });
+                            }
+                        }
                         return errors.createError('signature verification failed', errors.SIGNATURE_FAILED, { operation: method, info, response: result, params });
                     case 5: // CodeInsufficientFunds
                     case 10: // CodeInsufficientCoins
@@ -516,6 +525,8 @@ function checkResponseLog(self, method, result, defaultCode, defaultMessage, par
                         return errors.createError('token item not modifiable', errors.NOT_ALLOWED, { operation: method, info, response: result, params });
                     case 2111:
                         return errors.createError('token item not found', errors.NOT_FOUND, { operation: method, info, response: result, params });
+                    case 2113:
+                        return errors.createError('token endorserlist limit exceeded', errors.NOT_ALLOWED, { operation: method, info, response: result, params });
                     case 3001: // Fee setting not found
                         return errors.createError('fee setting not found', errors.MISSING_FEES, { operation: method, info, response: result, params });
                     case 3002: // Token fee setting not found

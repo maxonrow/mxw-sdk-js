@@ -62,6 +62,7 @@ export interface NonFungibleTokenStatus {
         transferable: boolean;
         modifiable: boolean;
         pub: boolean;
+        endorserListLimit: BigNumber;
     };
     pub_key: {
         type: string;

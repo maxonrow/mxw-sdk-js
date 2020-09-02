@@ -92,7 +92,8 @@ function checkNonFungibleTokenState(data) {
         TransferLimit: misc_1.checkBigNumber,
         MintLimit: misc_1.checkBigNumber,
         TotalSupply: misc_1.checkBigNumber,
-        EndorserList: misc_1.allowNullOrEmpty(misc_1.arrayOf(misc_1.checkAddress), [])
+        EndorserList: misc_1.allowNullOrEmpty(misc_1.arrayOf(misc_1.checkAddress), []),
+        EndorserListLimit: misc_1.checkBigNumber
     }, data), (key) => {
         switch (key) {
             case "Flags": return "flags";
@@ -106,6 +107,7 @@ function checkNonFungibleTokenState(data) {
             case "MintLimit": return "mintLimit";
             case "TotalSupply": return "totalSupply";
             case "EndorserList": return "endorserList";
+            case "EndorserListLimit": return "endorserListLimit";
         }
         return key;
     });

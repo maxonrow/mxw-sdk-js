@@ -46,6 +46,7 @@ export interface NFTokenState {
     transferLimit: BigNumber;
     endorserList: string[];
     totalSupply: BigNumber;
+    endorserListLimit: BigNumber;
 }
 export interface NFTokenItemState {
     id: string;

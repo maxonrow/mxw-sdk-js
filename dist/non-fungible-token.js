@@ -675,7 +675,7 @@ function setNonFungibleTokenStatus(symbol, status, signer, overrides) {
     }
     properties_1.checkProperties({ symbol, status }, { symbol: true, status: true });
     let tokenFees;
-    let mintLimit, transferLimit;
+    let mintLimit, transferLimit, endorserListLimit;
     let endorserList = null;
     let burnable, transferable, modifiable, pub;
     burnable = (overrides && overrides.burnable) ? true : false;
@@ -687,9 +687,11 @@ function setNonFungibleTokenStatus(symbol, status, signer, overrides) {
             let params = misc_1.checkFormat({
                 mintLimit: misc_1.checkBigNumberString,
                 transferLimit: misc_1.checkBigNumberString,
+                endorserListLimit: misc_1.checkBigNumberString
             }, overrides);
             mintLimit = params.mintLimit;
             transferLimit = params.transferLimit;
+            endorserListLimit = params.endorserListLimit;
             if (overrides) {
                 if (overrides.tokenFees) {
                     let tokenProperties = misc_1.checkFormat({
@@ -715,6 +717,7 @@ function setNonFungibleTokenStatus(symbol, status, signer, overrides) {
         case "UNFREEZE":
             mintLimit = "0";
             transferLimit = "0";
+            endorserListLimit = "0";
             endorserList = null;
             break;
         default:
@@ -744,7 +747,8 @@ function setNonFungibleTokenStatus(symbol, status, signer, overrides) {
                         burnable,
                         transferable,
                         modifiable,
-                        pub
+                        pub,
+                        endorserListLimit
                     },
                     pub_key: {
                         type: "tendermint/" + publicKeyType,
@@ -784,7 +788,8 @@ function checkNonFungibleTokenStatus(data) {
                     burnable: misc_1.checkBoolean,
                     transferable: misc_1.checkBoolean,
                     modifiable: misc_1.checkBoolean,
-                    pub: misc_1.checkBoolean
+                    pub: misc_1.checkBoolean,
+                    endorserListLimit: misc_1.checkBigNumber
                 },
                 pub_key: {
                     type: misc_1.checkString,
