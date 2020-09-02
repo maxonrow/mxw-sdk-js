@@ -94,6 +94,7 @@ Prototype
         - **transferLimit** --- *BigNumber* (token's maximum transfer limit)
         - **endorserList** --- *string[]* list of endorsers 
         - **totalSupply** --- *BigNumber* (total items minted by the token)
+        - **endorserListLimit** --- *BigNumber* (token's maximum endorser list limit)
 
 .. note:: All token must be authorized, before it can use to mint item or transfer ownership. All token state must be assigned.
 
@@ -114,7 +115,8 @@ Prototype
         mintLimit: 1,
         transferLimit: 1,
         burnable: false,
-        pub: false
+        pub: false,
+        endorserListLimit: 10
         };
 
         token.NonFungibleToken.approveNonFungibleToken("symbol",provider, tokenState).then((transaction) => {
