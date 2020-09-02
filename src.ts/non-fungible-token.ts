@@ -81,7 +81,8 @@ export interface NonFungibleTokenStatus {
         burnable: boolean,
         transferable: boolean,
         modifiable: boolean,
-        pub: boolean
+        pub: boolean,
+        endorserListLimit: BigNumber
     },
     pub_key: {
         type: string,
@@ -836,7 +837,7 @@ function setNonFungibleTokenStatus(symbol: string, status: string, signer: Signe
     checkProperties({ symbol, status }, { symbol: true, status: true });
 
     let tokenFees: NonFungibleTokenFee[];
-    let mintLimit: string, transferLimit: string;
+    let mintLimit: string, transferLimit: string, endorserListLimit: string;
     let endorserList: string[] = null;
     let burnable: boolean, transferable: boolean, modifiable: boolean, pub: boolean;
 
@@ -850,14 +851,16 @@ function setNonFungibleTokenStatus(symbol: string, status: string, signer: Signe
             let params: {
                 mintLimit: string,
                 transferLimit: string
-
+                endorserListLimit: string
             } = checkFormat({
                 mintLimit: checkBigNumberString,
                 transferLimit: checkBigNumberString,
+                endorserListLimit: checkBigNumberString
             }, overrides);
 
             mintLimit = params.mintLimit;
             transferLimit = params.transferLimit;
+            endorserListLimit = params.endorserListLimit;
 
             if (overrides) {
                 if (overrides.tokenFees) {
@@ -887,6 +890,7 @@ function setNonFungibleTokenStatus(symbol: string, status: string, signer: Signe
         case "UNFREEZE":
             mintLimit = "0";
             transferLimit = "0";
+            endorserListLimit = "0";
             endorserList = null;
 
             break;
@@ -920,7 +924,8 @@ function setNonFungibleTokenStatus(symbol: string, status: string, signer: Signe
                         burnable,
                         transferable,
                         modifiable,
-                        pub
+                        pub,
+                        endorserListLimit
                     },
                     pub_key: {
                         type: "tendermint/" + publicKeyType,
@@ -962,7 +967,8 @@ function checkNonFungibleTokenStatus(data: any): NonFungibleTokenStatusTransacti
                     burnable: checkBoolean,
                     transferable: checkBoolean,
                     modifiable: checkBoolean,
-                    pub: checkBoolean
+                    pub: checkBoolean,
+                    endorserListLimit: checkBigNumber
                 },
                 pub_key: {
                     type: checkString,

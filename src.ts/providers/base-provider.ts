@@ -114,7 +114,8 @@ function checkNonFungibleTokenState(data: any): NFTokenState {
         TransferLimit: checkBigNumber,
         MintLimit: checkBigNumber,
         TotalSupply: checkBigNumber,
-        EndorserList: allowNullOrEmpty(arrayOf(checkAddress), [])
+        EndorserList: allowNullOrEmpty(arrayOf(checkAddress), []),
+        EndorserListLimit: checkBigNumber
     }, data), (key) => {
         switch (key) {
             case "Flags": return "flags";
@@ -128,6 +129,7 @@ function checkNonFungibleTokenState(data: any): NFTokenState {
             case "MintLimit": return "mintLimit";
             case "TotalSupply": return "totalSupply";
             case "EndorserList": return "endorserList";
+            case "EndorserListLimit": return "endorserListLimit";
         }
         return key;
     });
@@ -148,12 +150,10 @@ function checkNonFungibleTokenItemState(data: any): NFTokenItemState {
             case "Properties": return "properties";
             case "Frozen": return "frozen";
             case "TransferLimit": return "transferLimit";
-
         }
         return key;
     });
 }
-
 
 function checkTokenAccountState(data: any): TokenAccountState {
     return camelize(checkFormat({
