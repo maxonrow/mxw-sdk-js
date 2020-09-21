@@ -17,9 +17,11 @@ export class NonFungibleTokenItem {
 
     readonly signer: Signer;
     readonly provider: Provider;
-
+    
     readonly symbol: string;
     readonly itemID: string;
+
+    private _owner: string;
     private _state: NFTokenItemState;
     private _NFT: NonFungibleToken;
 
@@ -55,6 +57,8 @@ export class NonFungibleTokenItem {
 
     get parent() { return this._NFT; }
 
+    get owner() { return this._owner; }
+
     refresh(overrides?: any) {
         if (!this.symbol) {
             errors.throwError('not initialized', errors.NOT_INITIALIZED, { arg: 'symbol' });
@@ -67,6 +71,7 @@ export class NonFungibleTokenItem {
             return this.getParent({ ...overrides, queryOnly: true }).then((token) => {
                 this._state = state;
                 this._NFT = token;
+                this._owner = state.owner;
 
                 return this;
             });
@@ -77,7 +82,7 @@ export class NonFungibleTokenItem {
     * Query token item state
     * @param itemID itemID
     * @param blockTag reserved for future
-    * 
+    *
     */
     getState(blockTag?: BlockTag, overrides?: any) {
         if (!this.symbol) {
@@ -91,7 +96,7 @@ export class NonFungibleTokenItem {
             if (!result) {
                 errors.throwError('token item state is not available', errors.NOT_AVAILABLE, { arg: 'itemID' });
             }
-            if (this.itemID != result.id) {
+            if (this.itemID != result.item.id) {
                 errors.throwError('token item id mismatch', errors.UNEXPECTED_RESULT, { expected: this.itemID, returned: result });
             }
             if (!(overrides && overrides.queryOnly)) {
