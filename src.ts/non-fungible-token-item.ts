@@ -17,9 +17,9 @@ export class NonFungibleTokenItem {
 
     readonly signer: Signer;
     readonly provider: Provider;
-
     readonly symbol: string;
     readonly itemID: string;
+
     private _state: NFTokenItemState;
     private _NFT: NonFungibleToken;
 
@@ -51,9 +51,11 @@ export class NonFungibleTokenItem {
         }
     }
 
-    get state() { return this._state; }
+    get state() { return this._state ? this._state : {} as NFTokenItemState; }
 
     get parent() { return this._NFT; }
+
+    get owner() { return this.state.owner; }
 
     refresh(overrides?: any) {
         if (!this.symbol) {
@@ -77,7 +79,7 @@ export class NonFungibleTokenItem {
     * Query token item state
     * @param itemID itemID
     * @param blockTag reserved for future
-    * 
+    *
     */
     getState(blockTag?: BlockTag, overrides?: any) {
         if (!this.symbol) {

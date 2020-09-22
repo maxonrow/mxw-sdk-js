@@ -66,6 +66,7 @@ export interface NFTokenState {
 }
 
 export interface NFTokenItemState {
+    owner: string,
     id: string,
     properties: string,
     metadata: string,

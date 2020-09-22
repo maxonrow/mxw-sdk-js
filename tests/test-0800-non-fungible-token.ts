@@ -467,7 +467,7 @@ if ("" != nodeProvider.nonFungibleToken.middleware) {
                                         return token.mint(wallet.address, itemProp).then((receipt) => {
                                             expect(receipt).is.not.exist;
                                         }).catch(error => {
-                                            expect(error).have.property("code").to.eq(errors.UNEXPECTED_RESULT);
+                                            expect(error).have.property("code").to.eq(errors.NOT_ALLOWED);
                                         });
                                     });
                                 });
@@ -475,6 +475,7 @@ if ("" != nodeProvider.nonFungibleToken.middleware) {
                                 it("Get item parent properties", function () {
                                     return NonFungibleTokenItem.fromSymbol(symbol, itemId, wallet).then((nftItem) => {
                                         expect(nftItem).exist;
+                                        expect(nftItem).have.property("owner").is.eq(wallet.address);
                                         expect(nftItem).have.property("symbol").is.eq(symbol);
                                         expect(nftItem).have.property("itemID").is.eq(itemId);
                                         expect(nftItem).have.property("parent").have.property("symbol").is.eq(symbol);
@@ -485,6 +486,7 @@ if ("" != nodeProvider.nonFungibleToken.middleware) {
                                 it("Update NFT item metadata - non holder", function () {
                                     return NonFungibleTokenItem.fromSymbol(symbol, itemId, modifiable ? issuer : wallet).then((nftItem) => {
                                         expect(nftItem).exist;
+                                        expect(nftItem).have.property("owner").is.eq(wallet.address);
                                         expect(nftItem).have.property("symbol").is.eq(symbol);
                                         expect(nftItem).have.property("itemID").is.eq(itemId);
                                         expect(nftItem).have.property("parent").have.property("symbol").is.eq(symbol);
@@ -500,6 +502,7 @@ if ("" != nodeProvider.nonFungibleToken.middleware) {
                                 it("Update NFT item metadata", function () {
                                     return NonFungibleTokenItem.fromSymbol(symbol, itemId, modifiable ? wallet : issuer).then((nftItem) => {
                                         expect(nftItem).exist;
+                                        expect(nftItem).have.property("owner").is.eq(wallet.address);
                                         expect(nftItem).have.property("symbol").is.eq(symbol);
                                         expect(nftItem).have.property("itemID").is.eq(itemId);
                                         expect(nftItem).have.property("parent").have.property("symbol").is.eq(symbol);
@@ -525,7 +528,7 @@ if ("" != nodeProvider.nonFungibleToken.middleware) {
                                         expect(receipt).is.not.exist;
                                     }).catch(error => {
                                         if (!transferable) expect(error).have.property("code").to.eq(errors.NOT_ALLOWED);
-                                        else expect(error).have.property("code").to.eq(errors.UNEXPECTED_RESULT);
+                                        else expect(error).have.property("code").to.eq(errors.NOT_ALLOWED);
                                     });
                                 });
 
@@ -700,6 +703,7 @@ if ("" != nodeProvider.nonFungibleToken.middleware) {
                                 it("Freeze NFT - update item metadata should not be allowed", function () {
                                     return NonFungibleTokenItem.fromSymbol(symbol, itemId, modifiable ? wallet : issuer).then((nftItem) => {
                                         expect(nftItem).exist;
+                                        expect(nftItem).have.property("owner").is.eq(wallet.address);
                                         expect(nftItem).have.property("symbol").is.eq(symbol);
                                         expect(nftItem).have.property("itemID").is.eq(itemId);
                                         expect(nftItem).have.property("parent").have.property("symbol").is.eq(symbol);
