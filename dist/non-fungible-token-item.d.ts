@@ -12,6 +12,7 @@ export declare class NonFungibleTokenItem {
     constructor(symbol: string, itemID: string, signerOrProvider: Signer | Provider);
     get state(): NFTokenItemState;
     get parent(): NonFungibleToken;
+    get owner(): string;
     refresh(overrides?: any): Promise<this>;
     /**
     * Query token item state

@@ -49,6 +49,7 @@ export interface NFTokenState {
     endorserListLimit: BigNumber;
 }
 export interface NFTokenItemState {
+    owner: string;
     id: string;
     properties: string;
     metadata: string;

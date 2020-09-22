@@ -114,6 +114,7 @@ function checkNonFungibleTokenState(data) {
 }
 function checkNonFungibleTokenItemState(data) {
     return properties_1.camelize(misc_1.checkFormat({
+        Owner: misc_1.checkString,
         ID: misc_1.checkString,
         Metadata: misc_1.allowNullOrEmpty(misc_1.checkString),
         Properties: misc_1.allowNullOrEmpty(misc_1.checkString),
@@ -121,6 +122,7 @@ function checkNonFungibleTokenItemState(data) {
         TransferLimit: misc_1.checkBigNumber
     }, data), (key) => {
         switch (key) {
+            case "Owner": return "owner";
             case "ID": return "id";
             case "Metadata": return "metadata";
             case "Properties": return "properties";

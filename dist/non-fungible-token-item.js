@@ -39,8 +39,9 @@ class NonFungibleTokenItem {
             errors.throwError('invalid signer or provider', errors.INVALID_ARGUMENT, { arg: 'signerOrProvider', value: signerOrProvider });
         }
     }
-    get state() { return this._state; }
+    get state() { return this._state ? this._state : {}; }
     get parent() { return this._NFT; }
+    get owner() { return this.state.owner; }
     refresh(overrides) {
         if (!this.symbol) {
             errors.throwError('not initialized', errors.NOT_INITIALIZED, { arg: 'symbol' });
