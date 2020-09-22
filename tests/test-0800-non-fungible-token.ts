@@ -475,7 +475,7 @@ if ("" != nodeProvider.nonFungibleToken.middleware) {
                                 it("Get item parent properties", function () {
                                     return NonFungibleTokenItem.fromSymbol(symbol, itemId, wallet).then((nftItem) => {
                                         expect(nftItem).exist;
-                                        expect(nftItem.owner).exist;
+                                        expect(nftItem).have.property("owner").is.eq(wallet.address);
                                         expect(nftItem).have.property("symbol").is.eq(symbol);
                                         expect(nftItem).have.property("itemID").is.eq(itemId);
                                         expect(nftItem).have.property("parent").have.property("symbol").is.eq(symbol);
@@ -486,7 +486,7 @@ if ("" != nodeProvider.nonFungibleToken.middleware) {
                                 it("Update NFT item metadata - non holder", function () {
                                     return NonFungibleTokenItem.fromSymbol(symbol, itemId, modifiable ? issuer : wallet).then((nftItem) => {
                                         expect(nftItem).exist;
-                                        expect(nftItem.owner).exist;
+                                        expect(nftItem).have.property("owner").is.eq(wallet.address);
                                         expect(nftItem).have.property("symbol").is.eq(symbol);
                                         expect(nftItem).have.property("itemID").is.eq(itemId);
                                         expect(nftItem).have.property("parent").have.property("symbol").is.eq(symbol);
@@ -502,7 +502,7 @@ if ("" != nodeProvider.nonFungibleToken.middleware) {
                                 it("Update NFT item metadata", function () {
                                     return NonFungibleTokenItem.fromSymbol(symbol, itemId, modifiable ? wallet : issuer).then((nftItem) => {
                                         expect(nftItem).exist;
-                                        expect(nftItem.owner).exist;
+                                        expect(nftItem).have.property("owner").is.eq(wallet.address);
                                         expect(nftItem).have.property("symbol").is.eq(symbol);
                                         expect(nftItem).have.property("itemID").is.eq(itemId);
                                         expect(nftItem).have.property("parent").have.property("symbol").is.eq(symbol);
@@ -703,7 +703,7 @@ if ("" != nodeProvider.nonFungibleToken.middleware) {
                                 it("Freeze NFT - update item metadata should not be allowed", function () {
                                     return NonFungibleTokenItem.fromSymbol(symbol, itemId, modifiable ? wallet : issuer).then((nftItem) => {
                                         expect(nftItem).exist;
-                                        expect(nftItem.owner).exist;
+                                        expect(nftItem).have.property("owner").is.eq(wallet.address);
                                         expect(nftItem).have.property("symbol").is.eq(symbol);
                                         expect(nftItem).have.property("itemID").is.eq(itemId);
                                         expect(nftItem).have.property("parent").have.property("symbol").is.eq(symbol);
