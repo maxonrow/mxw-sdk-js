@@ -146,7 +146,6 @@ function checkNonFungibleTokenItemState(data: any): NFTokenItemState {
     }, data), (key) => {
         switch (key) {
             case "Owner": return "owner";
-            case "Item": return "item";
             case "ID": return "id";
             case "Metadata": return "metadata";
             case "Properties": return "properties";
