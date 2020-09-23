@@ -137,7 +137,7 @@ function checkNonFungibleTokenState(data: any): NFTokenState {
 
 function checkNonFungibleTokenItemState(data: any): NFTokenItemState {
     return camelize(checkFormat({
-        Owner: checkString,
+        Owner: allowNullOrEmpty(checkString),
         ID: checkString,
         Metadata: allowNullOrEmpty(checkString),
         Properties: allowNullOrEmpty(checkString),

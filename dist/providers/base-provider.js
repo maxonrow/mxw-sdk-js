@@ -114,7 +114,7 @@ function checkNonFungibleTokenState(data) {
 }
 function checkNonFungibleTokenItemState(data) {
     return properties_1.camelize(misc_1.checkFormat({
-        Owner: misc_1.checkString,
+        Owner: misc_1.allowNullOrEmpty(misc_1.checkString),
         ID: misc_1.checkString,
         Metadata: misc_1.allowNullOrEmpty(misc_1.checkString),
         Properties: misc_1.allowNullOrEmpty(misc_1.checkString),
