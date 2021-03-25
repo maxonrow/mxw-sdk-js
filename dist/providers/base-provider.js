@@ -27,7 +27,7 @@ const abstract_provider_1 = require("./abstract-provider");
 function checkKeyValue(data) {
     return misc_1.checkFormat({
         key: misc_1.checkString,
-        value: misc_1.checkString
+        value: misc_1.allowNullOrEmpty(misc_1.checkString, null)
     }, data);
 }
 function checkTypeAttribute(data) {
@@ -91,7 +91,9 @@ function checkNonFungibleTokenState(data) {
         Properties: misc_1.allowNullOrEmpty(misc_1.checkString),
         TransferLimit: misc_1.checkBigNumber,
         MintLimit: misc_1.checkBigNumber,
-        TotalSupply: misc_1.checkString
+        TotalSupply: misc_1.checkBigNumber,
+        EndorserList: misc_1.allowNullOrEmpty(misc_1.arrayOf(misc_1.checkAddress), []),
+        EndorserListLimit: misc_1.checkBigNumber
     }, data), (key) => {
         switch (key) {
             case "Flags": return "flags";
@@ -104,12 +106,15 @@ function checkNonFungibleTokenState(data) {
             case "TransferLimit": return "transferLimit";
             case "MintLimit": return "mintLimit";
             case "TotalSupply": return "totalSupply";
+            case "EndorserList": return "endorserList";
+            case "EndorserListLimit": return "endorserListLimit";
         }
         return key;
     });
 }
 function checkNonFungibleTokenItemState(data) {
     return properties_1.camelize(misc_1.checkFormat({
+        Owner: misc_1.allowNullOrEmpty(misc_1.checkString),
         ID: misc_1.checkString,
         Metadata: misc_1.allowNullOrEmpty(misc_1.checkString),
         Properties: misc_1.allowNullOrEmpty(misc_1.checkString),
@@ -117,6 +122,7 @@ function checkNonFungibleTokenItemState(data) {
         TransferLimit: misc_1.checkBigNumber
     }, data), (key) => {
         switch (key) {
+            case "Owner": return "owner";
             case "ID": return "id";
             case "Metadata": return "metadata";
             case "Properties": return "properties";
@@ -582,10 +588,25 @@ class BaseProvider extends abstract_provider_1.Provider {
                         if (result) {
                             result = checkTokenAccountState(result);
                         }
+                        else {
+                            result = {
+                                owner: address,
+                                frozen: false,
+                                balance: bignumber_1.bigNumberify(0)
+                            };
+                        }
                         return result;
                     });
                 });
             });
+        });
+    }
+    getTokenAccountBalance(symbol, addressOrName, blockTag) {
+        return this.getTokenAccountState(symbol, addressOrName, blockTag).then((state) => {
+            if (state && state.balance) {
+                return state.balance;
+            }
+            return bignumber_1.bigNumberify(0);
         });
     }
     getNFTokenState(symbol, blockTag) {

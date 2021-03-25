@@ -13,6 +13,9 @@ export const NOT_FOUND = 'NOT_FOUND';
 //   - transaction: the transaction attempted
 export const KYC_REQUIRED = 'KYC_REQUIRED';
 
+// Receiver KYC registration is required
+export const RECEIVER_KYC_REQUIRED = 'RECEIVER_KYC_REQUIRED';
+
 // Resources not available
 //   - transaction: the transaction attempted
 export const NOT_AVAILABLE = 'NOT_AVAILABLE';

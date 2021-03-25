@@ -22,6 +22,8 @@ var NonFungibleTokenActions;
     NonFungibleTokenActions["burn"] = "burn";
     NonFungibleTokenActions["transferOwnership"] = "transferOwnership";
     NonFungibleTokenActions["acceptOwnership"] = "acceptOwnership";
+    NonFungibleTokenActions["endorse"] = "endorse";
+    NonFungibleTokenActions["updateNFTEndorserList"] = "updateNFTEndorserList";
 })(NonFungibleTokenActions = exports.NonFungibleTokenActions || (exports.NonFungibleTokenActions = {}));
 ;
 var NFTokenStateFlags;
@@ -273,8 +275,8 @@ class NonFungibleToken {
                     value: misc_1.checkBigNumber
                 }
             }, tokenProperties);
-            if (utils_1.bigNumberify(nonFungibleToken.fee.value).lte(0)) {
-                errors.throwError('create non fungible token transaction require non-zero application fee', errors.MISSING_FEES, { value: nonFungibleToken });
+            if (utils_1.bigNumberify(nonFungibleToken.fee.value).lt(0)) {
+                errors.throwError('create non fungible token transaction require non-negative application fee', errors.NUMERIC_FAULT, { value: nonFungibleToken });
             }
             let tx = signer.provider.getTransactionRequest("nonFungible", "createNonFungibleToken", {
                 appFeeTo: nonFungibleToken.fee.to,
@@ -325,7 +327,50 @@ class NonFungibleToken {
             let tx = this.signer.provider.getTransactionRequest("nonFungible", "updateNFTMetadata", {
                 symbol: this.symbol,
                 from: address,
-                metadata
+                metadata,
+                memo: (overrides && overrides.memo) ? overrides.memo : ""
+            });
+            tx.fee = (overrides && overrides.fee) ? overrides.fee : this.signer.provider.getTransactionFee(undefined, undefined, { tx });
+            return tx;
+        });
+    }
+    /**
+     * Update non-fungible token endorser list
+     * @param endorsers new endorsers
+     * @param overrides options
+     */
+    updateEndorserList(endorsers, overrides) {
+        return this.getUpdateEndorserListTransactionRequest(endorsers, overrides).then((tx) => {
+            return this.signer.sendTransaction(tx, overrides).then((response) => {
+                if (overrides && overrides.sendOnly) {
+                    return response;
+                }
+                let confirmations = (overrides && overrides.confirmations) ? Number(overrides.confirmations) : null;
+                return this.signer.provider.waitForTransaction(response.hash, confirmations).then((receipt) => {
+                    if (1 == receipt.status) {
+                        return receipt;
+                    }
+                    throw this.signer.provider.checkTransactionReceipt(receipt, errors.CALL_EXCEPTION, "update non fungible token endorser list failed", {
+                        method: "nonfungible-updateEndorserList",
+                        receipt
+                    });
+                });
+            });
+        });
+    }
+    getUpdateEndorserListTransactionRequest(endorsers, overrides) {
+        if (!this.signer) {
+            errors.throwError('update non fungible token endorser list require signer', errors.NOT_INITIALIZED, { arg: 'signer' });
+        }
+        return properties_1.resolveProperties({ address: this.signer.getAddress() }).then(({ address }) => {
+            if (!address) {
+                return errors.throwError('update non fungible token endorser list require signer address', errors.MISSING_ARGUMENT, { arg: 'signerAddress' });
+            }
+            let tx = this.signer.provider.getTransactionRequest("nonFungible", "updateNFTEndorserList", {
+                symbol: this.symbol,
+                from: address,
+                endorsers: endorsers,
+                memo: (overrides && overrides.memo) ? overrides.memo : ""
             });
             tx.fee = (overrides && overrides.fee) ? overrides.fee : this.signer.provider.getTransactionFee(undefined, undefined, { tx });
             return tx;
@@ -499,7 +544,7 @@ class NonFungibleToken {
      * @param overrides options
      */
     static approveNonFungibleTokenOwnership(symbol, signer, overrides) {
-        return setNonFungibleTokenStatus(symbol, "APPROVE_TRANFER_TOKEN_OWNERSHIP", signer, overrides);
+        return setNonFungibleTokenStatus(symbol, "APPROVE_TRANSFER_TOKEN_OWNERSHIP", signer, overrides);
     }
     /**
      * Reject fungible token ownership by provider
@@ -508,7 +553,7 @@ class NonFungibleToken {
      * @param overrides options
      */
     static rejectNonFungibleTokenOwnership(symbol, signer, overrides) {
-        return setNonFungibleTokenStatus(symbol, "REJECT_TRANFER_TOKEN_OWNERSHIP", signer, overrides);
+        return setNonFungibleTokenStatus(symbol, "REJECT_TRANSFER_TOKEN_OWNERSHIP", signer, overrides);
     }
     /**
      * Send non fungible token status transaction by middleware
@@ -630,7 +675,7 @@ function setNonFungibleTokenStatus(symbol, status, signer, overrides) {
     }
     properties_1.checkProperties({ symbol, status }, { symbol: true, status: true });
     let tokenFees;
-    let mintLimit, transferLimit;
+    let mintLimit, transferLimit, endorserListLimit;
     let endorserList = null;
     let burnable, transferable, modifiable, pub;
     burnable = (overrides && overrides.burnable) ? true : false;
@@ -642,9 +687,11 @@ function setNonFungibleTokenStatus(symbol, status, signer, overrides) {
             let params = misc_1.checkFormat({
                 mintLimit: misc_1.checkBigNumberString,
                 transferLimit: misc_1.checkBigNumberString,
+                endorserListLimit: misc_1.checkBigNumberString
             }, overrides);
             mintLimit = params.mintLimit;
             transferLimit = params.transferLimit;
+            endorserListLimit = params.endorserListLimit;
             if (overrides) {
                 if (overrides.tokenFees) {
                     let tokenProperties = misc_1.checkFormat({
@@ -654,24 +701,23 @@ function setNonFungibleTokenStatus(symbol, status, signer, overrides) {
                 }
                 if (overrides.endorserList) {
                     let endorsers = misc_1.checkFormat({
-                        endorserList: misc_1.allowNullOrEmpty(misc_1.arrayOf(misc_1.checkString))
+                        endorserList: misc_1.allowNullOrEmpty(misc_1.arrayOf(misc_1.checkString), null)
                     }, overrides);
                     endorserList = endorsers.endorserList;
-                    if (endorserList.length == 0)
-                        endorserList = null;
                 }
             }
             if (misc_1.isUndefinedOrNullOrEmpty(tokenFees)) {
                 errors.throwError('non fungible token fees are missing', errors.MISSING_ARGUMENT, { arg: 'tokenFees' });
             }
             break;
-        case "APPROVE_TRANFER_TOKEN_OWNERSHIP":
-        case "REJECT_TRANFER_TOKEN_OWNERSHIP":
+        case "APPROVE_TRANSFER_TOKEN_OWNERSHIP":
+        case "REJECT_TRANSFER_TOKEN_OWNERSHIP":
         case "REJECT":
         case "FREEZE":
         case "UNFREEZE":
             mintLimit = "0";
             transferLimit = "0";
+            endorserListLimit = "0";
             endorserList = null;
             break;
         default:
@@ -701,7 +747,8 @@ function setNonFungibleTokenStatus(symbol, status, signer, overrides) {
                         burnable,
                         transferable,
                         modifiable,
-                        pub
+                        pub,
+                        endorserListLimit
                     },
                     pub_key: {
                         type: "tendermint/" + publicKeyType,
@@ -741,7 +788,8 @@ function checkNonFungibleTokenStatus(data) {
                     burnable: misc_1.checkBoolean,
                     transferable: misc_1.checkBoolean,
                     modifiable: misc_1.checkBoolean,
-                    pub: misc_1.checkBoolean
+                    pub: misc_1.checkBoolean,
+                    endorserListLimit: misc_1.checkBigNumber
                 },
                 pub_key: {
                     type: misc_1.checkString,

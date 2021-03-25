@@ -2,7 +2,7 @@ import { BigNumber } from './utils/bignumber';
 declare const AddressPrefix = "mxw";
 declare const ValOperatorAddressPrefix = "mxwvaloper";
 declare const KycAddressPrefix = "kyc";
-declare const AddressZero = "mxw000000000000000000000000000000000000000";
+declare const AddressZero = "mxw1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqgcpfl3";
 declare const HashZero = "0x0000000000000000000000000000000000000000000000000000000000000000";
 declare const ZeroFee: {
     amount: {

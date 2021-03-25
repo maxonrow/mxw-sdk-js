@@ -9,7 +9,7 @@ exports.ValOperatorAddressPrefix = ValOperatorAddressPrefix;
 const KycAddressPrefix = 'kyc';
 exports.KycAddressPrefix = KycAddressPrefix;
 // Do we have a zero address?
-const AddressZero = 'mxw000000000000000000000000000000000000000';
+const AddressZero = 'mxw1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqgcpfl3';
 exports.AddressZero = AddressZero;
 const HashZero = '0x0000000000000000000000000000000000000000000000000000000000000000';
 exports.HashZero = HashZero;

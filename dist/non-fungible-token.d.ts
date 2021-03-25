@@ -7,7 +7,9 @@ export declare enum NonFungibleTokenActions {
     mint = "mint",
     burn = "burn",
     transferOwnership = "transferOwnership",
-    acceptOwnership = "acceptOwnership"
+    acceptOwnership = "acceptOwnership",
+    endorse = "endorse",
+    updateNFTEndorserList = "updateNFTEndorserList"
 }
 export declare enum NFTokenStateFlags {
     nonfungible = 1,
@@ -60,6 +62,7 @@ export interface NonFungibleTokenStatus {
         transferable: boolean;
         modifiable: boolean;
         pub: boolean;
+        endorserListLimit: BigNumber;
     };
     pub_key: {
         type: string;
@@ -141,6 +144,13 @@ export declare class NonFungibleToken {
      */
     updateMetadata(metadata?: string, overrides?: any): Promise<TransactionResponse | TransactionReceipt>;
     getUpdateMetadataTransactionRequest(metadata?: string, overrides?: any): Promise<TransactionRequest>;
+    /**
+     * Update non-fungible token endorser list
+     * @param endorsers new endorsers
+     * @param overrides options
+     */
+    updateEndorserList(endorsers: string[], overrides?: any): Promise<TransactionResponse | TransactionReceipt>;
+    getUpdateEndorserListTransactionRequest(endorsers: string[], overrides?: any): Promise<TransactionRequest>;
     /**
     * Mint NFT item
     * @param toAddressOrName receiver address

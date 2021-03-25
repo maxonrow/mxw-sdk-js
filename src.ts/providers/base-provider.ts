@@ -45,7 +45,7 @@ import { Network, Networkish } from '../utils/networks';
 function checkKeyValue(data: any): KeyValue {
     return checkFormat({
         key: checkString,
-        value: checkString
+        value: allowNullOrEmpty(checkString, null)
     }, data);
 }
 
@@ -113,7 +113,9 @@ function checkNonFungibleTokenState(data: any): NFTokenState {
         Properties: allowNullOrEmpty(checkString),
         TransferLimit: checkBigNumber,
         MintLimit: checkBigNumber,
-        TotalSupply: checkString
+        TotalSupply: checkBigNumber,
+        EndorserList: allowNullOrEmpty(arrayOf(checkAddress), []),
+        EndorserListLimit: checkBigNumber
     }, data), (key) => {
         switch (key) {
             case "Flags": return "flags";
@@ -125,8 +127,9 @@ function checkNonFungibleTokenState(data: any): NFTokenState {
             case "Properties": return "properties";
             case "TransferLimit": return "transferLimit";
             case "MintLimit": return "mintLimit";
-            case "TotalSupply": return "totalSupply"
-
+            case "TotalSupply": return "totalSupply";
+            case "EndorserList": return "endorserList";
+            case "EndorserListLimit": return "endorserListLimit";
         }
         return key;
     });
@@ -134,25 +137,24 @@ function checkNonFungibleTokenState(data: any): NFTokenState {
 
 function checkNonFungibleTokenItemState(data: any): NFTokenItemState {
     return camelize(checkFormat({
+        Owner: allowNullOrEmpty(checkString),
         ID: checkString,
         Metadata: allowNullOrEmpty(checkString),
         Properties: allowNullOrEmpty(checkString),
         Frozen: checkBoolean,
         TransferLimit: checkBigNumber
-
     }, data), (key) => {
         switch (key) {
+            case "Owner": return "owner";
             case "ID": return "id";
             case "Metadata": return "metadata";
             case "Properties": return "properties";
             case "Frozen": return "frozen";
             case "TransferLimit": return "transferLimit";
-
         }
         return key;
     });
 }
-
 
 function checkTokenAccountState(data: any): TokenAccountState {
     return camelize(checkFormat({
@@ -724,10 +726,26 @@ export class BaseProvider extends Provider {
                         if (result) {
                             result = checkTokenAccountState(result);
                         }
+                        else {
+                            result = {
+                                owner: address,
+                                frozen: false,
+                                balance: bigNumberify(0)
+                            }
+                        }
                         return result;
                     });
                 });
             });
+        });
+    }
+
+    getTokenAccountBalance(symbol: string | Promise<string>, addressOrName: string | Promise<string>, blockTag?: BlockTag | Promise<BlockTag>): Promise<BigNumber> {
+        return this.getTokenAccountState(symbol, addressOrName, blockTag).then((state) => {
+            if (state && state.balance) {
+                return state.balance;
+            }
+            return bigNumberify(0);
         });
     }
 
@@ -768,7 +786,6 @@ export class BaseProvider extends Provider {
             });
         });
     }
-
 
     getAliasState(address: string | Promise<string>, blockTag?: BlockTag | Promise<BlockTag>): Promise<AliasState> {
         return resolveProperties({ address, blockTag }).then(({ address, blockTag }) => {

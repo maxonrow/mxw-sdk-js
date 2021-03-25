@@ -426,6 +426,26 @@ if ("" != nodeProvider.kyc.middleware) {
             return promises;
         });
 
+        it("Load encrypted wallet format v0.1", function () {
+            let encryptedWallet = '{"address":"mxw1m5qg7swt85y7h90evp75h48ah7kq4d9qnshlg5","id":"9fb5b452-5d8e-4f21-b86c-36c8fb89a6ee","version":3,"Crypto":{"cipher":"aes-128-ctr","cipherparams":{"iv":"6225d04b84258963be446d6f2827c083"},"ciphertext":"ba4ab50b3811700eb13a6ce20210b14b7e3570e07b46add6b254c6f81e04b044","kdf":"scrypt","kdfparams":{"salt":"3a1cba8bd23170d41193da67682484cdd5afc639a7359dd119794d8c577e9a6f","n":131072,"dklen":32,"p":1,"r":8},"mac":"ac78dd013c91dfaf905f2185401f4bf9fd132d1fa5fbbb729e822e761bfaa2ec"},"x-mxw":{"client":"mxw-sdk","filename":"UTC--2020-07-19T17-25-11.0Z--mxw1m5qg7swt85y7h90evp75h48ah7kq4d9qnshlg5","mnemonicCounter":"1cfaee39612c2f4361f52c2fbfcd8ab0","mnemonicCiphertext":"b495932d586c6de3d8dde92f74416218","path":"m/44\'/376\'/0\'/0/0","version":"0.1"}}';
+
+            return mxw.Wallet.fromEncryptedJson(encryptedWallet, "any strong password").then((wallet) => {
+                expect(wallet).is.exist;
+                expect(wallet).has.property("address").is.eq("mxw1m5qg7swt85y7h90evp75h48ah7kq4d9qnshlg5");
+                expect(wallet).has.property("mnemonic").is.eq("ask cliff eyebrow sound age lottery initial casual choose book pudding invest");
+            });
+        });
+
+        it("Load encrypted wallet format v0.2", function () {
+            let encryptedWallet = '{"address":"mxw155uygslajet0ppga72vgah36kryuta6wr9233g","id":"c222613a-4058-46cb-9a2e-d73f0a3b4320","version":3,"Crypto":{"cipher":"aes-256-ctr","cipherparams":{"iv":"b53f720ded76b0cf156ccdeb9de52501"},"ciphertext":"7b93e5ae431c75bf3ccc103f657864c1cbc884bf51979e62c18b159270fcc25f","kdf":"scrypt","kdfparams":{"salt":"16015290370acbaba7bca00a5116414d9d0380b10e0b3f69e13222fbce7656a6","n":131072,"dklen":48,"p":1,"r":8},"mac":"d93a0277d435b419c5d0dbd6cef5d78f6b8bd8147e4739d3408a9a6c41b16470"},"x-mxw":{"client":"mxw-sdk","filename":"UTC--2020-07-19T17-42-56.0Z--mxw155uygslajet0ppga72vgah36kryuta6wr9233g","mnemonicCounter":"ed455dd20df0968174b9dd0103589e72","mnemonicCiphertext":"07f561c571747588ce803b7496519382","path":"m/44\'/376\'/0\'/0/0","locale":"en","version":"0.1"}}';
+
+            return mxw.Wallet.fromEncryptedJson(encryptedWallet, "any strong password").then((wallet) => {
+                expect(wallet).is.exist;
+                expect(wallet).has.property("address").is.eq("mxw155uygslajet0ppga72vgah36kryuta6wr9233g");
+                expect(wallet).has.property("mnemonic").is.eq("what bike cactus chalk hole height skill lava owner student festival trap");
+            });
+        });
+
         it("Compute shared secret", function () {
             let secret1With2 = wallet1.computeSharedSecret(wallet2.publicKey);
             let secret2With1 = wallet2.computeSharedSecret(wallet1.publicKey);

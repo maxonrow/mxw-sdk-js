@@ -39,8 +39,9 @@ class NonFungibleTokenItem {
             errors.throwError('invalid signer or provider', errors.INVALID_ARGUMENT, { arg: 'signerOrProvider', value: signerOrProvider });
         }
     }
-    get state() { return this._state; }
+    get state() { return this._state ? this._state : {}; }
     get parent() { return this._NFT; }
+    get owner() { return this.state.owner; }
     refresh(overrides) {
         if (!this.symbol) {
             errors.throwError('not initialized', errors.NOT_INITIALIZED, { arg: 'symbol' });
@@ -153,10 +154,13 @@ class NonFungibleTokenItem {
     }
     /**
     * Endorse token item by endorser
-    * @param overrides options
     */
-    endorse(overrides) {
-        return this.getEndorseTransactionRequest().then((tx) => {
+    endorse(metadata, overrides) {
+        if ("object" === typeof metadata) {
+            overrides = metadata;
+            metadata = undefined;
+        }
+        return this.getEndorseTransactionRequest(metadata, overrides).then((tx) => {
             return this.signer.sendTransaction(tx, overrides).then((response) => {
                 if (overrides && overrides.sendOnly) {
                     return response;
@@ -174,7 +178,7 @@ class NonFungibleTokenItem {
             });
         });
     }
-    getEndorseTransactionRequest(overrides) {
+    getEndorseTransactionRequest(metadata, overrides) {
         if (!this.signer) {
             errors.throwError('endorse non fungible token item require signer', errors.NOT_INITIALIZED, { arg: 'signer' });
         }
@@ -186,6 +190,7 @@ class NonFungibleTokenItem {
                 symbol: this.symbol,
                 from: address,
                 itemID: this.itemID,
+                metadata: metadata ? metadata : "",
                 memo: (overrides && overrides.memo) ? overrides.memo : ""
             });
             tx.fee = (overrides && overrides.fee) ? overrides.fee : this.signer.provider.getTransactionFee(undefined, undefined, { tx });

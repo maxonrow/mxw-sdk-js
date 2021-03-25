@@ -32,7 +32,7 @@ Creating fungible token requires approval from authorities.
 .. code-block:: javascript
     :caption: create fungible token
 
-    let provider = new mxw.Wallet(0x00000000000000000000000000000000000000000000000070726f7669646572);
+    let wallet = new mxw.Wallet(0x00000000000000000000000000000000000000000000000070726f7669646572);
     let fungibleTokenProperties = {
         name: "MY " + "symbol",
         symbol: "symbol",
@@ -46,8 +46,7 @@ Creating fungible token requires approval from authorities.
         metadata: ["Wallet is able to manage their own metadata"]
     };
 
-    var FungibleToken = new FungibleToken("symbol", provider);
-    FungibleToken.create(FungibleTokenProperties, provider).then((token) => {
+    mxw.token.FungibleToken.create(FungibleTokenProperties, wallet).then((token) => {
         console.log(JSON.stringify(token))
     });
 
@@ -59,7 +58,7 @@ Creating fungible token requires approval from authorities.
 .. code-block:: javascript
     :caption: check token state
 
-        mxw.token.FungibleToken.fromSymbol("symbol","issuer address").then((token)=>{
+        mxw.token.FungibleToken.fromSymbol("symbol", wallet).then((token)=>{
             console.log(JSON.stringify(token));
         });  
 
@@ -119,7 +118,7 @@ Prototype
 .. code-block:: javascript
     :caption: *burn a fungible token*
 
-    let ftInstance = new NonFungibleTokenItem(symbol, itemID, address);
+    let ftInstance = new NonFungibleTokenItem(symbol, itemID, wallet);
         ftInstance.burn().then((receipt) => {
                 console.log(receipt);
         });
@@ -139,9 +138,9 @@ Prototype
         let issuer = new mxw.Wallet(0x0000000000000000000000000000000000000000000000000000697373756572);
         let middleware = new mxw.Wallet(0x000000000000000000000000000000000000000000006d6964646c6577617265);
 
-        token.FungibleToken.freezeFungibleToken("symbol","itemID",provider).then((transaction) => {
-            token.FungibleToken.signFungibleTokenStatusTransaction(transaction, issuer).then((transaction) => {
-                token.FungibleToken.sendFungibleTokenStatusTransaction(transaction, middleware).then((receipt) => {
+        mxw.token.FungibleToken.freezeFungibleToken("symbol","itemID", provider).then((transaction) => {
+            mxw.token.FungibleToken.signFungibleTokenStatusTransaction(transaction, issuer).then((transaction) => {
+                mxw.token.FungibleToken.sendFungibleTokenStatusTransaction(transaction, middleware).then((receipt) => {
                     console.log(JSON.stringify(receipt));
                 });
             });
@@ -162,9 +161,9 @@ Prototype
         let issuer = new mxw.Wallet(0x0000000000000000000000000000000000000000000000000000697373756572);
         let middleware = new mxw.Wallet(0x000000000000000000000000000000000000000000006d6964646c6577617265);
 
-        token.FungibleToken.unfreezeFungibleToken("symbol","itemID",provider).then((transaction) => {
-            token.FungibleToken.signFungibleTokenStatusTransaction(transaction, issuer).then((transaction) => {
-                token.FungibleToken.sendFungibleTokenStatusTransaction(transaction, middleware).then((receipt) => {
+        mxw.token.FungibleToken.unfreezeFungibleToken("symbol","itemID", provider).then((transaction) => {
+            mxw.token.FungibleToken.signFungibleTokenStatusTransaction(transaction, issuer).then((transaction) => {
+                mxw.token.FungibleToken.sendFungibleTokenStatusTransaction(transaction, middleware).then((receipt) => {
                     console.log(JSON.stringify(receipt));
                 });
             });

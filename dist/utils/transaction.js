@@ -836,6 +836,7 @@ function getTransactionRequest(route, transactionType, overrides) {
                     symbol: misc_1.checkString,
                     from: misc_1.checkAddress,
                     itemID: misc_1.checkString,
+                    metadata: misc_1.checkString,
                     memo: misc_1.allowNullOrEmpty(misc_1.checkString)
                 }, overrides);
                 transaction = {
@@ -847,7 +848,8 @@ function getTransactionRequest(route, transactionType, overrides) {
                                 value: {
                                     symbol: params.symbol,
                                     from: params.from,
-                                    itemID: params.itemID
+                                    itemID: params.itemID,
+                                    metadata: params.metadata
                                 }
                             }
                         ],
@@ -956,6 +958,33 @@ function getTransactionRequest(route, transactionType, overrides) {
                                     symbol: params.symbol,
                                     from: params.from,
                                     metadata: params.metadata ? params.metadata : ""
+                                }
+                            }
+                        ],
+                        memo: params.memo ? params.memo : ""
+                    },
+                    fee: null
+                };
+            }
+            break;
+        case "nonFungible/updateNFTEndorserList":
+            {
+                let params = misc_1.checkFormat({
+                    symbol: misc_1.checkString,
+                    from: misc_1.checkAddress,
+                    endorsers: misc_1.allowNullOrEmpty(misc_1.arrayOf(misc_1.checkAddress), null),
+                    memo: misc_1.allowNullOrEmpty(misc_1.checkString)
+                }, overrides);
+                transaction = {
+                    type: "cosmos-sdk/StdTx",
+                    value: {
+                        msg: [
+                            {
+                                type: "nonFungible/updateNFTEndorserList",
+                                value: {
+                                    symbol: params.symbol,
+                                    from: params.from,
+                                    endorsers: params.endorsers
                                 }
                             }
                         ],

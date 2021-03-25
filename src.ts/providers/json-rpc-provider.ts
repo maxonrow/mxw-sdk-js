@@ -76,6 +76,19 @@ export class JsonRpcProvider extends BaseProvider {
         if (!this.connection.timeout || 0 > this.connection.timeout) {
             this.connection.timeout = 60000;
         }
+
+        // Configure polling interval
+        if (this.connection.pollingInterval && 0 < this.connection.pollingInterval) {
+            super.pollingInterval = this.connection.pollingInterval;
+        }
+    }
+
+    get pollingInterval() {
+        return super.pollingInterval;
+    }
+
+    set pollingInterval(value: number) {
+        super.pollingInterval = value;
     }
 
     send(method: string, params: any): Promise<any> {
@@ -486,6 +499,15 @@ function checkResponseLog(self: JsonRpcProvider, method: string, result: any, de
             case "sdk":
                 switch (info.code) {
                     case 4: // signature verification failed
+                        // Temporary solution for some error codes
+                        if (info.message) {
+                            switch (info.message) {
+                                case "Endorserlist limit exceeded.": // error code 2113
+                                    return errors.createError('token endorserlist limit exceeded', errors.NOT_ALLOWED, { operation: method, info, response: result, params });
+                                case "Endorserlist limit cannot less than or equal 0":
+                                    return errors.createError('token endorserlist limit is not valid', errors.INVALID_ARGUMENT, { operation: method, info, response: result, params });
+                            }
+                        }
                         return errors.createError('signature verification failed', errors.SIGNATURE_FAILED, { operation: method, info, response: result, params });
                     case 5: // CodeInsufficientFunds
                     case 10: // CodeInsufficientCoins
@@ -494,7 +516,6 @@ function checkResponseLog(self: JsonRpcProvider, method: string, result: any, de
                         return errors.createError('invalid amount', errors.NUMERIC_FAULT, { operation: method, info, response: result, params });
                     case 14: // CodeInsufficientFee
                         return errors.createError('insufficient fees', errors.INSUFFICIENT_FEES, { operation: method, info, response: result, params });
-
                 }
                 break;
 
@@ -504,6 +525,8 @@ function checkResponseLog(self: JsonRpcProvider, method: string, result: any, de
                         return errors.createError('KYC registration is required', errors.KYC_REQUIRED, { operation: method, info, response: result, params });
                     case 1001: // KYC address duplicated
                         return errors.createError('Duplicated KYC', errors.EXISTS, { operation: method, info, response: result, params });
+                    case 1002: // Receiver KYC is required
+                        return errors.createError('Receiver KYC is required', errors.RECEIVER_KYC_REQUIRED, { operation: method, info, response: result, params });
 
                     case 2001: // Token already exists
                         return errors.createError('token exists', errors.EXISTS, { operation: method, info, response: result, params });
@@ -534,7 +557,23 @@ function checkResponseLog(self: JsonRpcProvider, method: string, result: any, de
                     case 2103: // Invalid token owner
                         return errors.createError('invalid token owner', errors.NOT_ALLOWED, { operation: method, info, response: result, params });
                     case 2104: // Transfer token ownership approved
-                        return errors.createError('Token ownership is already approved', errors.EXISTS, { operation: method, info, response: result, params });
+                        return errors.createError('token ownership is already approved', errors.EXISTS, { operation: method, info, response: result, params });
+                    case 2105:
+                        return errors.createError('token item id is in used', errors.EXISTS, { operation: method, info, response: result, params });
+                    case 2106:
+                        return errors.createError('token item endorser invalid', errors.NOT_ALLOWED, { operation: method, info, response: result, params });
+                    case 2107:
+                        return errors.createError('token item frozen', errors.NOT_ALLOWED, { operation: method, info, response: result, params });
+                    case 2108:
+                        return errors.createError('token item unfrozen', errors.NOT_ALLOWED, { operation: method, info, response: result, params });
+                    case 2109:
+                        return errors.createError('invalid item owner', errors.NOT_ALLOWED, { operation: method, info, response: result, params });
+                    case 2110:
+                        return errors.createError('token item not modifiable', errors.NOT_ALLOWED, { operation: method, info, response: result, params });
+                    case 2111:
+                        return errors.createError('token item not found', errors.NOT_FOUND, { operation: method, info, response: result, params });
+                    case 2113:
+                        return errors.createError('token endorserlist limit exceeded', errors.NOT_ALLOWED, { operation: method, info, response: result, params });
 
                     case 3001: // Fee setting not found
                         return errors.createError('fee setting not found', errors.MISSING_FEES, { operation: method, info, response: result, params });

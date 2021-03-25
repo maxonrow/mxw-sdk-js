@@ -686,6 +686,9 @@ export class FungibleToken {
                     value: checkBigNumber
                 }
             }, properties);
+            if (bigNumberify(fungibleToken.fee.value).lt(0)) {
+                errors.throwError('create fungible token transaction require non-negative application fee', errors.NUMERIC_FAULT, { value: fungibleToken });
+            }
 
             let tx = signer.provider.getTransactionRequest("token", "token-createFungibleToken", {
                 appFeeTo: fungibleToken.fee.to,
@@ -928,7 +931,7 @@ export class FungibleToken {
      * @param overrides options
      */
     static approveFungibleTokenOwnership(symbol: string, signer: Signer, overrides?: any) {
-        return setFungibleTokenStatus(symbol, "APPROVE_TRANFER_TOKEN_OWNERSHIP", signer, overrides);
+        return setFungibleTokenStatus(symbol, "APPROVE_TRANSFER_TOKEN_OWNERSHIP", signer, overrides);
     }
 
     /**
@@ -938,7 +941,7 @@ export class FungibleToken {
      * @param overrides options
      */
     static rejectFungibleTokenOwnership(symbol: string, signer: Signer, overrides?: any) {
-        return setFungibleTokenStatus(symbol, "REJECT_TRANFER_TOKEN_OWNERSHIP", signer, overrides);
+        return setFungibleTokenStatus(symbol, "REJECT_TRANSFER_TOKEN_OWNERSHIP", signer, overrides);
     }
 
     /**
@@ -998,8 +1001,8 @@ function setFungibleTokenStatus(symbol: string, status: string, signer: Signer, 
         case "REJECT":
         case "FREEZE":
         case "UNFREEZE":
-        case "APPROVE_TRANFER_TOKEN_OWNERSHIP":
-        case "REJECT_TRANFER_TOKEN_OWNERSHIP":
+        case "APPROVE_TRANSFER_TOKEN_OWNERSHIP":
+        case "REJECT_TRANSFER_TOKEN_OWNERSHIP":
             break;
 
         default:

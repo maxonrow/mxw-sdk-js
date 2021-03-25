@@ -506,7 +506,7 @@ wallet instance from a JSON wallet.
     All options are optional. The valid options are:
 
         - **salt** --- the salt to use for scrypt
-        - **iv** --- the initialization vector to use for AES-CTR-128
+        - **iv** --- the initialization vector to use for AES-256-CTR
         - **uuid** --- the UUID to use for the wallet
         - **scrypt** --- the scrypt parameters to use (N, r, and p)
         - **entropy** --- the mnemonic entropy of this wallet; generally you should **not** specify this
@@ -529,7 +529,12 @@ wallet instance from a JSON wallet.
     return wallet.encrypt(password, callback).then((json) => {
         console.log(json);
         // expected result:
-        // a JSON text contains address, ID, and various info of the wallet.
+        // an encrypted wallet JSON.
+        return mxw.Wallet.fromEncryptedJson(json, password).then((decryptedWallet)=>{
+            console.log(decryptedWallet);
+            // expected result:
+            // a decrypted wallet object.
+        });
     });
 
 

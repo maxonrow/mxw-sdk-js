@@ -17,7 +17,7 @@ import { BigNumberish } from './bignumber';
 
 import { Provider, TransactionFee, TransactionRequest } from '../providers/abstract-provider';
 import { sha256 } from './sha2';
-import { sortObject, iterate, checkFormat, checkAddress, checkBigNumber, allowNullOrEmpty, checkString, checkAny, checkNumber, checkBoolean } from './misc';
+import { sortObject, iterate, checkFormat, checkAddress, checkBigNumber, allowNullOrEmpty, checkString, checkAny, checkNumber, checkBoolean, arrayOf } from './misc';
 import { smallestUnitName } from './units';
 
 ///////////////////////////////
@@ -1095,11 +1095,13 @@ export function getTransactionRequest(route: string, transactionType: string, ov
                     symbol: string,
                     from: string,
                     itemID: string,
+                    metadata: string,
                     memo: string
                 } = checkFormat({
                     symbol: checkString,
                     from: checkAddress,
                     itemID: checkString,
+                    metadata: checkString,
                     memo: allowNullOrEmpty(checkString)
                 }, overrides);
 
@@ -1112,7 +1114,8 @@ export function getTransactionRequest(route: string, transactionType: string, ov
                                 value: {
                                     symbol: params.symbol,
                                     from: params.from,
-                                    itemID: params.itemID
+                                    itemID: params.itemID,
+                                    metadata: params.metadata
                                 }
                             }
                         ],
@@ -1255,7 +1258,40 @@ export function getTransactionRequest(route: string, transactionType: string, ov
                         memo: params.memo ? params.memo : ""
                     },
                     fee: null
+                }
+            }
+            break;
 
+        case "nonFungible/updateNFTEndorserList":
+            {
+                let params: {
+                    symbol: string,
+                    from: string,
+                    endorsers: string[],
+                    memo: string
+                } = checkFormat({
+                    symbol: checkString,
+                    from: checkAddress,
+                    endorsers: allowNullOrEmpty(arrayOf(checkAddress), null),
+                    memo: allowNullOrEmpty(checkString)
+                }, overrides);
+
+                transaction = {
+                    type: "cosmos-sdk/StdTx",
+                    value: {
+                        msg: [
+                            {
+                                type: "nonFungible/updateNFTEndorserList",
+                                value: {
+                                    symbol: params.symbol,
+                                    from: params.from,
+                                    endorsers: params.endorsers
+                                }
+                            }
+                        ],
+                        memo: params.memo ? params.memo : ""
+                    },
+                    fee: null
                 }
             }
             break;

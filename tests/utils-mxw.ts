@@ -1,11 +1,11 @@
 'use strict';
 
 import readline from "readline";
-import { isUndefinedOrNullOrEmpty } from '../src.ts/utils/misc';
+import { utils } from '../src.ts/index';
 
 export function progress(counter: number, percentage?: number, message?: string, x?: number, y?: number) {
     readline.cursorTo(process.stdout, !x ? 0 : x, y);
-    if (isUndefinedOrNullOrEmpty(counter) || isUndefinedOrNullOrEmpty(percentage) || 100 <= percentage) {
+    if (utils.isUndefinedOrNullOrEmpty(counter) || utils.isUndefinedOrNullOrEmpty(percentage) || 100 <= percentage) {
         process.stdout.write("* ");
     }
     else {

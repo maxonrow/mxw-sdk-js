@@ -78,6 +78,28 @@ if ("" != nodeProvider.fungibleToken.middleware) {
         describe('Suite: FungibleToken - Fixed Supply ' + (burnable ? "(Burnable)" : "(Not Burnable)"), function () {
             this.slow(slowThreshold); // define the threshold for slow indicator
 
+            it("Create - challenge negative application fee", function () {
+                let symbol = "FIX" + hexlify(randomBytes(4)).substring(2);
+                let fungibleTokenProperties = {
+                    name: "MY " + symbol,
+                    symbol: symbol,
+                    decimals: 18,
+                    fixedSupply: true,
+                    maxSupply: bigNumberify("100000000000000000000000000"),
+                    fee: {
+                        to: nodeProvider.fungibleToken.feeCollector,
+                        value: bigNumberify("-1")
+                    },
+                    metadata: ""
+                };
+
+                return token.FungibleToken.create(fungibleTokenProperties, issuer, defaultOverrides).then((token) => {
+                    expect(token).is.not.exist;
+                }).catch(error => {
+                    expect(error).have.property("code").to.eq(errors.NUMERIC_FAULT);
+                });
+            });
+
             it("Create", function () {
                 let symbol = "FIX" + hexlify(randomBytes(4)).substring(2);
                 fungibleTokenProperties = {
@@ -151,6 +173,7 @@ if ("" != nodeProvider.fungibleToken.middleware) {
                     });
                 }
                 return performFungibleTokenStatus(fungibleTokenProperties.symbol, token.FungibleToken.approveFungibleToken, overrides).then((receipt) => {
+                    expect(receipt).have.property("status").is.eq(1);
                     if (!silent) console.log(indent, "RECEIPT:", JSON.stringify(receipt));
                 });
             });
@@ -178,14 +201,56 @@ if ("" != nodeProvider.fungibleToken.middleware) {
 
             it("State", function () {
                 return issuerFungibleToken.getState().then((state) => {
+                    expect(state).is.exist;
+                    expect(state).have.property("name").is.eq(fungibleTokenProperties.name);
+                    expect(state).have.property("symbol").is.eq(fungibleTokenProperties.symbol);
+                    expect(state).have.property("decimals").is.eq(fungibleTokenProperties.decimals);
+                    expect(state).have.property("totalSupply").is.satisfy(function (value) { return value.eq(fungibleTokenProperties.maxSupply) });
+                    expect(state).have.property("maxSupply").is.satisfy(function (value) { return value.eq(fungibleTokenProperties.maxSupply) });
+                    expect(state).have.property("owner").is.eq(issuer.address);
+                    expect(state).have.property("newOwner").is.empty;
+                    expect(state).have.property("metadata").is.empty;
+
                     if (!silent) console.log(indent, "STATE:", JSON.stringify(state));
+                });
+            });
+
+            it("AccountState - owner", function () {
+                let provider = new mxw.providers.JsonRpcProvider(nodeProvider.connection, nodeProvider);
+
+                return provider.getTokenAccountState(fungibleTokenProperties.symbol, issuer.address).then((state) => {
+                    expect(state).is.exist;
+                    expect(state).have.property("owner").is.eq(issuer.address);
+                    expect(state).have.property("frozen").is.false;
+                    expect(state).have.property("balance").is.satisfy(function (value) { return value.eq(fungibleTokenProperties.maxSupply) });
+                });
+            });
+
+            it("AccountState - others", function () {
+                let provider = new mxw.providers.JsonRpcProvider(nodeProvider.connection, nodeProvider);
+
+                return provider.getTokenAccountState(fungibleTokenProperties.symbol, wallet.address).then((state) => {
+                    expect(state).is.exist;
+                    expect(state).have.property("owner").is.eq(wallet.address);
+                    expect(state).have.property("frozen").is.false;
+                    expect(state).have.property("balance").is.satisfy(function (value) { return value.eq(0) });
                 });
             });
 
             it("Balance - owner", function () {
                 return issuerFungibleToken.getBalance().then((balance) => {
-                    if (!silent) console.log(indent, "Owner balance:", mxw.utils.formatUnits(balance, issuerFungibleToken.state.decimals));
                     expect(balance.toString()).to.equal(issuerFungibleToken.state.totalSupply.toString());
+                    if (!silent) console.log(indent, "Owner balance:", mxw.utils.formatUnits(balance, issuerFungibleToken.state.decimals), issuerFungibleToken.symbol);
+                });
+            });
+
+            it("Balance - others", function () {
+                let provider = new mxw.providers.JsonRpcProvider(nodeProvider.connection, nodeProvider);
+
+                return provider.getTokenAccountBalance(fungibleTokenProperties.symbol, wallet.address).then((balance) => {
+                    expect(balance).is.exist;
+                    expect(balance.toString()).to.equal("0");
+                    if (!silent) console.log(indent, "Other's balance:", mxw.utils.formatUnits(balance, issuerFungibleToken.state.decimals), issuerFungibleToken.symbol);
                 });
             });
 
@@ -306,6 +371,15 @@ if ("" != nodeProvider.fungibleToken.middleware) {
                 });
             });
 
+            it("Freeze Account - check state", function () {
+                let provider = new mxw.providers.JsonRpcProvider(nodeProvider.connection, nodeProvider);
+
+                return provider.getTokenAccountState(fungibleTokenProperties.symbol, wallet.address).then((state) => {
+                    expect(state).is.exist;
+                    expect(state).have.property("frozen").is.true;
+                });
+            });
+
             it("Transfer - challenge frozen account", function () {
                 return fungibleToken.getBalance().then((balance) => {
                     return fungibleToken.transfer(issuer.address, balance).then((receipt) => {
@@ -405,12 +479,6 @@ if ("" != nodeProvider.fungibleToken.middleware) {
                     expect(receipt).is.not.exist;
                 }).catch(error => {
                     expect(error.code).to.equal(errors.NOT_ALLOWED);
-                });
-            });
-
-            it("State", function () {
-                return issuerFungibleToken.getState().then((state) => {
-                    if (!silent) console.log(indent, "STATE:", JSON.stringify(state));
                 });
             });
         });

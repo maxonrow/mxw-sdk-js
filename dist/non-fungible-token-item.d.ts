@@ -12,6 +12,7 @@ export declare class NonFungibleTokenItem {
     constructor(symbol: string, itemID: string, signerOrProvider: Signer | Provider);
     get state(): NFTokenItemState;
     get parent(): NonFungibleToken;
+    get owner(): string;
     refresh(overrides?: any): Promise<this>;
     /**
     * Query token item state
@@ -38,10 +39,9 @@ export declare class NonFungibleTokenItem {
     getTransferTransactionRequest(toAddressOrName: string | Promise<string>, overrides?: any): Promise<TransactionRequest>;
     /**
     * Endorse token item by endorser
-    * @param overrides options
     */
-    endorse(overrides?: any): Promise<TransactionResponse | TransactionReceipt>;
-    getEndorseTransactionRequest(overrides?: any): Promise<TransactionRequest>;
+    endorse(metadata?: string, overrides?: any): Promise<TransactionResponse | TransactionReceipt>;
+    getEndorseTransactionRequest(metadata: string, overrides?: any): Promise<TransactionRequest>;
     /**
     * Update token item metadata
     * @param metadata metadata to update

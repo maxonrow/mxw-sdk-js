@@ -1,7 +1,7 @@
 mxw-sdk-js
 ==========
 
-Aims to be a complete and compact library for interacting with the Maxonrow Blockchain and its ecosystem.
+The mxw-sdk-js library aims to be a complete and compact library for interacting with the Maxonrow blockchain and its ecosystem.
 
 -----
 
@@ -9,14 +9,14 @@ Aims to be a complete and compact library for interacting with the Maxonrow Bloc
 
 - Keep your private keys in your client, **safe** and sound
 - Import and export **JSON wallets**
-- Import and export BIP 39 **mnemonic phrases** (12 word backup phrases) and HD Wallets (English, Italian, Japanese, Korean, Simplified Chinese, Traditional Chinese; more coming soon)
+- Import and export BIP 39 **mnemonic phrases** (12-word backup phrases) and HD wallets (English, Italian, Japanese, Korean, Simplified Chinese, Traditional Chinese; more coming soon)
 - Connect to Maxonrow nodes over `JSON-RPC`.
-- **Alias names** are first-class citizens; they can be used anywhere an Maxonrow addresses can be used
+- **Aliases names** are first-class citizens; it can be used to log in any Maxonrow services
 - **Complete** functionality for all your Maxonrow needs
 - Extensive [documentation](https://docs.maxonrow.com/mxw-sdk-js)
 - Large collection of **test cases** which are maintained and added to
-- Fully **TypeScript** ready, with definition files and full TypeScript source
-- **MIT License** (including ALL dependencies); completely open source to do with as you please
+- Fully **TypeScript**-ready, with definition files and full TypeScript source
+- **MIT License** (including ALL dependencies); completely open source, tweak as you please
 
 -----
 
@@ -50,7 +50,7 @@ Importing
 
 -----
 
-Acknowledgements
-----------------
+Acknowledgement
+---------------
 
-The initial idea was brought from [ethers.js](https://github.com/ethers-io/ethers.js), but soon after moving further, this library becomes its own beast.
+The initial idea was brought over `ethers.js`_, but soon after moving further, this library becomes its own entity.

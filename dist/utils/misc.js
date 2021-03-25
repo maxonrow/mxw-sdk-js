@@ -176,7 +176,7 @@ function notAllowNull(check) {
 exports.notAllowNull = notAllowNull;
 function allowNullOrEmpty(check, nullValue) {
     return (function (value) {
-        if (value == null || '' === value) {
+        if (value == null || '' === value || (Array.isArray(value) && 0 === value.length)) {
             return nullValue;
         }
         return check(value);

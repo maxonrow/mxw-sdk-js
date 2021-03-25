@@ -46,8 +46,10 @@ export interface NFTokenState {
     transferLimit: BigNumber;
     endorserList: string[];
     totalSupply: BigNumber;
+    endorserListLimit: BigNumber;
 }
 export interface NFTokenItemState {
+    owner: string;
     id: string;
     properties: string;
     metadata: string;
@@ -196,6 +198,8 @@ export declare abstract class Provider implements OnceBlockable {
     abstract removeAllListeners(eventName?: EventType): Provider;
     abstract removeListener(eventName: EventType, listener: Listener): Provider;
     abstract waitForTransaction(transactionHash: string, confirmations?: number): Promise<TransactionReceipt>;
+    abstract get pollingInterval(): number;
+    abstract set pollingInterval(value: number);
     constructor();
     static isProvider(value: any): value is Provider;
 }

@@ -94,6 +94,7 @@ Prototype
         - **transferLimit** --- *BigNumber* (token's maximum transfer limit)
         - **endorserList** --- *string[]* list of endorsers 
         - **totalSupply** --- *BigNumber* (total items minted by the token)
+        - **endorserListLimit** --- *BigNumber* (token's maximum endorser list limit)
 
 .. note:: All token must be authorized, before it can use to mint item or transfer ownership. All token state must be assigned.
 
@@ -114,7 +115,8 @@ Prototype
         mintLimit: 1,
         transferLimit: 1,
         burnable: false,
-        pub: false
+        pub: false,
+        endorserListLimit: 10
         };
 
         token.NonFungibleToken.approveNonFungibleToken("symbol",provider, tokenState).then((transaction) => {
@@ -173,7 +175,7 @@ Prototype
 .. code-block:: javascript
     :caption: *update metadata of an NFT*
 
-    let provider = new mxw.Wallet(0x00000000000000000000000000000000000000000000000070726f7669646572);
+    let wallet = new mxw.Wallet(0x00000000000000000000000000000000000000000000000070726f7669646572);
     let nonFungibleTokenProperties: NonFungibleTokenProperties;
     nonFungibleTokenProperties = {
         name: "MY " + symbol,
@@ -186,7 +188,7 @@ Prototype
         properties:["Decentralised identifier"]
     };
 
-    let nftInstance = new NonFungibleTokenItem(nonFungibleTokenProperties,provider);
+    let nftInstance = new NonFungibleTokenItem(nonFungibleTokenProperties, wallet);
 
     //overwrite the token metadata with string "overwrite"
     nftInstance.updateMetadata("overwite").then((receipt) => {
@@ -212,7 +214,7 @@ Freeze and unfreeze an item.
         let issuer = new mxw.Wallet(0x0000000000000000000000000000000000000000000000000000697373756572);
         let middleware = new mxw.Wallet(0x000000000000000000000000000000000000000000006d6964646c6577617265);
 
-        token.NonFungibleToken.freezeNonFungibleTokenItem("symbol","itemID",provider).then((transaction) => {
+        token.NonFungibleToken.freezeNonFungibleTokenItem("symbol","itemID", provider).then((transaction) => {
             token.NonFungibleToken.signNonFungibleTokenItemStatusTransaction(transaction, issuer).then((transaction) => {
                 token.NonFungibleToken.sendNonFungibleTokenItemStatusTransaction(transaction, middleware).then((receipt) => {
                     console.log(JSON.stringify(receipt));
@@ -227,7 +229,7 @@ Freeze and unfreeze an item.
         let issuer = new mxw.Wallet(0x0000000000000000000000000000000000000000000000000000697373756572);
         let middleware = new mxw.Wallet(0x000000000000000000000000000000000000000000006d6964646c6577617265);
 
-        token.NonFungibleToken.unfreezeNonFungibleTokenItem("symbol","itemID",provider).then((transaction) => {
+        token.NonFungibleToken.unfreezeNonFungibleTokenItem("symbol","itemID", provider).then((transaction) => {
             token.NonFungibleToken.signNonFungibleTokenItemStatusTransaction(transaction, issuer).then((transaction) => {
                 token.NonFungibleToken.sendNonFungibleTokenItemStatusTransaction(transaction, middleware).then((receipt) => {
                     console.log(JSON.stringify(receipt));
@@ -266,14 +268,14 @@ Create an item instance, three components must be included: symbol, itemId, and 
 .. code-block:: javascript
     :caption: check on item state
 
-        mxw.nonFungibleToken.NonFungibleToken.fromSymbol("symbol","itemID","issuer address").then((token)=>{
+        mxw.nonFungibleToken.NonFungibleToken.fromSymbol("symbol", "itemID", wallet).then((token)=>{
             console.log(JSON.stringify(token))
         });  
 
 .. code-block:: javascript
     :caption: get the state of token that minted this item
 
-        mxw.nonFungibleToken.NonFungibleToken.fromSymbol("symbol","itemID","issuer address").then((token)=>{
+        mxw.nonFungibleToken.NonFungibleToken.fromSymbol("symbol", "itemID", wallet).then((token)=>{
             console.log(JSON.stringify(token))
             var mintedNFTItem = nftItem;
             console.log(mintedNFTItem.parent.state);
@@ -290,19 +292,19 @@ Create an item instance, three components must be included: symbol, itemId, and 
 .. code-block:: javascript
     :caption: *burn an NFT item*
 
-        let nftInstance = new NonFungibleTokenItem(symbol, itemID, address);
+        let nftInstance = new NonFungibleTokenItem(symbol, itemID, wallet);
         nftInstance.burn().then((receipt) => {
                 console.log(receipt);
         });
 
-:sup:`prototype` . endorse( ) |nbsp| `=> Promise<TransactionReceipt>`
+:sup:`prototype` . endorse(metadata) |nbsp| `=> Promise<TransactionReceipt>`
     Sign/approves endorsement by an endorser
 
 .. code-block:: javascript
     :caption: *endorse an NFT item*
 
-    let nftInstance = new NonFungibleTokenItem("symbol", "itemID", "address");
-    nftInstance.endorse().then((receipt) => {
+    let nftInstance = new NonFungibleTokenItem("symbol", "itemID", wallet);
+    nftInstance.endorse("Optional endorsement metadata").then((receipt) => {
             console.log(receipt);
     });
 
@@ -312,7 +314,7 @@ Create an item instance, three components must be included: symbol, itemId, and 
 .. code-block:: javascript
     :caption: *update metadata of an NFT item*
 
-    let nftInstance = new NonFungibleTokenItem("symbol", "itemID", "address");
+    let nftInstance = new NonFungibleTokenItem("symbol", "itemID", wallet);
 
     //overwrite the NFT item metadata with string "overwrite"
     nftInstance.updateItemMetadata("overwite").then((receipt) => {

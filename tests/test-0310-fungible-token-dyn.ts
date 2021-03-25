@@ -78,6 +78,28 @@ if ("" != nodeProvider.fungibleToken.middleware) {
         describe('Suite: FungibleToken - Dynamic Supply ' + (unlimited ? "(Unlimited)" : "(Limited)"), function () {
             this.slow(slowThreshold); // define the threshold for slow indicator
 
+            it("Create - challenge negative application fee", function () {
+                let symbol = "DYN" + hexlify(randomBytes(4)).substring(2);
+                let fungibleTokenProperties = {
+                    name: "MY " + symbol,
+                    symbol: symbol,
+                    decimals: 18,
+                    fixedSupply: false,
+                    maxSupply: unlimited ? bigNumberify("0") : bigNumberify("100000000000000000000000000"),
+                    fee: {
+                        to: nodeProvider.fungibleToken.feeCollector,
+                        value: bigNumberify("-1")
+                    },
+                    metadata: ""
+                };
+
+                return token.FungibleToken.create(fungibleTokenProperties, issuer, defaultOverrides).then((token) => {
+                    expect(token).is.not.exist;
+                }).catch(error => {
+                    expect(error).have.property("code").to.eq(errors.NUMERIC_FAULT);
+                });
+            });
+
             it("Create", function () {
                 let symbol = "DYN" + hexlify(randomBytes(4)).substring(2);
                 fungibleTokenProperties = {
@@ -88,7 +110,7 @@ if ("" != nodeProvider.fungibleToken.middleware) {
                     maxSupply: unlimited ? bigNumberify("0") : bigNumberify("100000000000000000000000000"),
                     fee: {
                         to: nodeProvider.fungibleToken.feeCollector,
-                        value: bigNumberify("1")
+                        value: bigNumberify("0")
                     },
                     metadata: ""
                 };
@@ -166,14 +188,56 @@ if ("" != nodeProvider.fungibleToken.middleware) {
 
             it("State", function () {
                 return issuerFungibleToken.getState().then((state) => {
+                    expect(state).is.exist;
+                    expect(state).have.property("name").is.eq(fungibleTokenProperties.name);
+                    expect(state).have.property("symbol").is.eq(fungibleTokenProperties.symbol);
+                    expect(state).have.property("decimals").is.eq(fungibleTokenProperties.decimals);
+                    expect(state).have.property("totalSupply").is.satisfy(function (value) { return value.eq(0) });
+                    expect(state).have.property("maxSupply").is.satisfy(function (value) { return value.eq(fungibleTokenProperties.maxSupply) });
+                    expect(state).have.property("owner").is.eq(issuer.address);
+                    expect(state).have.property("newOwner").is.empty;
+                    expect(state).have.property("metadata").is.empty;
+
                     if (!silent) console.log(indent, "STATE:", JSON.stringify(state));
+                });
+            });
+
+            it("AccountState - owner", function () {
+                let provider = new mxw.providers.JsonRpcProvider(nodeProvider.connection, nodeProvider);
+
+                return provider.getTokenAccountState(fungibleTokenProperties.symbol, issuer.address).then((state) => {
+                    expect(state).is.exist;
+                    expect(state).have.property("owner").is.eq(issuer.address);
+                    expect(state).have.property("frozen").is.false;
+                    expect(state).have.property("balance").is.satisfy(function (value) { return value.eq(0) });
+                });
+            });
+
+            it("AccountState - others", function () {
+                let provider = new mxw.providers.JsonRpcProvider(nodeProvider.connection, nodeProvider);
+
+                return provider.getTokenAccountState(fungibleTokenProperties.symbol, wallet.address).then((state) => {
+                    expect(state).is.exist;
+                    expect(state).have.property("owner").is.eq(wallet.address);
+                    expect(state).have.property("frozen").is.false;
+                    expect(state).have.property("balance").is.satisfy(function (value) { return value.eq(0) });
                 });
             });
 
             it("Balance - owner", function () {
                 return issuerFungibleToken.getBalance().then((balance) => {
-                    if (!silent) console.log(indent, "Owner balance:", mxw.utils.formatUnits(balance, issuerFungibleToken.state.decimals));
                     expect(balance.toString()).to.equal(issuerFungibleToken.state.totalSupply.toString());
+                    if (!silent) console.log(indent, "Owner balance:", mxw.utils.formatUnits(balance, issuerFungibleToken.state.decimals), issuerFungibleToken.symbol);
+                });
+            });
+
+            it("Balance - others", function () {
+                let provider = new mxw.providers.JsonRpcProvider(nodeProvider.connection, nodeProvider);
+
+                return provider.getTokenAccountBalance(fungibleTokenProperties.symbol, wallet.address).then((balance) => {
+                    expect(balance).is.exist;
+                    expect(balance.toString()).to.equal("0");
+                    if (!silent) console.log(indent, "Other's balance:", mxw.utils.formatUnits(balance, issuerFungibleToken.state.decimals), issuerFungibleToken.symbol);
                 });
             });
 
@@ -198,8 +262,8 @@ if ("" != nodeProvider.fungibleToken.middleware) {
             it("Mint - zero", function () {
                 let value = bigNumberify("0");
                 return issuerFungibleToken.mint(wallet.address, value).then((receipt) => {
+                    expect(receipt).have.property("status").is.eq(1);
                     if (!silent) console.log(indent, "RECEIPT:", JSON.stringify(receipt));
-                    expect(receipt.status).to.equal(1);
                 }).then(() => {
                     return refresh(fungibleTokenProperties.symbol);
                 });
@@ -208,8 +272,8 @@ if ("" != nodeProvider.fungibleToken.middleware) {
             it("Mint", function () {
                 let value = unlimited ? bigNumberify("100000000000000000000000000") : issuerFungibleToken.state.maxSupply;
                 return issuerFungibleToken.mint(issuer.address, value).then((receipt) => {
+                    expect(receipt).have.property("status").is.eq(1);
                     if (!silent) console.log(indent, "RECEIPT:", JSON.stringify(receipt));
-                    expect(receipt.status).to.equal(1);
                 }).then(() => {
                     return refresh(fungibleTokenProperties.symbol);
                 });
@@ -228,16 +292,16 @@ if ("" != nodeProvider.fungibleToken.middleware) {
 
             it("Balance - total supply", function () {
                 return issuerFungibleToken.getBalance().then((balance) => {
-                    if (!silent) console.log(indent, "Owner balance:", mxw.utils.formatUnits(balance, issuerFungibleToken.state.decimals));
                     expect(balance.toString()).to.equal(issuerFungibleToken.state.totalSupply.toString());
+                    if (!silent) console.log(indent, "Owner balance:", mxw.utils.formatUnits(balance, issuerFungibleToken.state.decimals));
                 });
             });
 
             it("Transfer - self transfer", function () {
                 return issuerFungibleToken.getBalance().then((balance) => {
                     return issuerFungibleToken.transfer(issuer.address, balance).then((receipt) => {
+                        expect(receipt).have.property("status").is.eq(1);
                         if (!silent) console.log(indent, "RECEIPT:", JSON.stringify(receipt));
-                        expect(receipt.status).to.equal(1);
                     }).then(() => {
                         return issuerFungibleToken.getBalance().then((newBalance) => {
                             expect(newBalance.toString()).to.equal(balance.toString());
@@ -256,8 +320,8 @@ if ("" != nodeProvider.fungibleToken.middleware) {
                         memo: "Hello blockchain"
                     }).then((fee) => {
                         return issuerFungibleToken.transfer(wallet.address, balance, { fee }).then((receipt) => {
+                            expect(receipt).have.property("status").is.eq(1);
                             if (!silent) console.log(indent, "RECEIPT:", JSON.stringify(receipt));
-                            expect(receipt.status).to.equal(1);
                         });
                     }).then(() => {
                         return issuerFungibleToken.getBalance().then((issuerBalance) => {
@@ -273,7 +337,7 @@ if ("" != nodeProvider.fungibleToken.middleware) {
 
             it("Burn - zero", function () {
                 return fungibleToken.burn(bigNumberify("0")).then((receipt) => {
-                    expect(receipt.status).to.equal(1);
+                    expect(receipt).have.property("status").is.eq(1);
                 });
             });
 
@@ -292,7 +356,7 @@ if ("" != nodeProvider.fungibleToken.middleware) {
                 return fungibleToken.getBalance().then((balance) => {
                     balance = balance.div(2);
                     return fungibleToken.burn(balance).then((receipt) => {
-                        expect(receipt.status).to.equal(1);
+                        expect(receipt).have.property("status").is.eq(1);
                     });
                 });
             });
@@ -300,13 +364,14 @@ if ("" != nodeProvider.fungibleToken.middleware) {
             it("Burn", function () {
                 return fungibleToken.getBalance().then((balance) => {
                     return fungibleToken.burn(balance).then((receipt) => {
-                        expect(receipt.status).to.equal(1);
+                        expect(receipt).have.property("status").is.eq(1);
                     });
                 });
             });
 
             it("Freeze", function () {
                 return performFungibleTokenStatus(fungibleTokenProperties.symbol, token.FungibleToken.freezeFungibleToken).then((receipt) => {
+                    expect(receipt).have.property("status").is.eq(1);
                     if (!silent) console.log(indent, "RECEIPT:", JSON.stringify(receipt));
                 });
             });
@@ -352,6 +417,7 @@ if ("" != nodeProvider.fungibleToken.middleware) {
 
             it("Unfreeze", function () {
                 return performFungibleTokenStatus(fungibleTokenProperties.symbol, token.FungibleToken.unfreezeFungibleToken).then((receipt) => {
+                    expect(receipt).have.property("status").is.eq(1);
                     if (!silent) console.log(indent, "RECEIPT:", JSON.stringify(receipt));
                 });
             });
@@ -367,8 +433,8 @@ if ("" != nodeProvider.fungibleToken.middleware) {
             it("Mint - after unfreeze token", function () {
                 let value = bigNumberify("100000000000000000000000000");
                 return issuerFungibleToken.mint(issuer.address, value).then((receipt) => {
+                    expect(receipt).have.property("status").is.eq(1);
                     if (!silent) console.log(indent, "Mint RECEIPT:", JSON.stringify(receipt));
-                    expect(receipt.status).to.equal(1);
                 });
             });
 
@@ -376,8 +442,8 @@ if ("" != nodeProvider.fungibleToken.middleware) {
                 return issuerFungibleToken.getBalance().then((balance) => {
                     balance = balance.div(2);
                     return issuerFungibleToken.transfer(wallet.address, balance).then((receipt) => {
+                        expect(receipt).have.property("status").is.eq(1);
                         if (!silent) console.log(indent, "RECEIPT:", JSON.stringify(receipt));
-                        expect(receipt.status).to.equal(1);
                     });
                 });
             });
@@ -386,14 +452,15 @@ if ("" != nodeProvider.fungibleToken.middleware) {
                 return fungibleToken.getBalance().then((balance) => {
                     balance = balance.div(2);
                     return fungibleToken.burn(balance).then((receipt) => {
+                        expect(receipt).have.property("status").is.eq(1);
                         if (!silent) console.log(indent, "RECEIPT:", JSON.stringify(receipt));
-                        expect(receipt.status).to.equal(1);
                     });
                 });
             });
 
             it("Freeze Account", function () {
                 return performFungibleTokenAccountStatus(fungibleTokenProperties.symbol, wallet.address, token.FungibleToken.freezeFungibleTokenAccount).then((receipt) => {
+                    expect(receipt).have.property("status").is.eq(1);
                     if (!silent) console.log(indent, "RECEIPT:", JSON.stringify(receipt));
                 });
             });
@@ -447,6 +514,7 @@ if ("" != nodeProvider.fungibleToken.middleware) {
 
             it("Unfreeze Account", function () {
                 return performFungibleTokenAccountStatus(fungibleTokenProperties.symbol, wallet.address, token.FungibleToken.unfreezeFungibleTokenAccount).then((receipt) => {
+                    expect(receipt).have.property("status").is.eq(1);
                     if (!silent) console.log(indent, "RECEIPT:", JSON.stringify(receipt));
                 });
             });
@@ -462,16 +530,16 @@ if ("" != nodeProvider.fungibleToken.middleware) {
             it("Mint - after unfreeze account", function () {
                 let value = bigNumberify("10");
                 return issuerFungibleToken.mint(issuer.address, value).then((receipt) => {
+                    expect(receipt).have.property("status").is.eq(1);
                     if (!silent) console.log(indent, "RECEIPT:", JSON.stringify(receipt));
-                    expect(receipt.status).to.equal(1);
                 });
             });
 
             it("Transfer - after unfreeze account", function () {
                 return issuerFungibleToken.getBalance().then((balance) => {
                     return issuerFungibleToken.transfer(issuer.address, balance).then((receipt) => {
+                        expect(receipt).have.property("status").is.eq(1);
                         if (!silent) console.log(indent, "RECEIPT:", JSON.stringify(receipt));
-                        expect(receipt.status).to.equal(1);
                     });
                 });
             });
@@ -479,8 +547,8 @@ if ("" != nodeProvider.fungibleToken.middleware) {
             it("Burn - after unfreeze account", function () {
                 return issuerFungibleToken.getBalance().then((balance) => {
                     return issuerFungibleToken.burn(balance).then((receipt) => {
+                        expect(receipt).have.property("status").is.eq(1);
                         if (!silent) console.log(indent, "RECEIPT:", JSON.stringify(receipt));
-                        expect(receipt.status).to.equal(1);
                     });
                 });
             });
@@ -495,8 +563,8 @@ if ("" != nodeProvider.fungibleToken.middleware) {
 
             it("Transfer ownership", function () {
                 return issuerFungibleToken.transferOwnership(wallet.address).then((receipt) => {
+                    expect(receipt).have.property("status").is.eq(1);
                     if (!silent) console.log(indent, "RECEIPT:", JSON.stringify(receipt));
-                    expect(receipt.status).to.equal(1);
                 });
             });
 
@@ -518,6 +586,7 @@ if ("" != nodeProvider.fungibleToken.middleware) {
 
             it("Approve transfer ownership", function () {
                 return performFungibleTokenStatus(fungibleTokenProperties.symbol, token.FungibleToken.approveFungibleTokenOwnership).then((receipt) => {
+                    expect(receipt).have.property("status").is.eq(1);
                     if (!silent) console.log(indent, "RECEIPT:", JSON.stringify(receipt));
                 });
             });
@@ -540,8 +609,8 @@ if ("" != nodeProvider.fungibleToken.middleware) {
 
             it("Accept ownership", function () {
                 return fungibleToken.acceptOwnership().then((receipt) => {
+                    expect(receipt).have.property("status").is.eq(1);
                     if (!silent) console.log(indent, "RECEIPT:", JSON.stringify(receipt));
-                    expect(receipt.status).to.equal(1);
                 });
             });
 
@@ -550,12 +619,6 @@ if ("" != nodeProvider.fungibleToken.middleware) {
                     expect(receipt).is.not.exist;
                 }).catch(error => {
                     expect(error.code).to.equal(errors.NOT_ALLOWED);
-                });
-            });
-
-            it("State", function () {
-                return issuerFungibleToken.getState().then((state) => {
-                    if (!silent) console.log(indent, "STATE:", JSON.stringify(state));
                 });
             });
         });
@@ -589,6 +652,7 @@ if ("" != nodeProvider.fungibleToken.middleware) {
                     notRefresh: true
                 };
                 return performFungibleTokenStatus(fungibleTokenProperties.symbol, token.FungibleToken.rejectFungibleToken, overrides).then((receipt) => {
+                    expect(receipt).have.property("status").is.eq(1);
                     if (!silent) console.log(indent, "RECEIPT:", JSON.stringify(receipt));
                 });
             });
@@ -628,7 +692,7 @@ if ("" != nodeProvider.fungibleToken.middleware) {
             return token.FungibleToken.signFungibleTokenStatusTransaction(transaction, issuer);
         }).then((transaction) => {
             return token.FungibleToken.sendFungibleTokenStatusTransaction(transaction, middleware).then((receipt) => {
-                expect(receipt.status).to.equal(1);
+                expect(receipt).have.property("status").is.eq(1);
 
                 if (overrides && overrides.notRefresh) {
                     return receipt;
@@ -645,7 +709,7 @@ if ("" != nodeProvider.fungibleToken.middleware) {
             return token.FungibleToken.signFungibleTokenAccountStatusTransaction(transaction, issuer);
         }).then((transaction) => {
             return token.FungibleToken.sendFungibleTokenAccountStatusTransaction(transaction, middleware).then((receipt) => {
-                expect(receipt.status).to.equal(1);
+                expect(receipt).have.property("status").is.eq(1);
                 return refresh(symbol).then(() => {
                     return receipt;
                 });
