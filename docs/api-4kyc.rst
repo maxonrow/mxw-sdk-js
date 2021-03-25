@@ -113,22 +113,8 @@ Signing
     promise will reject with the error, with the additional property ``transactionHash``
     so that further processing may be done.
 
-:sup:`prototype` . bind ( :ref:`AddressOrName <addressOrName>`, kycAddress, signer ) |nbsp| `=> Promise<TransactionReceipt>`
-    Creates relationship between wallets by sending *kycBind* transaction to the **entire** blockchain network and returns a
-    :ref:`Promise <promise>` that resolves to the :ref:`Transaction Receipt <transaction-receipt>`.
-    The transaction should be signed by KYC middleware.
-
-    The :ref:`AddressOrName <addressOrName>` can be set to target alias or wallet address. The ``kycAddress`` is the reference of relationship.
-
-:sup:`prototype` . unbind ( :ref:`AddressOrName <addressOrName>`, kycAddress, signer ) |nbsp| `=> Promise<TransactionReceipt>`
-    Removes relationship between wallets by sending *kycUnbind* transaction to the **entire** blockchain network and returns a
-    :ref:`Promise <promise>` that resolves to the :ref:`Transaction Receipt <transaction-receipt>`.
-    The transaction should be signed by KYC middleware.
-
-    The :ref:`AddressOrName <addressOrName>` can be set to target alias or wallet address. The ``kycAddress`` is the reference of relationship.
-
-Checking Status
-###############
+Miscellaneous
+#############
 
 :sup:`wallet` . isWhitelisted ( ) |nbsp| `=> Promise<Boolean>`
     Returns a :ref:`Promise <promise>` of the wallet's whitelist status and 
@@ -145,3 +131,44 @@ Checking Status
     }); 
     // expected result:
     // true or false
+
+:sup:`prototype` . bind ( :ref:`AddressOrName <addressOrName>`, kycAddress, signer ) |nbsp| `=> Promise<TransactionReceipt>`
+    Creates relationship between wallets by sending *kycBind* transaction to the **entire** blockchain network and returns a
+    :ref:`Promise <promise>` that resolves to the :ref:`Transaction Receipt <transaction-receipt>`.
+    The transaction should be signed by the initiator.
+
+    The :ref:`AddressOrName <addressOrName>` can be set to target alias or wallet address. The ``kycAddress`` is the reference of relationship.
+
+.. code-block:: javascript
+    :caption: bind whitelisted wallet
+
+    let otherWalletAddress = mxw1duct5rv3wan3vpdk3ms6kgn0j8h905kqvccw4r;
+    let otherKycAddress = Kyc.create(otherWalletAddress).getKycAddress(otherWalletAddress);
+    let myWallet = new mxw.Wallet(0x00000000000000000000000000000000000000000000000070726f7669646572);
+    let myKyc = Kyc.create(myWallet);
+    let receipt = myKyc.bind(walletAddress, kycAddress, myWallet);
+    console.log(receipt.status)
+    //expected result:
+    //1 (successfully bind)
+
+:sup:`prototype` . unbind ( :ref:`AddressOrName <addressOrName>`, kycAddress, signer ) |nbsp| `=> Promise<TransactionReceipt>`
+    Removes relationship between wallets by sending *kycUnbind* transaction to the **entire** blockchain network and returns a
+    :ref:`Promise <promise>` that resolves to the :ref:`Transaction Receipt <transaction-receipt>`.
+    The transaction should be signed by initiator.
+
+    The :ref:`AddressOrName <addressOrName>` can be set to target alias or wallet address. The ``kycAddress`` is the reference of relationship.
+
+.. code-block:: javascript
+    :caption: unbind whitelisted wallet
+  
+    let otherWalletAddress = mxw1duct5rv3wan3vpdk3ms6kgn0j8h905kqvccw4r;
+    let otherKycAddress = Kyc.create(otherWalletAddress).getKycAddress(otherWalletAddress);
+    let myWallet = new mxw.Wallet(0x00000000000000000000000000000000000000000000000070726f7669646572);
+    let myKycWallet = Kyc.create(myWallet);
+    let receipt = myKycWallet.unbind(walletAddress, kycAddress, myWallet);
+    console.log(receipt.status)
+    //expected result:
+    //1 (successfully unbind)
+
+
+    
