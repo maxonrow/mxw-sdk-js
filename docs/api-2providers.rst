@@ -107,22 +107,21 @@ Provider Variables
 ******************
 
 :sup:`prototype` . blockNumber
+    *data type: integer*
     Returns the most recent block number (block height) this provider has seen and has triggered
     events for. If no block has been seen, this is *null*.
 
-    *data type: integer*
 
 :sup:`prototype` . polling
-    *mutable*
+    *data type: boolean* , *mutable*
 
     If the provider is currently polling because it is actively watching for events. This
     may be set to enable/disable polling temporarily or disabled permanently to allow a
     node process to exit.
-
-    *data type: boolean*
+    
 
 :sup:`prototype` . pollingInterval
-    *mutable*
+    *data type: integer* , *mutable*
 
     The frequency (in milliseconds) that the provider is polling. The default interval is 4 seconds.
 
@@ -130,7 +129,6 @@ Provider Variables
     setting this too low may result in the service blocking your IP address or otherwise
     throttling your API calls.
 
-    *data type: integer*
 
 .. _provider-network:
 

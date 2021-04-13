@@ -21,7 +21,7 @@ Wallets & Signer
 Wallet
 ######
 
-The **wallet** implements the :ref:`Signer API <signer>` that can be used anywhere a *Signer*
+The **wallet** implements the :ref:`Signer API <signer>` that can be used where a *Signer*
 is expected and has all the required properties.
 
 Create Wallet
@@ -55,7 +55,8 @@ Create Wallet
 
 .. warning:: 
         It is highly recommended to show mnemonic of the wallet to the users and advise them to write it down
-        because there is **no way to recover** their wallet without the mnemonic phrases.
+        because there is **no way to recover** their wallet without the mnemonic phrases. Writing down private key or 
+        JSON file on a paper is not practical.
 
 .. code-block:: javascript
     :caption: *create a new wallet using randomly generated private key*

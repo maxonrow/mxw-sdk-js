@@ -99,7 +99,7 @@ Prototype
 .. note:: All token must be authorized, before it can use to mint item or transfer ownership. All token state must be assigned.
 
 .. code-block:: javascript
-    :caption: authorize token
+    :caption: authorize token action
 
         let provider = new mxw.Wallet(0x00000000000000000000000000000000000000000000000070726f7669646572);
         let issuer = new mxw.Wallet(0x0000000000000000000000000000000000000000000000000000697373756572);

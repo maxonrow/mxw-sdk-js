@@ -85,6 +85,30 @@ Prototype
         - **metadata** — optional
         - **burnable** — whether the token balance can be burned, this will be always true for token with dynamic supply
 
+.. code-block:: javascript
+    :caption: authorize token action
+
+        let provider = new mxw.Wallet(0x00000000000000000000000000000000000000000000000070726f7669646572);
+        let issuer = new mxw.Wallet(0x0000000000000000000000000000000000000000000000000000697373756572);
+        let middleware = new mxw.Wallet(0x000000000000000000000000000000000000000000006d6964646c6577617265);
+
+        let tokenState = {
+        tokenFees: [
+                    { action: FungibleTokenActions.transfer, feeName: "default" },
+                    { action: FungibleTokenActions.transferOwnership, feeName: "default" },
+                    { action: FungibleTokenActions.acceptOwnership, feeName: "default" }
+                    ],
+        burnable: false,
+        };
+
+        token.FungibleToken.approveFungibleToken("symbol",provider, tokenState).then((transaction) => {
+            token.FungibleToken.signFungibleTokenStatusTransaction(transaction, issuer).then((transaction) => {
+                token.FungibleToken.sendFungibleTokenStatusTransaction(transaction, middleware).then((receipt) => {
+                    console.log("approve"+receipt);
+                });
+            });
+        });
+
 :sup:`prototype` . getBalance ( ) |nbsp| `=> Promise<BigNumber>`
     Returns a :ref:`Promise <promise>` that resolves to the fungible token balance
     (as a :ref:`BigNumber <bignumber>`) of the wallet. Be aware of the number of decimals applied to the token.
@@ -97,6 +121,22 @@ Prototype
 
     The :ref:`AddressOrName <addressOrName>` can be set to recipient's alias or wallet address. The ``value`` is the number of *fungible token*
     (as a :ref:`BigNumber <bignumber>`) that is being transferred to recipient. Be aware of the number of decimals applied to the token.
+
+:sup:`prototype` . transferOwnership ( :ref:`AddressOrName <addressOrName>` ) |nbsp| `=> Promise<TransactionReceipt>`
+    Sends the *transfer fungible token* to another person and returns a :ref:`Promise <promise>` that resolves to a
+    :ref:`Transaction Receipt <transaction-receipt>`.
+
+.. code-block:: javascript
+    :caption: transfer token ownership
+
+        let provider = new mxw.Wallet(0x00000000000000000000000000000000000000000000000070726f7669646572);
+        let privateKey = "0x0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef";
+        let wallet = new mxw.Wallet(privateKey, provider);
+
+        var fungibleToken = new FungibleToken(symbol, provider);
+        fungibleToken.transfer(wallet.address).then((receipt) => {
+            console.log(JSON.stringify(receipt));
+        })
 
 :sup:`prototype` . mint ( :ref:`AddressOrName <addressOrName>`, value ) |nbsp| `=> Promise<TransactionReceipt>`
     Sends the *mint fungible token transaction* to the network and returns a :ref:`Promise <promise>` that resolves to a
@@ -118,7 +158,7 @@ Prototype
 .. code-block:: javascript
     :caption: *burn a fungible token*
 
-    let ftInstance = new NonFungibleTokenItem(symbol, itemID, wallet);
+    let ftInstance = new FungibleTokenItem(symbol, itemID, wallet);
         ftInstance.burn().then((receipt) => {
                 console.log(receipt);
         });
