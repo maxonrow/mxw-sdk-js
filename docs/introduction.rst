@@ -10,5 +10,5 @@ Wallets are required to be connected by a network provider to a blockchain/serve
 in order to run any blockchain-related operations (e.g., transfer, check  balance, etc.).
 
 .. note:: Important Note
-Inside a Maxonrow blockchain,all wallets and tokens are require to go through a verification process - KYC (also known as Know Your Customer) 
-before it can be used in Maxonrow blockchain. 
+    Inside a Maxonrow blockchain,all wallets and tokens are require to go through a verification process - KYC (also known as Know Your Customer) 
+    before it can be used in Maxonrow blockchain. 
