@@ -131,18 +131,32 @@ Prototype
     Sends the *transfer non-fungible token* to another person and returns a :ref:`Promise <promise>` that resolves to a
     :ref:`Transaction Receipt <transaction-receipt>`.
 
-.. code-block:: javascript
-    :caption: transfer item ownership
+:sup:`prototype` . acceptOwnership () |nbsp| `=> Promise<TransactionReceipt>`
+    Accept the *non-fungible token* which transfer from another person and returns a :ref:`Promise <promise>` that resolves to a
+    :ref:`Transaction Receipt <transaction-receipt>`.
 
-        let provider = new mxw.Wallet(0x00000000000000000000000000000000000000000000000070726f7669646572);
-        let privateKey = "0x0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef";
-        let wallet = new mxw.Wallet(privateKey, provider);
+. code-block:: javascript
+    :caption: transfer and accept token ownership
 
-        var nonFungibleToken = new NonFungibleToken(symbol, provider);
-        nonFungibleToken.transfer(wallet.address).then((receipt) => {
+        let transfereePrivateKey = "0x0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef";
+        let transfereeWallet = new mxw.Wallet(transfereePrivateKey, networkProvider);
+        let transferorPrivateKey = "0x0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef";
+        let transferorWallet = new mxw.Wallet(transferorPrivateKey, networkProvider);
+
+        var transferorNft = token.NonFungibleToken.create(NonFungibleTokenProperties, transferorWallet);
+        transferorNft.transferOwnership(transfereeWallet.address).then((receipt) => {
             console.log(JSON.stringify(receipt));
         })
 
+        // authorize token action 
+
+        var transfereeNft = token.NonFungibleToken.create(NonFungibleTokenProperties, transfereeWallet);
+        //should perform by another party
+        transfereeNft.acceptOwnership().then((receipt) => {
+            console.log(JSON.stringify(receipt));
+        })
+
+        // authorize token action
 
 :sup:`prototype` . mint ( :ref:`AddressOrName <addressOrName>`, NonFungibleTokenItem) |nbsp| `=> Promise<TransactionReceipt>`
     Sends the *mint non-fungible token transaction* to the network and returns a :ref:`Promise <promise>` that resolves to a

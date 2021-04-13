@@ -126,17 +126,32 @@ Prototype
     Sends the *transfer fungible token* to another person and returns a :ref:`Promise <promise>` that resolves to a
     :ref:`Transaction Receipt <transaction-receipt>`.
 
+:sup:`prototype` . acceptOwnership () |nbsp| `=> Promise<TransactionReceipt>`
+    Accept the *fungible token* which transfer from another person and returns a :ref:`Promise <promise>` that resolves to a
+    :ref:`Transaction Receipt <transaction-receipt>`.
+
 .. code-block:: javascript
-    :caption: transfer token ownership
+    :caption: transfer and accept token ownership
 
-        let provider = new mxw.Wallet(0x00000000000000000000000000000000000000000000000070726f7669646572);
-        let privateKey = "0x0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef";
-        let wallet = new mxw.Wallet(privateKey, provider);
+        let transfereePrivateKey = "0x0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef";
+        let transfereeWallet = new mxw.Wallet(transfereePrivateKey, networkProvider);
+        let transferorPrivateKey = "0x0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef";
+        let transferorWallet = new mxw.Wallet(transferorPrivateKey, networkProvider);
 
-        var fungibleToken = new FungibleToken(symbol, provider);
-        fungibleToken.transfer(wallet.address).then((receipt) => {
+        var transferorFungibleToken = token.FungibleToken.create(FungibleTokenProperties, transferorWallet);
+        transferorFungibleToken.transferOwnership(transfereeWallet.address).then((receipt) => {
             console.log(JSON.stringify(receipt));
         })
+
+        // authorize token action 
+
+        var transfereeFungibleToken = token.FungibleToken.create(FungibleTokenProperties, transfereeWallet);
+        //should perform by another party
+        transfereeFungibleToken.acceptOwnership().then((receipt) => {
+            console.log(JSON.stringify(receipt));
+        })
+
+        // authorize token action
 
 :sup:`prototype` . mint ( :ref:`AddressOrName <addressOrName>`, value ) |nbsp| `=> Promise<TransactionReceipt>`
     Sends the *mint fungible token transaction* to the network and returns a :ref:`Promise <promise>` that resolves to a
