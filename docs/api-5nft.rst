@@ -6,7 +6,7 @@
 Non-Fungible Token
 ******************
 
-A non-fungible token (NFT) is a special type of cryptographic token which represents something unique; non-fungible 
+A non-fungible token (NFT) is a representation of an non-monetary assets in the form of cryptographic token; non-fungible 
 tokens are thus not mutually interchangeable by their individual specification. This is in contrast with 
 cryptocurrencies like Zcash, and many network or utility tokens that are fungible in nature.
 
@@ -45,7 +45,7 @@ Creating non-fungible token requires approval from authorities.
 .. code-block:: javascript
     :caption: create non-fungible token
 
-    let provider = new mxw.Wallet(0x00000000000000000000000000000000000000000000000070726f7669646572);
+    let wallet = new mxw.Wallet(0x00000000000000000000000000000000000000000000000070726f7669646572, networkProvider);
     let nonFungibleTokenProperties: NonFungibleTokenProperties;
     nonFungibleTokenProperties = {
         name: "MY " + "symbol",
@@ -58,8 +58,8 @@ Creating non-fungible token requires approval from authorities.
         properties:["Decentralised identifier"]
     };
 
-    var nonFungibleToken = new NonFungibleToken("symbol", provider);
-    nonFungibleToken.create(nonFungibleTokenProperties, provider).then((token) => {
+    var nonFungibleToken = new NonFungibleToken("symbol", wallet);
+    nonFungibleToken.create(nonFungibleTokenProperties, wallet).then((token) => {
         console.log(JSON.stringify(token));
     });
 
@@ -99,7 +99,7 @@ Prototype
 .. note:: All token must be authorized, before it can use to mint item or transfer ownership. All token state must be assigned.
 
 .. code-block:: javascript
-    :caption: authorize token
+    :caption: authorize token action
 
         let provider = new mxw.Wallet(0x00000000000000000000000000000000000000000000000070726f7669646572);
         let issuer = new mxw.Wallet(0x0000000000000000000000000000000000000000000000000000697373756572);
@@ -128,21 +128,35 @@ Prototype
         });
 
 :sup:`prototype` . transferOwnership ( :ref:`AddressOrName <addressOrName>` ) |nbsp| `=> Promise<TransactionReceipt>`
-    Sends the *transfer non-fungible token* to another person and returns a :ref:`Promise <promise>` that resolves to a
+    Transfer the *non-fungible token ownership* from token owner's wallet to another wallrt and returns a :ref:`Promise <promise>` that resolves to a
+    :ref:`Transaction Receipt <transaction-receipt>`.
+
+:sup:`prototype` . acceptOwnership () |nbsp| `=> Promise<TransactionReceipt>`
+    Accept the *non-fungible token ownership* which transfer from another person and returns a :ref:`Promise <promise>` that resolves to a
     :ref:`Transaction Receipt <transaction-receipt>`.
 
 .. code-block:: javascript
-    :caption: transfer item ownership
+    :caption: transfer and accept token ownership
 
-        let provider = new mxw.Wallet(0x00000000000000000000000000000000000000000000000070726f7669646572);
-        let privateKey = "0x0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef";
-        let wallet = new mxw.Wallet(privateKey, provider);
+        let transfereePrivateKey = "0x0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef";
+        let transfereeWallet = new mxw.Wallet(transfereePrivateKey, networkProvider);
+        let transferorPrivateKey = "0x0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef";
+        let transferorWallet = new mxw.Wallet(transferorPrivateKey, networkProvider);
 
-        var nonFungibleToken = new NonFungibleToken(symbol, provider);
-        nonFungibleToken.transfer(wallet.address).then((receipt) => {
+        var transferorNft = token.NonFungibleToken.create(NonFungibleTokenProperties, transferorWallet);
+        transferorNft.transferOwnership(transfereeWallet.address).then((receipt) => {
             console.log(JSON.stringify(receipt));
         })
 
+        // authorize token action 
+
+        var transfereeNft = token.NonFungibleToken.create(NonFungibleTokenProperties, transfereeWallet);
+        //should perform by another party
+        transfereeNft.acceptOwnership().then((receipt) => {
+            console.log(JSON.stringify(receipt));
+        })
+
+        // authorize token action
 
 :sup:`prototype` . mint ( :ref:`AddressOrName <addressOrName>`, NonFungibleTokenItem) |nbsp| `=> Promise<TransactionReceipt>`
     Sends the *mint non-fungible token transaction* to the network and returns a :ref:`Promise <promise>` that resolves to a

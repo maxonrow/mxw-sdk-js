@@ -10,12 +10,11 @@ Using the SDK
    introduction
    api-1wallet
    api-2providers
-   api-4kyc
-   api-5tokens
-   api-6nft
-   api-7name-service
-   api-8utils
-   api-9misc
+   api-3kyc
+   api-4tokens
+   api-5nft
+   api-7utils
+   api-8misc
    
 
 -----

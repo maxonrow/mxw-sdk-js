@@ -8,8 +8,8 @@ Maxonrow in JavaScript.
 
 .. _console-log:
 
-console.log
-===========
+Debugging
+=========
     The use of ``console.log`` `can substantially impact performance`_.
     For this reason, you may wish to reduce the log level to not show info and warnings.
 

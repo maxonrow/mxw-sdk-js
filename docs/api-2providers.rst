@@ -107,22 +107,21 @@ Provider Variables
 ******************
 
 :sup:`prototype` . blockNumber
+    *data type: integer*
     Returns the most recent block number (block height) this provider has seen and has triggered
     events for. If no block has been seen, this is *null*.
 
-    *data type: integer*
 
 :sup:`prototype` . polling
-    *mutable*
+    *data type: boolean* , *mutable*
 
     If the provider is currently polling because it is actively watching for events. This
     may be set to enable/disable polling temporarily or disabled permanently to allow a
     node process to exit.
-
-    *data type: boolean*
+    
 
 :sup:`prototype` . pollingInterval
-    *mutable*
+    *data type: integer* , *mutable*
 
     The frequency (in milliseconds) that the provider is polling. The default interval is 4 seconds.
 
@@ -130,7 +129,6 @@ Provider Variables
     setting this too low may result in the service blocking your IP address or otherwise
     throttling your API calls.
 
-    *data type: integer*
 
 .. _provider-network:
 
@@ -150,7 +148,7 @@ testnet, or private networks.
 .. code-block:: javascript
     :caption: *get a standard network*
 
-    let network = mxw.providers.getNetwork('localnet');
+    let network = new mxw.providers.Provider.getNetwork('localnet');
     // {
     //    chainId: "mxw",
     //    name: "localnet"
@@ -172,7 +170,7 @@ testnet, or private networks.
 Account
 *******
 
-*A 'dummy' wallet is used below, there is not real user behind it.*
+*A 'dummy' wallet is used below, it is not an actual wallet.*
 
 :sup:`prototype` . getBalance ( :ref:`AddressOrName <addressOrName>` ) |nbsp| `=> Promise<BigNumber>`
     Returns a :ref:`Promise <promise>` with the balance (as a :ref:`BigNumber <bignumber>`) of
@@ -183,7 +181,7 @@ Account
 
     let address = "mxw1x7tp9tt7mu0jm6qdmljgntvzzp53lrtndr7h8x";
 
-    provider.getBalance(address).then((balance) => {
+    mxw.providers.Provider.getBalance(address).then((balance) => {
 
         // balance is a BigNumber (in cin); format is as a string (in mxw)
         let mxwString = mxw.utils.formatMxw(balance);
@@ -203,7 +201,7 @@ Account
 
     let address = "mxw1x7tp9tt7mu0jm6qdmljgntvzzp53lrtndr7h8x";
 
-    provider.getTransactionCount(address).then((nonce) => {
+    mxw.providers.Provider.getTransactionCount(address).then((nonce) => {
         console.log("Total Transactions Ever Sent: " + nonce.toString());
     });
 
@@ -219,7 +217,7 @@ Account
 
     let address = "mxw1x7tp9tt7mu0jm6qdmljgntvzzp53lrtndr7h8x";
 
-    provider.getAccountNumber(address).then((accountNumber) => {
+    mxw.providers.Provider.getAccountNumber(address).then((accountNumber) => {
         console.log("Account number: " + accountNumber.toString());
     });
 
@@ -240,7 +238,7 @@ Blockchain Status
 .. code-block:: javascript
     :caption: *get latest block number*
 
-    provider.getBlockNumber().then((blockNumber) => {
+    mxw.providers.Provider.getBlockNumber().then((blockNumber) => {
         console.log("Latest block number: " + blockNumber);
     });
     // expected result:
@@ -253,7 +251,7 @@ Blockchain Status
     :caption: *blocks*
 
     // Block Number
-    provider.getBlock(12345).then((block) => {
+    mxw.providers.Provider.getBlock(12345).then((block) => {
         console.log(block);
     });
     //expected result:
@@ -268,7 +266,7 @@ Blockchain Status
 
     let transactionHash = "0x434c7fe4c7c7068289f0d369e428b7a3bf3882c3253f2b7f9529c0985a1cb500"
 
-    provider.getTransactionReceipt(transactionHash).then((receipt) => {
+    mxw.providers.Provider.getTransactionReceipt(transactionHash).then((receipt) => {
         console.log(receipt);
     });
     //expected result:
@@ -319,7 +317,7 @@ Blockchain Status
     :caption: *query the transaction fee*
     
     let value = utils.parseMxw("10").toString();
-    provider.getTransactionFee("bank", "bank-send").then((fee) => {
+    mxw.providers.Provider.getTransactionFee("bank", "bank-send").then((fee) => {
         console.log("Fee:", fee);
     });
 
@@ -337,7 +335,7 @@ Waiting for Transactions
 .. code-block:: javascript
     :caption: *transaction validated*
 
-    provider.waitForTransaction(transactionHash).then((receipt) => {
+    mxw.providers.Provider.waitForTransaction(transactionHash).then((receipt) => {
         console.log('Transaction validated: ' + receipt.hash);
         console.log(receipt);
     });
@@ -390,7 +388,7 @@ Provider-Specific Extra API Calls
     :caption: *send vendor-specific JSON-RPC API*
 
     //method parameter is based on vendor RPC API 
-    jsonRpcProvider.send('status', [ ]).then((result) => {
+    mxw.providers.jsonRpcProvider.send('status', [ ]).then((result) => {
         console.log(result);
     });
     // expected result:
