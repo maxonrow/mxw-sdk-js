@@ -143,7 +143,7 @@ Prototype
         let transferorPrivateKey = "0x0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef";
         let transferorWallet = new mxw.Wallet(transferorPrivateKey, networkProvider);
 
-        var transferorNft = token.NonFungibleToken.create(NonFungibleTokenProperties, transferorWallet);
+        var transferorNft = token.NonFungibleToken.fromSymbol(nftSymbol, transferorWallet);
         transferorNft.transferOwnership(transfereeWallet.address).then((receipt) => {
             console.log(JSON.stringify(receipt));
         })

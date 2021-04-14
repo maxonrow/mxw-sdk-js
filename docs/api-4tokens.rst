@@ -131,7 +131,7 @@ Prototype
         let transferorPrivateKey = "0x0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef";
         let transferorWallet = new mxw.Wallet(transferorPrivateKey, networkProvider);
 
-        var transferorFungibleToken = token.FungibleToken.create(FungibleTokenProperties, transferorWallet);
+        var transferorFungibleToken = token.FungibleToken.fromSymbol(tokenSymnbol, transferorWallet);
         transferorFungibleToken.transferOwnership(transfereeWallet.address).then((receipt) => {
             console.log(JSON.stringify(receipt));
         })
