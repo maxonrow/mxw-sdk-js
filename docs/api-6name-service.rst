@@ -30,7 +30,7 @@ Querying
 .. code-block:: javascript
     :caption: *resolve an alias to an address*
 
-    provider.resolveName("hello").then((address) => {
+    mxw.providers.Provider.resolveName("hello").then((address) => {
         console.log("Address:", address);
     });
 
@@ -39,7 +39,7 @@ Querying
     :caption: *lookup the alias of an address*
 
     let address = "mxw1x7tp9tt7mu0jm6qdmljgntvzzp53lrtndr7h8x";
-    provider.lookupAddress(address).then(function(name) {
+    mxw.providers.Provider.lookupAddress(address).then(function(name) {
         console.log("Name:", name);
         // "hello"
     });

@@ -43,10 +43,10 @@ Creating fungible token requires approval from authorities.
             to: "address",
             value: bigNumberify("1")
         },
-        metadata: ["Wallet is able to manage their own metadata"]
+        metadata: ["Fungible Token's metadata is able to modify"]
     };
 
-    mxw.token.FungibleToken.create(FungibleTokenProperties, wallet).then((token) => {
+    token.FungibleToken.create(FungibleTokenProperties, wallet).then((token) => {
         console.log(JSON.stringify(token))
     });
 

@@ -21,8 +21,8 @@ Creating Instances
 .. code-block:: javascript
     :caption: *create an instance of KYC with reference from provider*
 
-    let provider = new mxw.Wallet(0x00000000000000000000000000000000000000000000000070726f7669646572);
-    let kyc = Kyc.create(provider);
+    let wallet = new mxw.Wallet(0x00000000000000000000000000000000000000000000000070726f7669646572, networkProvider);
+    let kyc = auth.Kyc.create(wallet);
 
 Signing
 #######
@@ -53,7 +53,7 @@ Signing
         //create a new wallet to
         let networkProvider = mxw.getDefaultProvider("localnet");
         var wallet = mxw.Wallet.createRandom().connect(networkProvider);
-        Kyc.create(wallet).then((kycR)=>{
+        auth.Kyc.create(wallet).then((kycR)=>{
             let seed = sha256(toUtf8Bytes(JSON.stringify(sortObject({
                 juridical: ["", ""].sort(),
                 seed: utils.getHash(utils.randomBytes(32))
@@ -143,9 +143,9 @@ Miscellaneous
     :caption: bind whitelisted wallet
 
     let otherWalletAddress = mxw1duct5rv3wan3vpdk3ms6kgn0j8h905kqvccw4r;
-    let otherKycAddress = Kyc.create(otherWalletAddress).getKycAddress(otherWalletAddress);
-    let myWallet = new mxw.Wallet(0x00000000000000000000000000000000000000000000000070726f7669646572);
-    let myKyc = Kyc.create(myWallet);
+    let otherKycAddress = auth.Kyc.create(otherWalletAddress).getKycAddress(otherWalletAddress);
+    let myWallet = new mxw.Wallet(0x00000000000000000000000000000000000000000000000070726f7669646572, networkProvider);
+    let myKyc = auth.Kyc.create(myWallet);
     let receipt = myKyc.bind(walletAddress, kycAddress, myWallet);
     console.log(receipt.status)
     //expected result:
@@ -162,9 +162,9 @@ Miscellaneous
     :caption: unbind whitelisted wallet
   
     let otherWalletAddress = mxw1duct5rv3wan3vpdk3ms6kgn0j8h905kqvccw4r;
-    let otherKycAddress = Kyc.create(otherWalletAddress).getKycAddress(otherWalletAddress);
-    let myWallet = new mxw.Wallet(0x00000000000000000000000000000000000000000000000070726f7669646572);
-    let myKycWallet = Kyc.create(myWallet);
+    let otherKycAddress = auth.Kyc.create(otherWalletAddress).getKycAddress(otherWalletAddress);
+    let myWallet = new mxw.Wallet(0x00000000000000000000000000000000000000000000000070726f7669646572, networkProvider);
+    let myKycWallet = auth.Kyc.create(myWallet);
     let receipt = myKycWallet.unbind(walletAddress, kycAddress, myWallet);
     console.log(receipt.status)
     //expected result:

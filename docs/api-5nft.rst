@@ -45,7 +45,7 @@ Creating non-fungible token requires approval from authorities.
 .. code-block:: javascript
     :caption: create non-fungible token
 
-    let provider = new mxw.Wallet(0x00000000000000000000000000000000000000000000000070726f7669646572);
+    let wallet = new mxw.Wallet(0x00000000000000000000000000000000000000000000000070726f7669646572, networkProvider);
     let nonFungibleTokenProperties: NonFungibleTokenProperties;
     nonFungibleTokenProperties = {
         name: "MY " + "symbol",
@@ -58,8 +58,8 @@ Creating non-fungible token requires approval from authorities.
         properties:["Decentralised identifier"]
     };
 
-    var nonFungibleToken = new NonFungibleToken("symbol", provider);
-    nonFungibleToken.create(nonFungibleTokenProperties, provider).then((token) => {
+    var nonFungibleToken = new NonFungibleToken("symbol", wallet);
+    nonFungibleToken.create(nonFungibleTokenProperties, wallet).then((token) => {
         console.log(JSON.stringify(token));
     });
 

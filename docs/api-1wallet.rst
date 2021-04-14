@@ -322,7 +322,7 @@ another wallet, it will be encryted again using their public key.
 
     let privateKey = "0xca250aeca008d36b4b4ff83709343c9e4c4ea461e5aa5fa51d57a0fe11eb045e";
     let networkProvider = mxw.getDefaultProvider("localnet");
-    let wallet = new mxw.Wallet(privateKey, provider);
+    let wallet = new mxw.Wallet(privateKey, networkProvider);
 
     console.log(wallet.address);
     // expected result:
@@ -416,7 +416,7 @@ These operations require wallet to be connected to blockchain by a network provi
 
         let networkProvider = mxw.getDefaultProvider("localnet");
         let privateKey = "0x0000000000000000000000000000000000000000000000000000000000000001";
-        let wallet = new mxw.Wallet(privateKey,provider);
+        let wallet = new mxw.Wallet(privateKey,networkProvider);
         wallet.getBalance().then((balance)=>{
             console.log(mxw.utils.formatMxw("Wallet balance: " + balance));
         });
@@ -434,7 +434,7 @@ These operations require wallet to be connected to blockchain by a network provi
     let networkProvider = mxw.getDefaultProvider("localnet");
 
     let privateKey = "0x0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef";
-    let wallet = new mxw.Wallet(privateKey, provider);
+    let wallet = new mxw.Wallet(privateKey, networkProvider);
 
     wallet.getBalance().then((balance) => {
         console.log("Balance: " + mxw.utils.formatMxw(balance));
@@ -463,7 +463,7 @@ These operations require wallet to be connected to blockchain by a network provi
     let networkProvider = mxw.getDefaultProvider("localnet");
 
     let privateKey = "0x0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef";
-    let wallet = new mxw.Wallet(privateKey, provider);
+    let wallet = new mxw.Wallet(privateKey, networkProvider);
 
     let to = "mxw1j4yh2gfumy8d327n0uvztg9075fjzd59vxf9ae";
     // ... or supports alias names
