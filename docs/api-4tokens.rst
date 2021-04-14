@@ -116,11 +116,11 @@ Prototype
     versa :ref:`parseUnits <parseUnits>`.
 
 :sup:`prototype` . transferOwnership ( :ref:`AddressOrName <addressOrName>` ) |nbsp| `=> Promise<TransactionReceipt>`
-    Transfer the *fungible token* from token owner's wallet to another wallet and returns a :ref:`Promise <promise>` that resolves to a
+    Transfer the *fungible token ownership* from token owner's wallet to another wallet and returns a :ref:`Promise <promise>` that resolves to a
     :ref:`Transaction Receipt <transaction-receipt>`.
 
 :sup:`prototype` . acceptOwnership () |nbsp| `=> Promise<TransactionReceipt>`
-    Accept the *fungible token* which transfer from another wallet and returns a :ref:`Promise <promise>` that resolves to a
+    Accept the *fungible token ownership* which transfer from another wallet and returns a :ref:`Promise <promise>` that resolves to a
     :ref:`Transaction Receipt <transaction-receipt>`.
 
 .. code-block:: javascript

@@ -128,11 +128,11 @@ Prototype
         });
 
 :sup:`prototype` . transferOwnership ( :ref:`AddressOrName <addressOrName>` ) |nbsp| `=> Promise<TransactionReceipt>`
-    Transfer the *non-fungible token* from token owner's wallet to another wallrt and returns a :ref:`Promise <promise>` that resolves to a
+    Transfer the *non-fungible token ownership* from token owner's wallet to another wallrt and returns a :ref:`Promise <promise>` that resolves to a
     :ref:`Transaction Receipt <transaction-receipt>`.
 
 :sup:`prototype` . acceptOwnership () |nbsp| `=> Promise<TransactionReceipt>`
-    Accept the *non-fungible token* which transfer from another person and returns a :ref:`Promise <promise>` that resolves to a
+    Accept the *non-fungible token ownership* which transfer from another person and returns a :ref:`Promise <promise>` that resolves to a
     :ref:`Transaction Receipt <transaction-receipt>`.
 
 .. code-block:: javascript

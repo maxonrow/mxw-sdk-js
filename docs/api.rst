@@ -13,7 +13,6 @@ Using the SDK
    api-3kyc
    api-4tokens
    api-5nft
-   api-6name-service
    api-7utils
    api-8misc
    
