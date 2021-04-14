@@ -126,25 +126,31 @@ Prototype
 .. code-block:: javascript
     :caption: transfer and accept token ownership
 
-        let transfereePrivateKey = "0x0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef";
+        let transfereePrivateKey = "0x0123abcdefabcdef0123456789abcdef0123456789abcdef0123456789abcdef";
         let transfereeWallet = new mxw.Wallet(transfereePrivateKey, networkProvider);
         let transferorPrivateKey = "0x0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef";
         let transferorWallet = new mxw.Wallet(transferorPrivateKey, networkProvider);
 
-        var transferorFungibleToken = token.FungibleToken.fromSymbol(tokenSymnbol, transferorWallet);
-        transferorFungibleToken.transferOwnership(transfereeWallet.address).then((receipt) => {
-            console.log(JSON.stringify(receipt));
+        // transferor transfering token ownership 
+        token.FungibleToken.fromSymbol(tokenSymbol, transferorWallet).then((token) =>{
+            token.transferOwnership(transfereeWallet.address).then((receipt) => {
+                console.log(JSON.stringify(receipt));
+            })
+        })
+        
+        // after verified the wallet owner done transfering the token ownership
+        // then this action must get approval from authorities
+
+        // transferee accepting token ownership
+        token.FungibleToken.fromSymbol(tokenSymbol, transfereeWallet).then((token)=>{
+            token.acceptOwnership().then((receipt) => {
+                console.log(JSON.stringify(receipt));
+            })
         })
 
-        // authorize the transfer token action 
 
-        //should perform by another party
-        var fungibleToken = token.FungibleToken.fromSymbol(tokenSymnbol, transfereeWallet);
-        fungibleToken.acceptOwnership().then((receipt) => {
-            console.log(JSON.stringify(receipt));
-        })
+        /* tokenSymbol is the symbol from a token, which already been created and approved by authorities */
 
-        // authorize the accept token action
 
 :sup:`prototype` . transfer ( :ref:`AddressOrName <addressOrName>`, value ) |nbsp| `=> Promise<TransactionReceipt>`
     Sends the *transfer fungible token transaction* to the network and returns a :ref:`Promise <promise>` that resolves to a
