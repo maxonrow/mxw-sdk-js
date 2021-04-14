@@ -101,9 +101,9 @@ Prototype
 .. code-block:: javascript
     :caption: authorize token action
 
-        let provider = new mxw.Wallet(0x00000000000000000000000000000000000000000000000070726f7669646572);
-        let issuer = new mxw.Wallet(0x0000000000000000000000000000000000000000000000000000697373756572);
-        let middleware = new mxw.Wallet(0x000000000000000000000000000000000000000000006d6964646c6577617265);
+        let provider = new mxw.Wallet(0x00000000000000000000000000000000000000000000000070726f7669646572, networkProvider);
+        let issuer = new mxw.Wallet(0x0000000000000000000000000000000000000000000000000000697373756572, networkProvider);
+        let middleware = new mxw.Wallet(0x000000000000000000000000000000000000000000006d6964646c6577617265m ,networkProvider);
 
         let tokenState = {
         tokenFees: [
@@ -138,25 +138,31 @@ Prototype
 .. code-block:: javascript
     :caption: transfer and accept token ownership
 
-        let transfereePrivateKey = "0x0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef";
+        let transfereePrivateKey = "0x0123abcdefabcdef0123456789abcdef0123456789abcdef0123456789abcdef";
         let transfereeWallet = new mxw.Wallet(transfereePrivateKey, networkProvider);
         let transferorPrivateKey = "0x0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef";
         let transferorWallet = new mxw.Wallet(transferorPrivateKey, networkProvider);
 
-        var transferorNft = token.NonFungibleToken.create(NonFungibleTokenProperties, transferorWallet);
-        transferorNft.transferOwnership(transfereeWallet.address).then((receipt) => {
-            console.log(JSON.stringify(receipt));
+        // transferor transfering token ownership 
+        token.NonFungibleToken.fromSymbol(nftSymbol, transferorWallet).then((nft)=>{
+            nft.transferOwnership(transfereeWallet.address).then((receipt) => {
+                console.log(JSON.stringify(receipt));
+            })
+        })
+        
+        // after verified the wallet owner done transfering the token ownership
+        // then this action must get approval from authorities
+
+        // transferee accepting token ownership
+        token.NonFungibleToken.fromSymbol(nftSymbol, transfereeWallet).then((nft) =>{
+            nft.acceptOwnership().then((receipt) => {
+                console.log(JSON.stringify(receipt));
+            })
         })
 
-        // authorize token action 
 
-        var transfereeNft = token.NonFungibleToken.create(NonFungibleTokenProperties, transfereeWallet);
-        //should perform by another party
-        transfereeNft.acceptOwnership().then((receipt) => {
-            console.log(JSON.stringify(receipt));
-        })
+        /* nftSymbol is the symbol from a token, which already been created and approved by authorities */
 
-        // authorize token action
 
 :sup:`prototype` . mint ( :ref:`AddressOrName <addressOrName>`, NonFungibleTokenItem) |nbsp| `=> Promise<TransactionReceipt>`
     Sends the *mint non-fungible token transaction* to the network and returns a :ref:`Promise <promise>` that resolves to a
@@ -189,7 +195,7 @@ Prototype
 .. code-block:: javascript
     :caption: *update metadata of an NFT*
 
-    let wallet = new mxw.Wallet(0x00000000000000000000000000000000000000000000000070726f7669646572);
+    let wallet = new mxw.Wallet(0x00000000000000000000000000000000000000000000000070726f7669646572, networkProvider);
     let nonFungibleTokenProperties: NonFungibleTokenProperties;
     nonFungibleTokenProperties = {
         name: "MY " + symbol,
@@ -224,9 +230,9 @@ Freeze and unfreeze an item.
 .. code-block:: javascript
     :caption: freeze item
 
-        let provider = new mxw.Wallet(0x00000000000000000000000000000000000000000000000070726f7669646572);
-        let issuer = new mxw.Wallet(0x0000000000000000000000000000000000000000000000000000697373756572);
-        let middleware = new mxw.Wallet(0x000000000000000000000000000000000000000000006d6964646c6577617265);
+        let provider = new mxw.Wallet(0x00000000000000000000000000000000000000000000000070726f7669646572, networkProvider);
+        let issuer = new mxw.Wallet(0x0000000000000000000000000000000000000000000000000000697373756572, networkProvider);
+        let middleware = new mxw.Wallet(0x000000000000000000000000000000000000000000006d6964646c6577617265, networkProvider);
 
         token.NonFungibleToken.freezeNonFungibleTokenItem("symbol","itemID", provider).then((transaction) => {
             token.NonFungibleToken.signNonFungibleTokenItemStatusTransaction(transaction, issuer).then((transaction) => {
@@ -239,9 +245,9 @@ Freeze and unfreeze an item.
 .. code-block:: javascript
     :caption: unfreeze item
 
-        let provider = new mxw.Wallet(0x00000000000000000000000000000000000000000000000070726f7669646572);
-        let issuer = new mxw.Wallet(0x0000000000000000000000000000000000000000000000000000697373756572);
-        let middleware = new mxw.Wallet(0x000000000000000000000000000000000000000000006d6964646c6577617265);
+        let provider = new mxw.Wallet(0x00000000000000000000000000000000000000000000000070726f7669646572, networkProvider);
+        let issuer = new mxw.Wallet(0x0000000000000000000000000000000000000000000000000000697373756572, networkProvider);
+        let middleware = new mxw.Wallet(0x000000000000000000000000000000000000000000006d6964646c6577617265, networkProvider);
 
         token.NonFungibleToken.unfreezeNonFungibleTokenItem("symbol","itemID", provider).then((transaction) => {
             token.NonFungibleToken.signNonFungibleTokenItemStatusTransaction(transaction, issuer).then((transaction) => {
