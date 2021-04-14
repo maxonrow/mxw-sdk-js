@@ -115,19 +115,12 @@ Prototype
     The balance can be converted to a human-readable format by :ref:`formatUnits <formatUnits>`,
     versa :ref:`parseUnits <parseUnits>`.
 
-:sup:`prototype` . transfer ( :ref:`AddressOrName <addressOrName>`, value ) |nbsp| `=> Promise<TransactionReceipt>`
-    Sends the *transfer fungible token transaction* to the network and returns a :ref:`Promise <promise>` that resolves to a
-    :ref:`Transaction Receipt <transaction-receipt>`.
-
-    The :ref:`AddressOrName <addressOrName>` can be set to recipient's alias or wallet address. The ``value`` is the number of *fungible token*
-    (as a :ref:`BigNumber <bignumber>`) that is being transferred to recipient. Be aware of the number of decimals applied to the token.
-
 :sup:`prototype` . transferOwnership ( :ref:`AddressOrName <addressOrName>` ) |nbsp| `=> Promise<TransactionReceipt>`
-    Sends the *transfer fungible token* to another person and returns a :ref:`Promise <promise>` that resolves to a
+    Transfer the *fungible token* from token owner's wallet to another wallet and returns a :ref:`Promise <promise>` that resolves to a
     :ref:`Transaction Receipt <transaction-receipt>`.
 
 :sup:`prototype` . acceptOwnership () |nbsp| `=> Promise<TransactionReceipt>`
-    Accept the *fungible token* which transfer from another person and returns a :ref:`Promise <promise>` that resolves to a
+    Accept the *fungible token* which transfer from another wallet and returns a :ref:`Promise <promise>` that resolves to a
     :ref:`Transaction Receipt <transaction-receipt>`.
 
 .. code-block:: javascript
@@ -143,15 +136,23 @@ Prototype
             console.log(JSON.stringify(receipt));
         })
 
-        // authorize token action 
+        // authorize the transfer token action 
 
-        var transfereeFungibleToken = token.FungibleToken.create(FungibleTokenProperties, transfereeWallet);
         //should perform by another party
+        var transfereeFungibleToken = token.FungibleToken.create(FungibleTokenProperties, transfereeWallet);
         transfereeFungibleToken.acceptOwnership().then((receipt) => {
             console.log(JSON.stringify(receipt));
         })
 
-        // authorize token action
+        // authorize the accept token action
+
+:sup:`prototype` . transfer ( :ref:`AddressOrName <addressOrName>`, value ) |nbsp| `=> Promise<TransactionReceipt>`
+    Sends the *transfer fungible token transaction* to the network and returns a :ref:`Promise <promise>` that resolves to a
+    :ref:`Transaction Receipt <transaction-receipt>`.
+
+    The :ref:`AddressOrName <addressOrName>` can be set to recipient's alias or wallet address. The ``value`` is the number of *fungible token*
+    (as a :ref:`BigNumber <bignumber>`) that is being transferred to recipient. Be aware of the number of decimals applied to the token.
+
 
 :sup:`prototype` . mint ( :ref:`AddressOrName <addressOrName>`, value ) |nbsp| `=> Promise<TransactionReceipt>`
     Sends the *mint fungible token transaction* to the network and returns a :ref:`Promise <promise>` that resolves to a
