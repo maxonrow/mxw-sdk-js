@@ -32,7 +32,7 @@ Creating fungible token requires approval from authorities.
 .. code-block:: javascript
     :caption: create fungible token
 
-    let wallet = new mxw.Wallet(0x00000000000000000000000000000000000000000000000070726f7669646572);
+    let wallet = new mxw.Wallet(0x00000000000000000000000000000000000000000000000070726f7669646572, networkProvider);
     let fungibleTokenProperties = {
         name: "MY " + "symbol",
         symbol: "symbol",
@@ -88,9 +88,9 @@ Prototype
 .. code-block:: javascript
     :caption: authorize token action
 
-        let provider = new mxw.Wallet(0x00000000000000000000000000000000000000000000000070726f7669646572);
-        let issuer = new mxw.Wallet(0x0000000000000000000000000000000000000000000000000000697373756572);
-        let middleware = new mxw.Wallet(0x000000000000000000000000000000000000000000006d6964646c6577617265);
+        let provider = new mxw.Wallet(0x00000000000000000000000000000000000000000000000070726f7669646572, networkProvider);
+        let issuer = new mxw.Wallet(0x0000000000000000000000000000000000000000000000000000697373756572, networkProvider);
+        let middleware = new mxw.Wallet(0x000000000000000000000000000000000000000000006d6964646c6577617265, networkProvider);
 
         let tokenState = {
         tokenFees: [
@@ -139,8 +139,8 @@ Prototype
         // authorize the transfer token action 
 
         //should perform by another party
-        var transfereeFungibleToken = token.FungibleToken.create(FungibleTokenProperties, transfereeWallet);
-        transfereeFungibleToken.acceptOwnership().then((receipt) => {
+        var fungibleToken = token.FungibleToken.fromSymbol(tokenSymnbol, transfereeWallet);
+        fungibleToken.acceptOwnership().then((receipt) => {
             console.log(JSON.stringify(receipt));
         })
 
@@ -190,9 +190,9 @@ Prototype
 .. code-block:: javascript
     :caption: freeze token
 
-        let provider = new mxw.Wallet(0x00000000000000000000000000000000000000000000000070726f7669646572);
-        let issuer = new mxw.Wallet(0x0000000000000000000000000000000000000000000000000000697373756572);
-        let middleware = new mxw.Wallet(0x000000000000000000000000000000000000000000006d6964646c6577617265);
+        let provider = new mxw.Wallet(0x00000000000000000000000000000000000000000000000070726f7669646572, networkProvider);
+        let issuer = new mxw.Wallet(0x0000000000000000000000000000000000000000000000000000697373756572, networkProvider);
+        let middleware = new mxw.Wallet(0x000000000000000000000000000000000000000000006d6964646c6577617265, networkProvider);
 
         mxw.token.FungibleToken.freezeFungibleToken("symbol","itemID", provider).then((transaction) => {
             mxw.token.FungibleToken.signFungibleTokenStatusTransaction(transaction, issuer).then((transaction) => {
@@ -213,9 +213,9 @@ Prototype
 .. code-block:: javascript
     :caption: unfreeze token
 
-        let provider = new mxw.Wallet(0x00000000000000000000000000000000000000000000000070726f7669646572);
-        let issuer = new mxw.Wallet(0x0000000000000000000000000000000000000000000000000000697373756572);
-        let middleware = new mxw.Wallet(0x000000000000000000000000000000000000000000006d6964646c6577617265);
+        let provider = new mxw.Wallet(0x00000000000000000000000000000000000000000000000070726f7669646572, networkProvider);
+        let issuer = new mxw.Wallet(0x0000000000000000000000000000000000000000000000000000697373756572, networkProvider);
+        let middleware = new mxw.Wallet(0x000000000000000000000000000000000000000000006d6964646c6577617265, networkProvider);
 
         mxw.token.FungibleToken.unfreezeFungibleToken("symbol","itemID", provider).then((transaction) => {
             mxw.token.FungibleToken.signFungibleTokenStatusTransaction(transaction, issuer).then((transaction) => {
