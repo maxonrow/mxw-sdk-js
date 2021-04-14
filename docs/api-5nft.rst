@@ -128,14 +128,14 @@ Prototype
         });
 
 :sup:`prototype` . transferOwnership ( :ref:`AddressOrName <addressOrName>` ) |nbsp| `=> Promise<TransactionReceipt>`
-    Sends the *transfer non-fungible token* to another person and returns a :ref:`Promise <promise>` that resolves to a
+    Transfer the *non-fungible token* from token owner's wallet to another wallrt and returns a :ref:`Promise <promise>` that resolves to a
     :ref:`Transaction Receipt <transaction-receipt>`.
 
 :sup:`prototype` . acceptOwnership () |nbsp| `=> Promise<TransactionReceipt>`
     Accept the *non-fungible token* which transfer from another person and returns a :ref:`Promise <promise>` that resolves to a
     :ref:`Transaction Receipt <transaction-receipt>`.
 
-. code-block:: javascript
+.. code-block:: javascript
     :caption: transfer and accept token ownership
 
         let transfereePrivateKey = "0x0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef";
