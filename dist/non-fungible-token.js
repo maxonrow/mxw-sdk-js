@@ -24,6 +24,7 @@ var NonFungibleTokenActions;
     NonFungibleTokenActions["acceptOwnership"] = "acceptOwnership";
     NonFungibleTokenActions["endorse"] = "endorse";
     NonFungibleTokenActions["updateNFTEndorserList"] = "updateNFTEndorserList";
+    NonFungibleTokenActions["updateNFTItemMetadata"] = "updateNFTItemMetadata";
 })(NonFungibleTokenActions = exports.NonFungibleTokenActions || (exports.NonFungibleTokenActions = {}));
 ;
 var NFTokenStateFlags;

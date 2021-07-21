@@ -9,7 +9,8 @@ export declare enum NonFungibleTokenActions {
     transferOwnership = "transferOwnership",
     acceptOwnership = "acceptOwnership",
     endorse = "endorse",
-    updateNFTEndorserList = "updateNFTEndorserList"
+    updateNFTEndorserList = "updateNFTEndorserList",
+    updateNFTItemMetadata = "updateNFTItemMetadata"
 }
 export declare enum NFTokenStateFlags {
     nonfungible = 1,
