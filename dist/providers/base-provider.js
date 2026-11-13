@@ -1,12 +1,39 @@
 'use strict';
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
-    result["default"] = mod;
-    return result;
-};
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || (function () {
+    var ownKeys = function(o) {
+        ownKeys = Object.getOwnPropertyNames || function (o) {
+            var ar = [];
+            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
+            return ar;
+        };
+        return ownKeys(o);
+    };
+    return function (mod) {
+        if (mod && mod.__esModule) return mod;
+        var result = {};
+        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
+        __setModuleDefault(result, mod);
+        return result;
+    };
+})();
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.BaseProvider = void 0;
 const address_1 = require("../utils/address");
 const bignumber_1 = require("../utils/bignumber");
 const bytes_1 = require("../utils/bytes");
@@ -25,19 +52,19 @@ const abstract_provider_1 = require("./abstract-provider");
 //////////////////////////////
 // Request and Response Checking
 function checkKeyValue(data) {
-    return misc_1.checkFormat({
+    return (0, misc_1.checkFormat)({
         key: misc_1.checkString,
-        value: misc_1.allowNullOrEmpty(misc_1.checkString, null)
+        value: (0, misc_1.allowNullOrEmpty)(misc_1.checkString, null)
     }, data);
 }
 function checkTypeAttribute(data) {
-    return misc_1.checkFormat({
+    return (0, misc_1.checkFormat)({
         type: misc_1.checkString,
-        attributes: misc_1.allowNullOrEmpty(misc_1.arrayOf(checkKeyValue))
+        attributes: (0, misc_1.allowNullOrEmpty)((0, misc_1.arrayOf)(checkKeyValue))
     }, data);
 }
 function checkAliasState(data) {
-    return properties_1.camelize(misc_1.checkFormat({
+    return (0, properties_1.camelize)((0, misc_1.checkFormat)({
         Name: misc_1.checkString,
         Approved: misc_1.checkBoolean,
         Owner: misc_1.checkString,
@@ -55,7 +82,7 @@ function checkAliasState(data) {
     });
 }
 function checkTokenState(data) {
-    return properties_1.camelize(misc_1.checkFormat({
+    return (0, properties_1.camelize)((0, misc_1.checkFormat)({
         Flags: misc_1.checkNumber,
         Name: misc_1.checkString,
         Symbol: misc_1.checkString,
@@ -81,18 +108,18 @@ function checkTokenState(data) {
     });
 }
 function checkNonFungibleTokenState(data) {
-    return properties_1.camelize(misc_1.checkFormat({
+    return (0, properties_1.camelize)((0, misc_1.checkFormat)({
         Flags: misc_1.checkNumber,
         Name: misc_1.checkString,
         Symbol: misc_1.checkString,
         Owner: misc_1.checkAddress,
         NewOwner: misc_1.checkAddress,
-        Metadata: misc_1.allowNullOrEmpty(misc_1.checkString),
-        Properties: misc_1.allowNullOrEmpty(misc_1.checkString),
+        Metadata: (0, misc_1.allowNullOrEmpty)(misc_1.checkString),
+        Properties: (0, misc_1.allowNullOrEmpty)(misc_1.checkString),
         TransferLimit: misc_1.checkBigNumber,
         MintLimit: misc_1.checkBigNumber,
         TotalSupply: misc_1.checkBigNumber,
-        EndorserList: misc_1.allowNullOrEmpty(misc_1.arrayOf(misc_1.checkAddress), []),
+        EndorserList: (0, misc_1.allowNullOrEmpty)((0, misc_1.arrayOf)(misc_1.checkAddress), []),
         EndorserListLimit: misc_1.checkBigNumber
     }, data), (key) => {
         switch (key) {
@@ -113,11 +140,11 @@ function checkNonFungibleTokenState(data) {
     });
 }
 function checkNonFungibleTokenItemState(data) {
-    return properties_1.camelize(misc_1.checkFormat({
-        Owner: misc_1.allowNullOrEmpty(misc_1.checkString),
+    return (0, properties_1.camelize)((0, misc_1.checkFormat)({
+        Owner: (0, misc_1.allowNullOrEmpty)(misc_1.checkString),
         ID: misc_1.checkString,
-        Metadata: misc_1.allowNullOrEmpty(misc_1.checkString),
-        Properties: misc_1.allowNullOrEmpty(misc_1.checkString),
+        Metadata: (0, misc_1.allowNullOrEmpty)(misc_1.checkString),
+        Properties: (0, misc_1.allowNullOrEmpty)(misc_1.checkString),
         Frozen: misc_1.checkBoolean,
         TransferLimit: misc_1.checkBigNumber
     }, data), (key) => {
@@ -133,7 +160,7 @@ function checkNonFungibleTokenItemState(data) {
     });
 }
 function checkTokenAccountState(data) {
-    return properties_1.camelize(misc_1.checkFormat({
+    return (0, properties_1.camelize)((0, misc_1.checkFormat)({
         Owner: misc_1.checkString,
         Frozen: misc_1.checkBoolean,
         Balance: misc_1.checkBigNumber
@@ -147,7 +174,7 @@ function checkTokenAccountState(data) {
     });
 }
 function checkStatus(data) {
-    return properties_1.camelize(misc_1.checkFormat({
+    return (0, properties_1.camelize)((0, misc_1.checkFormat)({
         node_info: {
             protocol_version: {
                 p2p: misc_1.checkNumber,
@@ -189,22 +216,22 @@ function checkStatus(data) {
     });
 }
 function checkTransactionFee(fee) {
-    return properties_1.camelize(misc_1.checkFormat({
-        amount: misc_1.arrayOf(checkTransactionFeeAmount),
+    return (0, properties_1.camelize)((0, misc_1.checkFormat)({
+        amount: (0, misc_1.arrayOf)(checkTransactionFeeAmount),
         gas: misc_1.checkBigNumber
     }, fee));
 }
 function checkTransactionFeeAmount(amount) {
-    return properties_1.camelize(misc_1.checkFormat({
+    return (0, properties_1.camelize)((0, misc_1.checkFormat)({
         amount: misc_1.checkBigNumber,
         denom: misc_1.checkString
     }, amount));
 }
 function checkBlock(data) {
-    let block = properties_1.camelize(misc_1.checkFormat({
+    let block = (0, properties_1.camelize)((0, misc_1.checkFormat)({
         height: misc_1.checkNumber,
         results: {
-            deliver_tx: misc_1.allowNullOrEmpty(misc_1.arrayOf(checkDeliverTransaction))
+            deliver_tx: (0, misc_1.allowNullOrEmpty)((0, misc_1.arrayOf)(checkDeliverTransaction))
         }
     }, data), (key) => {
         switch (key) {
@@ -242,10 +269,10 @@ function checkBlock(data) {
             transaction.events = events;
         }
     }
-    return properties_1.camelize(block);
+    return (0, properties_1.camelize)(block);
 }
 function checkBlockInfo(data) {
-    data = properties_1.camelize(misc_1.checkFormat({
+    data = (0, properties_1.camelize)((0, misc_1.checkFormat)({
         block: {
             header: {
                 height: misc_1.checkNumber,
@@ -263,14 +290,14 @@ function checkBlockInfo(data) {
         return key;
     });
     if (data.block && data.block.header) {
-        data.block.header.proposerAddress = utils_1.computeAddress(data.block.header.proposerAddress, constants_1.ValOperatorAddressPrefix);
+        data.block.header.proposerAddress = (0, utils_1.computeAddress)(data.block.header.proposerAddress, constants_1.ValOperatorAddressPrefix);
         return Object.assign({}, data.block.header);
     }
     return undefined;
 }
 function checkDeliverTransaction(value) {
-    let transaction = properties_1.camelize(misc_1.checkFormat({
-        log: misc_1.allowNullOrEmpty(misc_1.checkString),
+    let transaction = (0, properties_1.camelize)((0, misc_1.checkFormat)({
+        log: (0, misc_1.allowNullOrEmpty)(misc_1.checkString),
         events: checkTransactionEvents
     }, value), (key) => {
         switch (key) {
@@ -287,7 +314,7 @@ function checkDeliverTransaction(value) {
             }
             if (0 < transaction.logs.length) {
                 let log = transaction.logs[0];
-                if (log && log.info && 0 <= log.info.nonce) {
+                if (log && log.info && (0, bignumber_1.bigNumberify)(log.info.nonce).gte(0)) {
                     transaction.nonce = log.info.nonce;
                     log.info.nonce = undefined; // remove it from redundant data
                 }
@@ -307,18 +334,18 @@ function checkDeliverTransaction(value) {
 function checkTransactionEvent(data) {
     let kv = checkKeyValue(data);
     if ("string" === typeof kv.value) {
-        kv.value = JSON.parse(utils_1.toUtf8String(base64_1.decode(kv.value)));
+        kv.value = JSON.parse((0, utils_1.toUtf8String)((0, base64_1.decode)(kv.value)));
     }
-    let event = properties_1.camelize(misc_1.checkFormat({
+    let event = (0, properties_1.camelize)((0, misc_1.checkFormat)({
         hash: misc_1.checkString,
-        params: misc_1.allowNullOrEmpty(misc_1.arrayOf(misc_1.checkString))
+        params: (0, misc_1.allowNullOrEmpty)((0, misc_1.arrayOf)(misc_1.checkString))
     }, kv.value));
-    event.address = misc_1.checkAddress(utils_1.toUtf8String(base64_1.decode(kv.key)));
+    event.address = (0, misc_1.checkAddress)((0, utils_1.toUtf8String)((0, base64_1.decode)(kv.key)));
     event.hash = "0x" + event.hash;
     return event;
 }
 function checkTransactionEvents(data) {
-    let groups = misc_1.allowNullOrEmpty(misc_1.arrayOf(checkTypeAttribute))(data);
+    let groups = (0, misc_1.allowNullOrEmpty)((0, misc_1.arrayOf)(checkTypeAttribute))(data);
     let events = [];
     if (groups && Array.isArray(groups)) {
         for (let group of groups) {
@@ -334,7 +361,7 @@ function checkTransactionEvents(data) {
     return events;
 }
 function checkTransactionReceipt(transaction) {
-    let receipt = properties_1.camelize(misc_1.checkFormat({
+    let receipt = (0, properties_1.camelize)((0, misc_1.checkFormat)({
         hash: misc_1.checkHash,
         height: misc_1.checkNumber,
         status: misc_1.checkNumber,
@@ -378,7 +405,7 @@ function checkTransactionReceipt(transaction) {
                     }
                     if (0 < receipt.result.logs.length) {
                         let log = receipt.result.logs[0];
-                        if (log && log.info && 0 <= log.info.nonce) {
+                        if (log && log.info && (0, bignumber_1.bigNumberify)(log.info.nonce).gte(0)) {
                             receipt.nonce = log.info.nonce;
                             log.info.nonce = undefined; // remove it from redundant data
                         }
@@ -404,13 +431,13 @@ function checkTransactionReceipt(transaction) {
     if (!receipt.hash) {
         return undefined; // Discard failed transaction
     }
-    return properties_1.camelize(receipt);
+    return (0, properties_1.camelize)(receipt);
 }
 function checkTransactionLog(data) {
     if ("string" === typeof data) {
         data = JSON.parse(data);
     }
-    let log = properties_1.camelize(misc_1.checkFormat({
+    let log = (0, properties_1.camelize)((0, misc_1.checkFormat)({
         success: misc_1.checkBoolean,
         log: misc_1.checkString
     }, data), (key) => {
@@ -421,7 +448,7 @@ function checkTransactionLog(data) {
     });
     if (log.info) {
         try {
-            log.info = misc_1.checkFormat({
+            log.info = (0, misc_1.checkFormat)({
                 hash: misc_1.checkHash,
                 nonce: misc_1.checkBigNumber
             }, JSON.parse(log.info));
@@ -440,11 +467,11 @@ function checkTransactionLog(data) {
 // Event Serializeing
 function getEventTag(eventName) {
     if (typeof (eventName) === 'string') {
-        if (bytes_1.hexDataLength(eventName) === 20) {
-            return 'address:' + address_1.getAddress(eventName);
+        if ((0, bytes_1.hexDataLength)(eventName) === 20) {
+            return 'address:' + (0, address_1.getAddress)(eventName);
         }
         eventName = eventName.toLowerCase();
-        if (bytes_1.hexDataLength(eventName) === 32) {
+        if ((0, bytes_1.hexDataLength)(eventName) === 32) {
             return 'tx:' + eventName;
         }
         if (eventName.indexOf(':') === -1) {
@@ -463,18 +490,18 @@ class BaseProvider extends abstract_provider_1.Provider {
         super();
         errors.checkNew(this, abstract_provider_1.Provider);
         if (network instanceof Promise) {
-            properties_1.defineReadOnly(this, 'ready', network.then((network) => {
-                properties_1.defineReadOnly(this, '_network', network);
+            (0, properties_1.defineReadOnly)(this, 'ready', network.then((network) => {
+                (0, properties_1.defineReadOnly)(this, '_network', network);
                 return network;
             }));
             // Squash any "unhandled promise" errors; the don't need to be handled
             this.ready.catch((error) => { });
         }
         else {
-            let knownNetwork = networks_1.getNetwork((network == null) ? 'homestead' : network);
+            let knownNetwork = (0, networks_1.getNetwork)((network == null) ? 'homestead' : network);
             if (knownNetwork) {
-                properties_1.defineReadOnly(this, '_network', knownNetwork);
-                properties_1.defineReadOnly(this, 'ready', Promise.resolve(this._network));
+                (0, properties_1.defineReadOnly)(this, '_network', knownNetwork);
+                (0, properties_1.defineReadOnly)(this, 'ready', Promise.resolve(this._network));
             }
             else {
                 errors.throwError('invalid network', errors.INVALID_ARGUMENT, { arg: 'network', value: network });
@@ -502,12 +529,12 @@ class BaseProvider extends abstract_provider_1.Provider {
         });
     }
     getTransactionRequest(route, transactionType, overrides) {
-        return transaction_1.getTransactionRequest(route, transactionType, overrides);
+        return (0, transaction_1.getTransactionRequest)(route, transactionType, overrides);
     }
     getTransactionFee(route, transactionType, overrides) {
         return this.ready.then(() => {
-            let tx = (overrides && overrides.tx) ? overrides.tx : transaction_1.getTransactionRequest(route, transactionType, overrides);
-            let transaction = misc_1.iterate(tx, function (key, value, type) {
+            let tx = (overrides && overrides.tx) ? overrides.tx : (0, transaction_1.getTransactionRequest)(route, transactionType, overrides);
+            let transaction = (0, misc_1.iterate)(tx, function (key, value, type) {
                 switch (type) {
                     case "Number":
                     case "BigNumber":
@@ -515,9 +542,9 @@ class BaseProvider extends abstract_provider_1.Provider {
                 }
                 return value;
             });
-            transaction = misc_1.sortObject(transaction);
+            transaction = (0, misc_1.sortObject)(transaction);
             let params = {
-                unsignedTransaction: base64_1.encode(utils_1.toUtf8Bytes(JSON.stringify(transaction)))
+                unsignedTransaction: (0, base64_1.encode)((0, utils_1.toUtf8Bytes)(JSON.stringify(transaction)))
             };
             return this.perform('getTransactionFee', params).then((fee) => {
                 fee = checkTransactionFee(fee);
@@ -542,7 +569,7 @@ class BaseProvider extends abstract_provider_1.Provider {
     }
     getTokenState(symbol, blockTag) {
         return this.ready.then(() => {
-            return properties_1.resolveProperties({ symbol: symbol, blockTag: blockTag }).then(({ symbol, blockTag }) => {
+            return (0, properties_1.resolveProperties)({ symbol: symbol, blockTag: blockTag }).then(({ symbol, blockTag }) => {
                 let params = {
                     symbol: symbol,
                     blockTag: checkBlockTag(blockTag)
@@ -559,15 +586,15 @@ class BaseProvider extends abstract_provider_1.Provider {
     }
     getTokenList(blockTag) {
         return this.ready.then(() => {
-            return properties_1.resolveProperties({ blockTag: blockTag }).then(({ blockTag }) => {
+            return (0, properties_1.resolveProperties)({ blockTag: blockTag }).then(({ blockTag }) => {
                 let params = {
                     blockTag: checkBlockTag(blockTag)
                 };
                 return this.perform('getTokenList', params).then((result) => {
                     if (result) {
-                        result = properties_1.camelize(misc_1.checkFormat({
-                            fungible: misc_1.arrayOf(misc_1.checkString),
-                            nonfungible: misc_1.arrayOf(misc_1.checkString)
+                        result = (0, properties_1.camelize)((0, misc_1.checkFormat)({
+                            fungible: (0, misc_1.arrayOf)(misc_1.checkString),
+                            nonfungible: (0, misc_1.arrayOf)(misc_1.checkString)
                         }, result));
                     }
                     return result;
@@ -577,7 +604,7 @@ class BaseProvider extends abstract_provider_1.Provider {
     }
     getTokenAccountState(symbol, addressOrName, blockTag) {
         return this.ready.then(() => {
-            return properties_1.resolveProperties({ symbol: symbol, addressOrName: addressOrName, blockTag: blockTag }).then(({ symbol, addressOrName, blockTag }) => {
+            return (0, properties_1.resolveProperties)({ symbol: symbol, addressOrName: addressOrName, blockTag: blockTag }).then(({ symbol, addressOrName, blockTag }) => {
                 return this.resolveName(addressOrName).then((address) => {
                     let params = {
                         symbol: symbol,
@@ -592,7 +619,7 @@ class BaseProvider extends abstract_provider_1.Provider {
                             result = {
                                 owner: address,
                                 frozen: false,
-                                balance: bignumber_1.bigNumberify(0)
+                                balance: (0, bignumber_1.bigNumberify)(0)
                             };
                         }
                         return result;
@@ -606,12 +633,12 @@ class BaseProvider extends abstract_provider_1.Provider {
             if (state && state.balance) {
                 return state.balance;
             }
-            return bignumber_1.bigNumberify(0);
+            return (0, bignumber_1.bigNumberify)(0);
         });
     }
     getNFTokenState(symbol, blockTag) {
         return this.ready.then(() => {
-            return properties_1.resolveProperties({ symbol: symbol, blockTag: blockTag }).then(({ symbol, blockTag }) => {
+            return (0, properties_1.resolveProperties)({ symbol: symbol, blockTag: blockTag }).then(({ symbol, blockTag }) => {
                 let params = {
                     symbol: symbol,
                     blockTag: checkBlockTag(blockTag)
@@ -628,7 +655,7 @@ class BaseProvider extends abstract_provider_1.Provider {
     }
     getNFTokenItemState(symbol, itemID, blockTag) {
         return this.ready.then(() => {
-            return properties_1.resolveProperties({ symbol: symbol, itemID: itemID, blockTag: blockTag }).then(({ symbol, itemID, blockTag }) => {
+            return (0, properties_1.resolveProperties)({ symbol: symbol, itemID: itemID, blockTag: blockTag }).then(({ symbol, itemID, blockTag }) => {
                 let params = {
                     symbol: symbol,
                     itemID: itemID,
@@ -645,7 +672,7 @@ class BaseProvider extends abstract_provider_1.Provider {
         });
     }
     getAliasState(address, blockTag) {
-        return properties_1.resolveProperties({ address, blockTag }).then(({ address, blockTag }) => {
+        return (0, properties_1.resolveProperties)({ address, blockTag }).then(({ address, blockTag }) => {
             return this.ready.then(() => {
                 let params = {
                     address,
@@ -662,7 +689,7 @@ class BaseProvider extends abstract_provider_1.Provider {
     }
     getAccountState(addressOrName, blockTag) {
         return this.ready.then(() => {
-            return properties_1.resolveProperties({ addressOrName: addressOrName, blockTag: blockTag }).then(({ addressOrName, blockTag }) => {
+            return (0, properties_1.resolveProperties)({ addressOrName: addressOrName, blockTag: blockTag }).then(({ addressOrName, blockTag }) => {
                 return this.resolveName(addressOrName).then((address) => {
                     let params = {
                         address: address,
@@ -670,7 +697,7 @@ class BaseProvider extends abstract_provider_1.Provider {
                     };
                     return this.perform('getAccountState', params).then((result) => {
                         if (result) {
-                            result = properties_1.camelize(misc_1.checkFormat({
+                            result = (0, properties_1.camelize)((0, misc_1.checkFormat)({
                                 type: misc_1.checkString,
                                 value: misc_1.checkAny
                             }, result));
@@ -685,9 +712,9 @@ class BaseProvider extends abstract_provider_1.Provider {
         return this.ready.then(() => {
             return this.getAccountState(addressOrName, blockTag).then((result) => {
                 if (result && result.value && result.value.accountNumber) {
-                    return bignumber_1.bigNumberify(result.value.accountNumber);
+                    return (0, bignumber_1.bigNumberify)(result.value.accountNumber);
                 }
-                return bignumber_1.bigNumberify(0);
+                return (0, bignumber_1.bigNumberify)(0);
             });
         });
     }
@@ -698,11 +725,11 @@ class BaseProvider extends abstract_provider_1.Provider {
                     let coins = result.value.coins;
                     if (0 < coins.length) {
                         if (coins[0].amount) {
-                            return bignumber_1.bigNumberify(coins[0].amount);
+                            return (0, bignumber_1.bigNumberify)(coins[0].amount);
                         }
                     }
                 }
-                return bignumber_1.bigNumberify(0);
+                return (0, bignumber_1.bigNumberify)(0);
             });
         });
     }
@@ -710,21 +737,21 @@ class BaseProvider extends abstract_provider_1.Provider {
         return this.ready.then(() => {
             return this.getAccountState(addressOrName, blockTag).then((result) => {
                 if (result && result.value && result.value.sequence) {
-                    return bignumber_1.bigNumberify(result.value.sequence);
+                    return (0, bignumber_1.bigNumberify)(result.value.sequence);
                 }
-                return bignumber_1.bigNumberify(0);
+                return (0, bignumber_1.bigNumberify)(0);
             });
         });
     }
     sendTransaction(signedTransaction, overrides) {
         return this.ready.then(() => {
-            return properties_1.resolveProperties({ signedTransaction: signedTransaction }).then(({ signedTransaction }) => {
+            return (0, properties_1.resolveProperties)({ signedTransaction: signedTransaction }).then(({ signedTransaction }) => {
                 let params = { signedTransaction };
                 let async = overrides && overrides.async ? true : false;
                 return this.perform(async ? 'sendTransactionAsync' : 'sendTransaction', params).then((result) => {
-                    return this._wrapTransaction(transaction_1.parse(signedTransaction), result.hash, result.blockNumber);
+                    return this._wrapTransaction((0, transaction_1.parse)(signedTransaction), result.hash, result.blockNumber);
                 }, function (error) {
-                    error.transaction = transaction_1.parse(signedTransaction);
+                    error.transaction = (0, transaction_1.parse)(signedTransaction);
                     if (error.response && error.response.hash) {
                         error.transactionHash = error.response.hash;
                     }
@@ -737,7 +764,7 @@ class BaseProvider extends abstract_provider_1.Provider {
     _wrapTransaction(tx, hash, blockNumber) {
         // Check the hash we expect is the same as the hash the server reported
         if (hash != null) {
-            if (bytes_1.hexDataLength(hash) !== 32) {
+            if ((0, bytes_1.hexDataLength)(hash) !== 32) {
                 errors.throwError('invalid response - sendTransaction', errors.INVALID_ARGUMENT, { expectedHash: tx.hash, returnedHash: hash });
             }
             // TODO Currently we are not able to calculate the transaction hash that based on amino format
@@ -779,11 +806,11 @@ class BaseProvider extends abstract_provider_1.Provider {
     }
     getBlock(blockTag) {
         return this.ready.then(() => {
-            return properties_1.resolveProperties({ blockTag }).then(({ blockTag }) => {
+            return (0, properties_1.resolveProperties)({ blockTag }).then(({ blockTag }) => {
                 try {
                     let blockNumber;
                     blockTag = checkBlockTag(blockTag);
-                    if (bytes_1.isHexString(blockTag)) {
+                    if ((0, bytes_1.isHexString)(blockTag)) {
                         blockNumber = parseInt(blockTag.substring(2), 16);
                     }
                     else {
@@ -794,7 +821,7 @@ class BaseProvider extends abstract_provider_1.Provider {
                             return this.getBlock(blockNumber);
                         });
                     }
-                    return web_1.poll(() => {
+                    return (0, web_1.poll)(() => {
                         let promises = [
                             // Query block result
                             this.perform('getBlock', { blockTag: blockNumber.toString() }),
@@ -804,8 +831,8 @@ class BaseProvider extends abstract_provider_1.Provider {
                             this.perform('getBlockInfo', { blockTag: (blockNumber + 1).toString() })
                         ];
                         return Promise.all(promises).then((results) => {
-                            if (misc_1.isUndefinedOrNullOrEmpty(results) ||
-                                misc_1.isUndefinedOrNullOrEmpty(results[0]) || misc_1.isUndefinedOrNullOrEmpty(results[1])) {
+                            if ((0, misc_1.isUndefinedOrNullOrEmpty)(results) ||
+                                (0, misc_1.isUndefinedOrNullOrEmpty)(results[0]) || (0, misc_1.isUndefinedOrNullOrEmpty)(results[1])) {
                                 if (blockNumber <= this._emitted.block) {
                                     return undefined;
                                 }
@@ -814,7 +841,7 @@ class BaseProvider extends abstract_provider_1.Provider {
                             let block = checkBlock(results[0]);
                             let blockInfo = checkBlockInfo(results[1]);
                             blockInfo.blockTime = null;
-                            if (!misc_1.isUndefinedOrNullOrEmpty(results[2])) {
+                            if (!(0, misc_1.isUndefinedOrNullOrEmpty)(results[2])) {
                                 let newBlockInfo = checkBlockInfo(results[2]);
                                 blockInfo.blockTime = newBlockInfo.blockTime;
                             }
@@ -835,9 +862,9 @@ class BaseProvider extends abstract_provider_1.Provider {
     }
     getTransactionReceipt(transactionHash) {
         return this.ready.then(() => {
-            return properties_1.resolveProperties({ transactionHash: transactionHash }).then(({ transactionHash }) => {
-                let params = { transactionHash: misc_1.checkHash(transactionHash, true) };
-                return web_1.poll(() => {
+            return (0, properties_1.resolveProperties)({ transactionHash: transactionHash }).then(({ transactionHash }) => {
+                let params = { transactionHash: (0, misc_1.checkHash)(transactionHash, true) };
+                return (0, web_1.poll)(() => {
                     return this.perform('getTransactionReceipt', params).then((result) => {
                         if (result == null) {
                             if (this._emitted['t:' + transactionHash] == null) {
@@ -877,7 +904,7 @@ class BaseProvider extends abstract_provider_1.Provider {
         });
     }
     isWhitelisted(addressOrName, blockTag) {
-        return properties_1.resolveProperties({ addressOrName: addressOrName, blockTag: blockTag }).then(({ addressOrName, blockTag }) => {
+        return (0, properties_1.resolveProperties)({ addressOrName: addressOrName, blockTag: blockTag }).then(({ addressOrName, blockTag }) => {
             // If it is a promise, resolve it then recurse
             if (addressOrName instanceof Promise) {
                 return addressOrName.then((address) => {
@@ -896,7 +923,7 @@ class BaseProvider extends abstract_provider_1.Provider {
         });
     }
     getKycAddress(addressOrName, blockTag) {
-        return properties_1.resolveProperties({ addressOrName: addressOrName, blockTag: blockTag }).then(({ addressOrName, blockTag }) => {
+        return (0, properties_1.resolveProperties)({ addressOrName: addressOrName, blockTag: blockTag }).then(({ addressOrName, blockTag }) => {
             // If it is a promise, resolve it then recurse
             if (addressOrName instanceof Promise) {
                 return addressOrName.then((address) => {
@@ -915,10 +942,10 @@ class BaseProvider extends abstract_provider_1.Provider {
         });
     }
     resolveName(name, blockTag) {
-        return properties_1.resolveProperties({ name: name, blockTag: blockTag }).then(({ name, blockTag }) => {
+        return (0, properties_1.resolveProperties)({ name: name, blockTag: blockTag }).then(({ name, blockTag }) => {
             // If it is already an address, nothing to resolve
             try {
-                return address_1.getAddress(name);
+                return (0, address_1.getAddress)(name);
             }
             catch (error) { }
             return this.ready.then(() => {
@@ -936,13 +963,13 @@ class BaseProvider extends abstract_provider_1.Provider {
         });
     }
     lookupAddress(address, blockTag) {
-        return properties_1.resolveProperties({ address: address, blockTag: blockTag }).then(({ address, blockTag }) => {
+        return (0, properties_1.resolveProperties)({ address: address, blockTag: blockTag }).then(({ address, blockTag }) => {
             if (address instanceof Promise) {
                 return address.then((address) => {
                     return this.lookupAddress(address);
                 });
             }
-            address = address_1.getAddress(address);
+            address = (0, address_1.getAddress)(address);
             return this.ready.then(() => {
                 let params = {
                     address: address,
@@ -1264,8 +1291,8 @@ function checkBlockTag(blockTag) {
     if (blockTag === 'latest' || blockTag === 'pending') {
         return "0";
     }
-    if (bytes_1.isHexString(blockTag)) {
-        return bignumber_1.bigNumberify(blockTag).toString();
+    if ((0, bytes_1.isHexString)(blockTag)) {
+        return (0, bignumber_1.bigNumberify)(blockTag).toString();
     }
     try {
         if ('string' === typeof blockTag)
@@ -1276,5 +1303,5 @@ function checkBlockTag(blockTag) {
     }
     throw new Error('invalid blockTag');
 }
-properties_1.defineReadOnly(abstract_provider_1.Provider, 'inherits', properties_1.inheritable(abstract_provider_1.Provider));
+(0, properties_1.defineReadOnly)(abstract_provider_1.Provider, 'inherits', (0, properties_1.inheritable)(abstract_provider_1.Provider));
 //# sourceMappingURL=base-provider.js.map

@@ -1,12 +1,44 @@
 'use strict';
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
-    result["default"] = mod;
-    return result;
-};
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || (function () {
+    var ownKeys = function(o) {
+        ownKeys = Object.getOwnPropertyNames || function (o) {
+            var ar = [];
+            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
+            return ar;
+        };
+        return ownKeys(o);
+    };
+    return function (mod) {
+        if (mod && mod.__esModule) return mod;
+        var result = {};
+        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
+        __setModuleDefault(result, mod);
+        return result;
+    };
+})();
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.power1UnitName = exports.power4UnitName = exports.power7UnitName = exports.power10UnitName = exports.power13UnitName = exports.power16UnitName = exports.power18UnitName = exports.unitDecimals = exports.smallestUnitName = exports.unitName = void 0;
+exports.commify = commify;
+exports.formatUnits = formatUnits;
+exports.parseUnits = parseUnits;
+exports.formatMxw = formatMxw;
+exports.parseMxw = parseMxw;
 const constants_1 = require("../constants");
 const errors = __importStar(require("../errors"));
 const bignumber_1 = require("./bignumber");
@@ -43,7 +75,7 @@ const unitInfos = {};
 function _getUnitInfo(value) {
     return {
         decimals: value.length - 1,
-        tenPower: bignumber_1.bigNumberify(value)
+        tenPower: (0, bignumber_1.bigNumberify)(value)
     };
 }
 // Build cache of common units
@@ -112,11 +144,10 @@ function commify(value) {
     }
     return negative + formatted.join(',') + suffix;
 }
-exports.commify = commify;
 function formatUnits(value, unitType) {
     let unitInfo = getUnitInfo(unitType);
     // Make sure wei is a big number (convert as necessary)
-    value = bignumber_1.bigNumberify(value);
+    value = (0, bignumber_1.bigNumberify)(value);
     let negative = value.lt(constants_1.Zero);
     if (negative) {
         value = value.mul(constants_1.NegativeOne);
@@ -134,7 +165,6 @@ function formatUnits(value, unitType) {
     }
     return value;
 }
-exports.formatUnits = formatUnits;
 function parseUnits(value, unitType) {
     if (unitType == null) {
         unitType = 18;
@@ -144,7 +174,7 @@ function parseUnits(value, unitType) {
         errors.throwError('invalid decimal value', errors.INVALID_ARGUMENT, { arg: 'value', value: value });
     }
     if (unitInfo.decimals === 0) {
-        return bignumber_1.bigNumberify(value);
+        return (0, bignumber_1.bigNumberify)(value);
     }
     // Is it negative?
     let negative = (value.substring(0, 1) === '-');
@@ -174,21 +204,18 @@ function parseUnits(value, unitType) {
     while (fraction.length < unitInfo.decimals) {
         fraction += '0';
     }
-    let wholeValue = bignumber_1.bigNumberify(whole);
-    let fractionValue = bignumber_1.bigNumberify(fraction);
+    let wholeValue = (0, bignumber_1.bigNumberify)(whole);
+    let fractionValue = (0, bignumber_1.bigNumberify)(fraction);
     let wei = (wholeValue.mul(unitInfo.tenPower)).add(fractionValue);
     if (negative) {
         wei = wei.mul(constants_1.NegativeOne);
     }
     return wei;
 }
-exports.parseUnits = parseUnits;
 function formatMxw(cin) {
     return formatUnits(cin, unitDecimals);
 }
-exports.formatMxw = formatMxw;
 function parseMxw(mxw) {
     return parseUnits(mxw, unitDecimals);
 }
-exports.parseMxw = parseMxw;
 //# sourceMappingURL=units.js.map

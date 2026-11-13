@@ -1,5 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.Wordlist = void 0;
+exports.check = check;
+exports.register = register;
 // This gets overriddenby gulp during bip39-XX
 var exportWordlist = false;
 const hash_1 = require("../utils/hash");
@@ -13,12 +16,11 @@ function check(wordlist) {
         }
         words.push(word);
     }
-    return hash_1.id(words.join('\n') + '\n');
+    return (0, hash_1.id)(words.join('\n') + '\n');
 }
-exports.check = check;
 class Wordlist {
     constructor(locale) {
-        properties_1.defineReadOnly(this, 'locale', locale);
+        (0, properties_1.defineReadOnly)(this, 'locale', locale);
     }
     // Subclasses may override this
     split(mnemonic) {
@@ -37,17 +39,16 @@ function register(lang, name) {
     if (exportWordlist) {
         let g = global;
         if (!(g.wordlists)) {
-            properties_1.defineReadOnly(g, 'wordlists', {});
+            (0, properties_1.defineReadOnly)(g, 'wordlists', {});
         }
         if (!g.wordlists[name]) {
-            properties_1.defineReadOnly(g.wordlists, name, lang);
+            (0, properties_1.defineReadOnly)(g.wordlists, name, lang);
         }
         if (g.mxw && g.mxw.wordlists) {
             if (!g.mxw.wordlists[name]) {
-                properties_1.defineReadOnly(g.mxw.wordlists, name, lang);
+                (0, properties_1.defineReadOnly)(g.mxw.wordlists, name, lang);
             }
         }
     }
 }
-exports.register = register;
 //# sourceMappingURL=wordlist.js.map

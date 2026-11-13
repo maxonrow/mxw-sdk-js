@@ -1,5 +1,10 @@
 'use strict';
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.UnicodeNormalizationForm = void 0;
+exports.toUtf8Bytes = toUtf8Bytes;
+exports.toUtf8String = toUtf8String;
+exports.formatBytes32String = formatBytes32String;
+exports.parseBytes32String = parseBytes32String;
 const constants_1 = require("../constants");
 const errors_1 = require("../errors");
 const bytes_1 = require("./bytes");
@@ -11,12 +16,12 @@ var UnicodeNormalizationForm;
     UnicodeNormalizationForm["NFD"] = "NFD";
     UnicodeNormalizationForm["NFKC"] = "NFKC";
     UnicodeNormalizationForm["NFKD"] = "NFKD";
-})(UnicodeNormalizationForm = exports.UnicodeNormalizationForm || (exports.UnicodeNormalizationForm = {}));
+})(UnicodeNormalizationForm || (exports.UnicodeNormalizationForm = UnicodeNormalizationForm = {}));
 ;
 // http://stackoverflow.com/questions/18729405/how-to-convert-utf8-string-to-byte-array
 function toUtf8Bytes(str, form = UnicodeNormalizationForm.current) {
     if (form != UnicodeNormalizationForm.current) {
-        errors_1.checkNormalize();
+        (0, errors_1.checkNormalize)();
         str = str.normalize(form);
     }
     var result = [];
@@ -48,13 +53,12 @@ function toUtf8Bytes(str, form = UnicodeNormalizationForm.current) {
             result.push((c & 0x3f) | 0x80);
         }
     }
-    return bytes_1.arrayify(result);
+    return (0, bytes_1.arrayify)(result);
 }
-exports.toUtf8Bytes = toUtf8Bytes;
 ;
 // http://stackoverflow.com/questions/13356493/decode-utf-8-with-javascript#13691499
 function toUtf8String(bytes, ignoreErrors) {
-    bytes = bytes_1.arrayify(bytes);
+    bytes = (0, bytes_1.arrayify)(bytes);
     let result = '';
     let i = 0;
     // Invalid bytes are ignored
@@ -154,7 +158,6 @@ function toUtf8String(bytes, ignoreErrors) {
     }
     return result;
 }
-exports.toUtf8String = toUtf8String;
 function formatBytes32String(text) {
     // Get the bytes
     let bytes = toUtf8Bytes(text);
@@ -163,11 +166,10 @@ function formatBytes32String(text) {
         throw new Error('bytes32 string must be less than 32 bytes');
     }
     // Zero-pad (implicitly null-terminates)
-    return bytes_1.hexlify(bytes_1.concat([bytes, constants_1.HashZero]).slice(0, 32));
+    return (0, bytes_1.hexlify)((0, bytes_1.concat)([bytes, constants_1.HashZero]).slice(0, 32));
 }
-exports.formatBytes32String = formatBytes32String;
 function parseBytes32String(bytes) {
-    let data = bytes_1.arrayify(bytes);
+    let data = (0, bytes_1.arrayify)(bytes);
     // Must be 32 bytes with a null-termination
     if (data.length !== 32) {
         throw new Error('invalid bytes32 - not 32 bytes long');
@@ -183,5 +185,4 @@ function parseBytes32String(bytes) {
     // Determine the string value
     return toUtf8String(data.slice(0, length));
 }
-exports.parseBytes32String = parseBytes32String;
 //# sourceMappingURL=utf8.js.map

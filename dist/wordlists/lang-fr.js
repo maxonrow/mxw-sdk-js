@@ -1,5 +1,6 @@
 'use strict';
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.langFr = void 0;
 const wordlist_1 = require("../utils/wordlist");
 const utf8_1 = require("../utils/utf8");
 const errors_1 = require("../errors");
@@ -7,14 +8,14 @@ const words = "AbaisserAbandonAbdiquerAbeilleAbolirAborderAboutirAboyerAbrasifAb
 let wordlist = null;
 let lookup = {};
 function dropDiacritic(word) {
-    errors_1.checkNormalize();
-    return utf8_1.toUtf8String(Array.prototype.filter.call(utf8_1.toUtf8Bytes(word.normalize('NFD').toLowerCase()), (c) => {
+    (0, errors_1.checkNormalize)();
+    return (0, utf8_1.toUtf8String)(Array.prototype.filter.call((0, utf8_1.toUtf8Bytes)(word.normalize('NFD').toLowerCase()), (c) => {
         return ((c >= 65 && c <= 90) || (c >= 97 && c <= 123));
     }));
 }
 function expand(word) {
     let output = [];
-    Array.prototype.forEach.call(utf8_1.toUtf8Bytes(word), (c) => {
+    Array.prototype.forEach.call((0, utf8_1.toUtf8Bytes)(word), (c) => {
         // Acute accent
         if (c === 47) {
             output.push(204);
@@ -29,7 +30,7 @@ function expand(word) {
             output.push(c);
         }
     });
-    return utf8_1.toUtf8String(output);
+    return (0, utf8_1.toUtf8String)(output);
 }
 function loadWords(lang) {
     if (wordlist != null) {
@@ -39,7 +40,7 @@ function loadWords(lang) {
     wordlist.forEach((word, index) => {
         lookup[dropDiacritic(word)] = index;
     });
-    if (wordlist_1.check(lang) !== '0xebc3959ab7801a1df6bac4fa7d970652f1df76b683cd2f4003c941c63d517e59') {
+    if ((0, wordlist_1.check)(lang) !== '0xebc3959ab7801a1df6bac4fa7d970652f1df76b683cd2f4003c941c63d517e59') {
         wordlist = null;
         throw new Error('BIP39 Wordlist for fr (French) FAILED');
     }
@@ -63,5 +64,5 @@ class LangFr extends wordlist_1.Wordlist {
 }
 const langFr = new LangFr();
 exports.langFr = langFr;
-wordlist_1.register(langFr);
+(0, wordlist_1.register)(langFr);
 //# sourceMappingURL=lang-fr.js.map

@@ -1,5 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.isSecretStorageWallet = isSecretStorageWallet;
+exports.getJsonWalletAddress = getJsonWalletAddress;
 const address_1 = require("./address");
 function isSecretStorageWallet(json) {
     try {
@@ -14,11 +16,10 @@ function isSecretStorageWallet(json) {
     // @TODO: Put more checks to make sure it has kdf, iv and all that good stuff
     return true;
 }
-exports.isSecretStorageWallet = isSecretStorageWallet;
 function getJsonWalletAddress(json) {
     if (isSecretStorageWallet(json)) {
         try {
-            return address_1.getAddress(JSON.parse(json).address);
+            return (0, address_1.getAddress)(JSON.parse(json).address);
         }
         catch (error) {
             return null;
@@ -26,5 +27,4 @@ function getJsonWalletAddress(json) {
     }
     return null;
 }
-exports.getJsonWalletAddress = getJsonWalletAddress;
 //# sourceMappingURL=json-wallet.js.map

@@ -38,7 +38,7 @@ export function isHexable(value: any): value is Hexable {
 function addSlice(array: Uint8Array): Uint8Array {
     if (array.slice) { return array; }
 
-    array.slice = function () {
+    (array as any).slice = function () {
         var args = Array.prototype.slice.call(arguments);
         return addSlice(new Uint8Array(Array.prototype.slice.apply(array, args)));
     }

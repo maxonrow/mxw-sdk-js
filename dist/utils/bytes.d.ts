@@ -2,7 +2,7 @@
  *  Conversion Utilities
  *
  */
-export declare type Arrayish = string | ArrayLike<number>;
+export type Arrayish = string | ArrayLike<number>;
 export interface Hexable {
     toHexString(): string;
 }

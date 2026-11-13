@@ -1,12 +1,39 @@
 'use strict';
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
-    result["default"] = mod;
-    return result;
-};
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || (function () {
+    var ownKeys = function(o) {
+        ownKeys = Object.getOwnPropertyNames || function (o) {
+            var ar = [];
+            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
+            return ar;
+        };
+        return ownKeys(o);
+    };
+    return function (mod) {
+        if (mod && mod.__esModule) return mod;
+        var result = {};
+        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
+        __setModuleDefault(result, mod);
+        return result;
+    };
+})();
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.FungibleToken = exports.FixedSupplyBurnableFungibleTokenFlag = exports.FixedSupplyFungibleTokenFlag = exports.DynamicSupplyFungibleTokenFlag = exports.TokenStateFlags = exports.FungibleTokenActions = void 0;
 const properties_1 = require("./utils/properties");
 const misc_1 = require("./utils/misc");
 const base64_1 = require("./utils/base64");
@@ -22,7 +49,7 @@ var FungibleTokenActions;
     FungibleTokenActions["burn"] = "burn";
     FungibleTokenActions["transferOwnership"] = "transferOwnership";
     FungibleTokenActions["acceptOwnership"] = "acceptOwnership";
-})(FungibleTokenActions = exports.FungibleTokenActions || (exports.FungibleTokenActions = {}));
+})(FungibleTokenActions || (exports.FungibleTokenActions = FungibleTokenActions = {}));
 ;
 var TokenStateFlags;
 (function (TokenStateFlags) {
@@ -31,22 +58,22 @@ var TokenStateFlags;
     TokenStateFlags[TokenStateFlags["burn"] = 4] = "burn";
     TokenStateFlags[TokenStateFlags["frozen"] = 8] = "frozen";
     TokenStateFlags[TokenStateFlags["approved"] = 16] = "approved";
-})(TokenStateFlags = exports.TokenStateFlags || (exports.TokenStateFlags = {}));
+})(TokenStateFlags || (exports.TokenStateFlags = TokenStateFlags = {}));
 ;
 exports.DynamicSupplyFungibleTokenFlag = TokenStateFlags.fungible + TokenStateFlags.mint + TokenStateFlags.burn;
 exports.FixedSupplyFungibleTokenFlag = TokenStateFlags.fungible;
 exports.FixedSupplyBurnableFungibleTokenFlag = TokenStateFlags.fungible + TokenStateFlags.burn;
 function checkFungibleTokenStatus(data) {
-    return misc_1.checkFormat({
+    return (0, misc_1.checkFormat)({
         payload: function (value) {
-            return misc_1.checkFormat({
+            return (0, misc_1.checkFormat)({
                 token: {
                     from: misc_1.checkAddress,
                     nonce: misc_1.checkBigNumber,
                     status: misc_1.checkString,
                     symbol: misc_1.checkString,
-                    tokenFees: misc_1.allowNullOrEmpty(misc_1.arrayOf(checkFungibleTokenFee)),
-                    burnable: misc_1.allowNullOrEmpty(misc_1.checkBoolean)
+                    tokenFees: (0, misc_1.allowNullOrEmpty)((0, misc_1.arrayOf)(checkFungibleTokenFee)),
+                    burnable: (0, misc_1.allowNullOrEmpty)(misc_1.checkBoolean)
                 },
                 pub_key: {
                     type: misc_1.checkString,
@@ -55,8 +82,8 @@ function checkFungibleTokenStatus(data) {
                 signature: misc_1.checkString
             }, value);
         },
-        signatures: misc_1.arrayOf(function (value) {
-            return misc_1.checkFormat({
+        signatures: (0, misc_1.arrayOf)(function (value) {
+            return (0, misc_1.checkFormat)({
                 pub_key: {
                     type: misc_1.checkString,
                     value: misc_1.checkString
@@ -67,19 +94,19 @@ function checkFungibleTokenStatus(data) {
     }, data);
 }
 function checkFungibleTokenFee(data) {
-    let fee = misc_1.checkFormat({
+    let fee = (0, misc_1.checkFormat)({
         action: misc_1.checkString,
         feeName: misc_1.checkString
     }, data);
-    if (misc_1.isUndefinedOrNullOrEmpty(FungibleTokenActions[fee.action])) {
+    if ((0, misc_1.isUndefinedOrNullOrEmpty)(FungibleTokenActions[fee.action])) {
         return errors.throwError("invalid fungible token fee", errors.INVALID_ARGUMENT, { value: fee });
     }
     return fee;
 }
 function checkFungibleTokenAccountStatus(data) {
-    return misc_1.checkFormat({
+    return (0, misc_1.checkFormat)({
         payload: function (value) {
-            return misc_1.checkFormat({
+            return (0, misc_1.checkFormat)({
                 tokenAccount: {
                     from: misc_1.checkAddress,
                     to: misc_1.checkAddress,
@@ -94,8 +121,8 @@ function checkFungibleTokenAccountStatus(data) {
                 signature: misc_1.checkString
             }, value);
         },
-        signatures: misc_1.arrayOf(function (value) {
-            return misc_1.checkFormat({
+        signatures: (0, misc_1.arrayOf)(function (value) {
+            return (0, misc_1.checkFormat)({
                 pub_key: {
                     type: misc_1.checkString,
                     value: misc_1.checkString
@@ -111,17 +138,17 @@ class FungibleToken {
         if (!symbol) {
             errors.throwError('symbol is required', errors.MISSING_ARGUMENT, { arg: 'symbol' });
         }
-        properties_1.defineReadOnly(this, 'symbol', symbol);
+        (0, properties_1.defineReadOnly)(this, 'symbol', symbol);
         if (abstract_signer_1.Signer.isSigner(signerOrProvider)) {
             if (!signerOrProvider.provider) {
                 return errors.throwError('missing provider', errors.INVALID_ARGUMENT, { arg: 'signerOrProvider', value: signerOrProvider });
             }
-            properties_1.defineReadOnly(this, 'provider', signerOrProvider.provider);
-            properties_1.defineReadOnly(this, 'signer', signerOrProvider);
+            (0, properties_1.defineReadOnly)(this, 'provider', signerOrProvider.provider);
+            (0, properties_1.defineReadOnly)(this, 'signer', signerOrProvider);
         }
         else if (abstract_provider_1.Provider.isProvider(signerOrProvider)) {
-            properties_1.defineReadOnly(this, 'provider', signerOrProvider);
-            properties_1.defineReadOnly(this, 'signer', null);
+            (0, properties_1.defineReadOnly)(this, 'provider', signerOrProvider);
+            (0, properties_1.defineReadOnly)(this, 'signer', null);
         }
         else {
             errors.throwError('invalid signer or provider', errors.INVALID_ARGUMENT, { arg: 'signerOrProvider', value: signerOrProvider });
@@ -130,13 +157,13 @@ class FungibleToken {
     get state() { return this._state; }
     get accountState() { return this._accountState; }
     get isApproved() {
-        if (misc_1.isUndefinedOrNullOrEmpty(this._state)) {
+        if ((0, misc_1.isUndefinedOrNullOrEmpty)(this._state)) {
             errors.throwError('not initialized', errors.NOT_INITIALIZED, { arg: 'state' });
         }
         return (TokenStateFlags.approved & this._state.flags) ? true : false;
     }
     get isFrozen() {
-        if (misc_1.isUndefinedOrNullOrEmpty(this._state)) {
+        if ((0, misc_1.isUndefinedOrNullOrEmpty)(this._state)) {
             errors.throwError('not initialized', errors.NOT_INITIALIZED, { arg: 'state' });
         }
         return (TokenStateFlags.frozen & this._state.flags) ? true : false;
@@ -221,7 +248,7 @@ class FungibleToken {
         if (!this.symbol) {
             errors.throwError('not initialized', errors.NOT_INITIALIZED, { arg: 'symbol' });
         }
-        return properties_1.resolveProperties({ signerAddress: this.signer.getAddress() }).then(({ signerAddress }) => {
+        return (0, properties_1.resolveProperties)({ signerAddress: this.signer.getAddress() }).then(({ signerAddress }) => {
             if (!signerAddress) {
                 errors.throwError('query fungible token account require signer address', errors.MISSING_ARGUMENT, { arg: 'signerAddress' });
             }
@@ -241,9 +268,9 @@ class FungibleToken {
     getBalance(blockTag, overrides) {
         return this.getAccountState(blockTag, overrides).then((accountState) => {
             if (accountState && accountState.balance) {
-                return utils_1.bigNumberify(accountState.balance);
+                return (0, utils_1.bigNumberify)(accountState.balance);
             }
-            return utils_1.bigNumberify("0");
+            return (0, utils_1.bigNumberify)("0");
         });
     }
     /**
@@ -276,7 +303,7 @@ class FungibleToken {
             errors.throwError('transfer fungible token require signer', errors.NOT_INITIALIZED, { arg: 'signer' });
         }
         this.isUsable; // check token useability, otherwise throw error
-        return properties_1.resolveProperties({ signerAddress: this.signer.getAddress(), toAddressOrName: toAddressOrName }).then(({ signerAddress, toAddressOrName }) => {
+        return (0, properties_1.resolveProperties)({ signerAddress: this.signer.getAddress(), toAddressOrName: toAddressOrName }).then(({ signerAddress, toAddressOrName }) => {
             if (!signerAddress) {
                 return errors.throwError('transfer fungible token require signer address', errors.MISSING_ARGUMENT, { arg: 'signerAddress' });
             }
@@ -323,7 +350,7 @@ class FungibleToken {
             errors.throwError('mint fungible token require signer', errors.NOT_INITIALIZED, { arg: 'signer' });
         }
         this.isMintable; // check token useability and mintable, otherwise throw error
-        return properties_1.resolveProperties({ signerAddress: this.signer.getAddress(), toAddressOrName: toAddressOrName }).then(({ signerAddress, toAddressOrName }) => {
+        return (0, properties_1.resolveProperties)({ signerAddress: this.signer.getAddress(), toAddressOrName: toAddressOrName }).then(({ signerAddress, toAddressOrName }) => {
             if (!signerAddress) {
                 return errors.throwError('mint fungible token require signer address', errors.MISSING_ARGUMENT, { arg: 'signerAddress' });
             }
@@ -369,7 +396,7 @@ class FungibleToken {
             errors.throwError('burn fungible token require signer', errors.NOT_INITIALIZED, { arg: 'signer' });
         }
         this.isBurnable; // check token useability and burnable, otherwise throw error
-        return properties_1.resolveProperties({ signerAddress: this.signer.getAddress() }).then(({ signerAddress }) => {
+        return (0, properties_1.resolveProperties)({ signerAddress: this.signer.getAddress() }).then(({ signerAddress }) => {
             if (!signerAddress) {
                 return errors.throwError('burn fungible token require signer address', errors.MISSING_ARGUMENT, { arg: 'signerAddress' });
             }
@@ -414,7 +441,7 @@ class FungibleToken {
             errors.throwError('transfer fungible token ownership require signer', errors.NOT_INITIALIZED, { arg: 'signer' });
         }
         this.isUsable; // check token useability, otherwise throw error
-        return properties_1.resolveProperties({ signerAddress: this.signer.getAddress(), addressOrName: addressOrName }).then(({ signerAddress, addressOrName }) => {
+        return (0, properties_1.resolveProperties)({ signerAddress: this.signer.getAddress(), addressOrName: addressOrName }).then(({ signerAddress, addressOrName }) => {
             if (!signerAddress) {
                 return errors.throwError('transfer fungible token ownership require signer address', errors.MISSING_ARGUMENT, { required: 'signerAddress' });
             }
@@ -461,7 +488,7 @@ class FungibleToken {
             errors.throwError('accept fungible token ownership require signer', errors.NOT_INITIALIZED, { arg: 'signer' });
         }
         this.isUsable; // check token useability, otherwise throw error
-        return properties_1.resolveProperties({ signerAddress: this.signer.getAddress() }).then(({ signerAddress }) => {
+        return (0, properties_1.resolveProperties)({ signerAddress: this.signer.getAddress() }).then(({ signerAddress }) => {
             if (!signerAddress) {
                 return errors.throwError('accept fungible token ownership require signer address', errors.MISSING_ARGUMENT, { required: 'signerAddress' });
             }
@@ -518,36 +545,36 @@ class FungibleToken {
         if (properties && 'string' === typeof (properties)) {
             properties = JSON.parse(properties);
         }
-        properties_1.checkProperties(properties, {
+        (0, properties_1.checkProperties)(properties, {
             name: true,
             symbol: true,
             decimals: true,
             fixedSupply: true,
             maxSupply: true,
-            fee: true,
-            owner: false,
+            fee: true, // Application fee
+            owner: false, // Optional
             metadata: false // Optional
         }, true);
-        properties_1.checkProperties(properties.fee, { to: true, value: true });
-        return properties_1.resolveProperties({ address: signer.getAddress() }).then(({ address }) => {
+        (0, properties_1.checkProperties)(properties.fee, { to: true, value: true });
+        return (0, properties_1.resolveProperties)({ address: signer.getAddress() }).then(({ address }) => {
             if (!address) {
                 errors.throwError('create fungible token transaction require signer address', errors.MISSING_ARGUMENT, { required: 'signer' });
             }
             properties.owner = address; // Set signer address as owner
-            let fungibleToken = misc_1.checkFormat({
+            let fungibleToken = (0, misc_1.checkFormat)({
                 name: misc_1.checkString,
                 symbol: misc_1.checkString,
                 decimals: misc_1.checkNumber,
                 fixedSupply: misc_1.checkBoolean,
                 maxSupply: misc_1.checkBigNumber,
-                owner: misc_1.allowNull(misc_1.checkAddress),
-                metadata: misc_1.allowNullOrEmpty(misc_1.checkString),
+                owner: (0, misc_1.allowNull)(misc_1.checkAddress),
+                metadata: (0, misc_1.allowNullOrEmpty)(misc_1.checkString),
                 fee: {
                     to: misc_1.checkAddress,
                     value: misc_1.checkBigNumber
                 }
             }, properties);
-            if (utils_1.bigNumberify(fungibleToken.fee.value).lt(0)) {
+            if ((0, utils_1.bigNumberify)(fungibleToken.fee.value).lt(0)) {
                 errors.throwError('create fungible token transaction require non-negative application fee', errors.NUMERIC_FAULT, { value: fungibleToken });
             }
             let tx = signer.provider.getTransactionRequest("token", "token-createFungibleToken", {
@@ -576,14 +603,14 @@ class FungibleToken {
         if (!abstract_signer_1.Signer.isSigner(signer)) {
             errors.throwError('sign fungible token status transaction require signer', errors.MISSING_ARGUMENT, { arg: 'signer' });
         }
-        properties_1.checkProperties(transaction, { payload: true, signatures: true });
+        (0, properties_1.checkProperties)(transaction, { payload: true, signatures: true });
         transaction = checkFungibleTokenStatus(transaction);
-        return properties_1.resolveProperties({
+        return (0, properties_1.resolveProperties)({
             publicKeyType: signer.getPublicKeyType(),
             compressedPublicKey: signer.getCompressedPublicKey()
         }).then(({ publicKeyType, compressedPublicKey }) => {
             // Convert number and big number to string
-            transaction = misc_1.iterate(transaction, function (key, value, type) {
+            transaction = (0, misc_1.iterate)(transaction, function (key, value, type) {
                 switch (type) {
                     case "Number":
                     case "BigNumber":
@@ -591,14 +618,14 @@ class FungibleToken {
                 }
                 return value;
             });
-            transaction = misc_1.sortObject(transaction);
+            transaction = (0, misc_1.sortObject)(transaction);
             return signer.signMessage(JSON.stringify(transaction.payload), true).then((signature) => {
                 transaction.signatures.push({
                     pub_key: {
                         type: "tendermint/" + publicKeyType,
-                        value: base64_1.encode(compressedPublicKey)
+                        value: (0, base64_1.encode)(compressedPublicKey)
                     },
-                    signature: base64_1.encode(signature)
+                    signature: (0, base64_1.encode)(signature)
                 });
                 return transaction;
             });
@@ -614,14 +641,14 @@ class FungibleToken {
         if (!abstract_signer_1.Signer.isSigner(signer)) {
             errors.throwError('sign fungible token status transaction require signer', errors.MISSING_ARGUMENT, { arg: 'signer' });
         }
-        properties_1.checkProperties(transaction, { payload: true, signatures: true });
+        (0, properties_1.checkProperties)(transaction, { payload: true, signatures: true });
         transaction = checkFungibleTokenAccountStatus(transaction);
-        return properties_1.resolveProperties({
+        return (0, properties_1.resolveProperties)({
             publicKeyType: signer.getPublicKeyType(),
             compressedPublicKey: signer.getCompressedPublicKey()
         }).then(({ publicKeyType, compressedPublicKey }) => {
             // Convert number and big number to string
-            transaction = misc_1.iterate(transaction, function (key, value, type) {
+            transaction = (0, misc_1.iterate)(transaction, function (key, value, type) {
                 switch (type) {
                     case "Number":
                     case "BigNumber":
@@ -629,14 +656,14 @@ class FungibleToken {
                 }
                 return value;
             });
-            transaction = misc_1.sortObject(transaction);
+            transaction = (0, misc_1.sortObject)(transaction);
             return signer.signMessage(JSON.stringify(transaction.payload), true).then((signature) => {
                 transaction.signatures.push({
                     pub_key: {
                         type: "tendermint/" + publicKeyType,
-                        value: base64_1.encode(compressedPublicKey)
+                        value: (0, base64_1.encode)(compressedPublicKey)
                     },
-                    signature: base64_1.encode(signature)
+                    signature: (0, base64_1.encode)(signature)
                 });
                 return transaction;
             });
@@ -671,9 +698,9 @@ class FungibleToken {
         if (!abstract_signer_1.Signer.isSigner(signer)) {
             errors.throwError('send fungible token status transaction require signer', errors.MISSING_ARGUMENT, { arg: 'signer' });
         }
-        properties_1.checkProperties(transaction, { payload: true, signatures: true });
+        (0, properties_1.checkProperties)(transaction, { payload: true, signatures: true });
         transaction = checkFungibleTokenStatus(transaction);
-        return properties_1.resolveProperties({ signerAddress: signer.getAddress() }).then(({ signerAddress }) => {
+        return (0, properties_1.resolveProperties)({ signerAddress: signer.getAddress() }).then(({ signerAddress }) => {
             let tx = signer.provider.getTransactionRequest("token", "token-setFungibleTokenStatus", {
                 payload: transaction.payload,
                 signatures: transaction.signatures,
@@ -713,9 +740,9 @@ class FungibleToken {
         if (!abstract_signer_1.Signer.isSigner(signer)) {
             errors.throwError('send fungible token status transaction require signer', errors.MISSING_ARGUMENT, { arg: 'signer' });
         }
-        properties_1.checkProperties(transaction, { payload: true, signatures: true });
+        (0, properties_1.checkProperties)(transaction, { payload: true, signatures: true });
         transaction = checkFungibleTokenAccountStatus(transaction);
-        return properties_1.resolveProperties({ signerAddress: signer.getAddress() }).then(({ signerAddress }) => {
+        return (0, properties_1.resolveProperties)({ signerAddress: signer.getAddress() }).then(({ signerAddress }) => {
             let tx = signer.provider.getTransactionRequest("token", "token-setFungibleTokenAccountStatus", {
                 payload: transaction.payload,
                 signatures: transaction.signatures,
@@ -812,18 +839,18 @@ function setFungibleTokenStatus(symbol, status, signer, overrides) {
     switch (status) {
         case "APPROVE":
             if (overrides) {
-                if (misc_1.isUndefinedOrNull(overrides.burnable)) {
+                if ((0, misc_1.isUndefinedOrNull)(overrides.burnable)) {
                     errors.throwError('fungible token burnable setting is missing', errors.MISSING_ARGUMENT, { arg: 'burnable' });
                 }
                 burnable = overrides.burnable ? true : false;
                 if (overrides.tokenFees) {
-                    let tokenProperties = misc_1.checkFormat({
-                        tokenFees: misc_1.arrayOf(checkFungibleTokenFee)
+                    let tokenProperties = (0, misc_1.checkFormat)({
+                        tokenFees: (0, misc_1.arrayOf)(checkFungibleTokenFee)
                     }, overrides);
                     tokenFees = tokenProperties.tokenFees;
                 }
             }
-            if (misc_1.isUndefinedOrNullOrEmpty(tokenFees)) {
+            if ((0, misc_1.isUndefinedOrNullOrEmpty)(tokenFees)) {
                 errors.throwError('fungible token fees are missing', errors.MISSING_ARGUMENT, { arg: 'tokenFees' });
             }
             break;
@@ -836,7 +863,7 @@ function setFungibleTokenStatus(symbol, status, signer, overrides) {
         default:
             errors.throwError('invalid fungible token status', errors.UNEXPECTED_ARGUMENT, { arg: 'status', value: status });
     }
-    return properties_1.resolveProperties({
+    return (0, properties_1.resolveProperties)({
         signerAddress: signer.getAddress(),
         publicKeyType: signer.getPublicKeyType(),
         compressedPublicKey: signer.getCompressedPublicKey()
@@ -845,8 +872,8 @@ function setFungibleTokenStatus(symbol, status, signer, overrides) {
         if (!nonce) {
             nonce = signer.provider.getTransactionCount(signerAddress, "pending");
         }
-        return properties_1.resolveProperties({ nonce: nonce }).then(({ nonce }) => {
-            let transaction = misc_1.sortObject(misc_1.iterate({
+        return (0, properties_1.resolveProperties)({ nonce: nonce }).then(({ nonce }) => {
+            let transaction = (0, misc_1.sortObject)((0, misc_1.iterate)({
                 payload: {
                     token: {
                         from: signerAddress,
@@ -858,7 +885,7 @@ function setFungibleTokenStatus(symbol, status, signer, overrides) {
                     },
                     pub_key: {
                         type: "tendermint/" + publicKeyType,
-                        value: base64_1.encode(compressedPublicKey)
+                        value: (0, base64_1.encode)(compressedPublicKey)
                     },
                     signature: ""
                 },
@@ -872,7 +899,7 @@ function setFungibleTokenStatus(symbol, status, signer, overrides) {
                 return value;
             }));
             return signer.signMessage(JSON.stringify(transaction.payload.token), true).then((signature) => {
-                transaction.payload.signature = base64_1.encode(signature);
+                transaction.payload.signature = (0, base64_1.encode)(signature);
                 return transaction;
             });
         });
@@ -892,7 +919,7 @@ function setFungibleTokenAccountStatus(symbol, to, status, signer, overrides) {
         case "FREEZE_ACCOUNT":
         case "UNFREEZE_ACCOUNT":
             try {
-                to = misc_1.checkAddress(to);
+                to = (0, misc_1.checkAddress)(to);
             }
             catch (error) {
                 errors.throwError('fungible token target account is not valid', errors.INVALID_ADDRESS, { arg: 'to', value: to });
@@ -901,7 +928,7 @@ function setFungibleTokenAccountStatus(symbol, to, status, signer, overrides) {
         default:
             errors.throwError('invalid fungible token account status', errors.UNEXPECTED_ARGUMENT, { arg: 'status', value: status });
     }
-    return properties_1.resolveProperties({
+    return (0, properties_1.resolveProperties)({
         signerAddress: signer.getAddress(),
         publicKeyType: signer.getPublicKeyType(),
         compressedPublicKey: signer.getCompressedPublicKey()
@@ -910,8 +937,8 @@ function setFungibleTokenAccountStatus(symbol, to, status, signer, overrides) {
         if (!nonce) {
             nonce = signer.provider.getTransactionCount(signerAddress, "pending");
         }
-        return properties_1.resolveProperties({ nonce: nonce }).then(({ nonce }) => {
-            let transaction = misc_1.sortObject(misc_1.iterate({
+        return (0, properties_1.resolveProperties)({ nonce: nonce }).then(({ nonce }) => {
+            let transaction = (0, misc_1.sortObject)((0, misc_1.iterate)({
                 payload: {
                     tokenAccount: {
                         from: signerAddress,
@@ -922,7 +949,7 @@ function setFungibleTokenAccountStatus(symbol, to, status, signer, overrides) {
                     },
                     pub_key: {
                         type: "tendermint/" + publicKeyType,
-                        value: base64_1.encode(compressedPublicKey)
+                        value: (0, base64_1.encode)(compressedPublicKey)
                     },
                     signature: ""
                 },
@@ -936,7 +963,7 @@ function setFungibleTokenAccountStatus(symbol, to, status, signer, overrides) {
                 return value;
             }));
             return signer.signMessage(JSON.stringify(transaction.payload.tokenAccount), true).then((signature) => {
-                transaction.payload.signature = base64_1.encode(signature);
+                transaction.payload.signature = (0, base64_1.encode)(signature);
                 return transaction;
             });
         });

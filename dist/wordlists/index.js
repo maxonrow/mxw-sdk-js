@@ -1,5 +1,6 @@
 'use strict';
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.zh_tw = exports.zh_cn = exports.zh = exports.ko = exports.ja = exports.it = exports.fr = exports.es = exports.en = exports.locales = void 0;
 const lang_en_1 = require("./lang-en");
 const lang_es_1 = require("./lang-es");
 const lang_fr_1 = require("./lang-fr");

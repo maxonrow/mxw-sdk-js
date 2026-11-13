@@ -65,10 +65,12 @@ export interface AccountState {
     type: string;
     value: {
         address: string;
-        coins: [{
-            denom: string;
-            amount: BigNumberish;
-        }];
+        coins: [
+            {
+                denom: string;
+                amount: BigNumberish;
+            }
+        ];
         publicKey: {
             type: string;
             value: string;
@@ -106,27 +108,27 @@ export interface TransactionEvent {
     hash: string;
     params: Array<string>;
 }
-export declare type BlockTag = string | number;
-export declare type TransactionFee = {
+export type BlockTag = string | number;
+export type TransactionFee = {
     amount: Array<{
         denom: string;
         amount: BigNumber;
     }>;
     gas: BigNumber;
 };
-export declare type TransactionFeeSetting = {
+export type TransactionFeeSetting = {
     min: BigNumberish;
     max: BigNumberish;
     percentage: BigNumberish;
 };
-export declare type TransactionSignature = {
+export type TransactionSignature = {
     publicKey: {
         type: string;
         value: string;
     };
     signature: string;
 };
-export declare type TransactionRequest = {
+export type TransactionRequest = {
     type?: string;
     value?: {
         msg?: Array<{
@@ -163,8 +165,8 @@ export interface TransactionReceipt extends Transaction {
     status: number;
     confirmations: number;
 }
-export declare type EventType = string | Array<string>;
-export declare type Listener = (...args: Array<any>) => void;
+export type EventType = string | Array<string>;
+export type Listener = (...args: Array<any>) => void;
 export declare abstract class Provider implements OnceBlockable {
     abstract getNetwork(): Promise<Network>;
     abstract getBlockNumber(): Promise<number>;

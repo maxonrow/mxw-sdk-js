@@ -1,12 +1,39 @@
 'use strict';
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
-    result["default"] = mod;
-    return result;
-};
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || (function () {
+    var ownKeys = function(o) {
+        ownKeys = Object.getOwnPropertyNames || function (o) {
+            var ar = [];
+            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
+            return ar;
+        };
+        return ownKeys(o);
+    };
+    return function (mod) {
+        if (mod && mod.__esModule) return mod;
+        var result = {};
+        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
+        __setModuleDefault(result, mod);
+        return result;
+    };
+})();
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.Alias = void 0;
 const properties_1 = require("./utils/properties");
 const misc_1 = require("./utils/misc");
 const base64_1 = require("./utils/base64");
@@ -28,10 +55,10 @@ const formatAliasStatus = {
 };
 const formatAliasStatusTransaction = {
     payload: function (value) {
-        return misc_1.checkFormat(formatAliasStatus, value);
+        return (0, misc_1.checkFormat)(formatAliasStatus, value);
     },
-    signatures: misc_1.arrayOf(function (value) {
-        return misc_1.checkFormat({
+    signatures: (0, misc_1.arrayOf)(function (value) {
+        return (0, misc_1.checkFormat)({
             pub_key: {
                 type: misc_1.checkString,
                 value: misc_1.checkString
@@ -51,15 +78,15 @@ class Alias {
         if (!abstract_signer_1.Signer.isSigner(signer)) {
             errors.throwError('sign alias status transaction require signer', errors.MISSING_ARGUMENT, { arg: 'signer' });
         }
-        properties_1.checkProperties(transaction, { payload: true, signatures: true });
-        transaction = misc_1.checkFormat(formatAliasStatusTransaction, transaction);
-        return properties_1.resolveProperties({
+        (0, properties_1.checkProperties)(transaction, { payload: true, signatures: true });
+        transaction = (0, misc_1.checkFormat)(formatAliasStatusTransaction, transaction);
+        return (0, properties_1.resolveProperties)({
             signerAddress: signer.getAddress(),
             publicKeyType: signer.getPublicKeyType(),
             compressedPublicKey: signer.getCompressedPublicKey()
         }).then(({ signerAddress, publicKeyType, compressedPublicKey }) => {
             // Convert number and big number to string
-            transaction = misc_1.iterate(transaction, function (key, value, type) {
+            transaction = (0, misc_1.iterate)(transaction, function (key, value, type) {
                 switch (type) {
                     case "Number":
                     case "BigNumber":
@@ -67,14 +94,14 @@ class Alias {
                 }
                 return value;
             });
-            transaction = misc_1.sortObject(transaction);
+            transaction = (0, misc_1.sortObject)(transaction);
             return signer.signMessage(JSON.stringify(transaction.payload), true).then((signature) => {
                 transaction.signatures.push({
                     pub_key: {
                         type: "tendermint/" + publicKeyType,
-                        value: base64_1.encode(compressedPublicKey)
+                        value: (0, base64_1.encode)(compressedPublicKey)
                     },
-                    signature: base64_1.encode(signature)
+                    signature: (0, base64_1.encode)(signature)
                 });
                 return transaction;
             });
@@ -112,9 +139,9 @@ class Alias {
         if (!signer.provider) {
             return errors.throwError('missing provider', errors.INVALID_ARGUMENT, { arg: 'signer', value: signer });
         }
-        properties_1.checkProperties(transaction, { payload: true, signatures: true });
-        transaction = misc_1.checkFormat(formatAliasStatusTransaction, transaction);
-        return properties_1.resolveProperties({ signerAddress: signer.getAddress() }).then(({ signerAddress }) => {
+        (0, properties_1.checkProperties)(transaction, { payload: true, signatures: true });
+        transaction = (0, misc_1.checkFormat)(formatAliasStatusTransaction, transaction);
+        return (0, properties_1.resolveProperties)({ signerAddress: signer.getAddress() }).then(({ signerAddress }) => {
             let tx = signer.provider.getTransactionRequest("nameservice", "nameservice-setAliasStatus", {
                 payload: transaction.payload,
                 signatures: transaction.signatures,
@@ -172,7 +199,7 @@ function setAliasStatus(name, status, signer, overrides) {
         default:
             errors.throwError('invalid alias status', errors.UNEXPECTED_ARGUMENT, { arg: 'status', value: status });
     }
-    return properties_1.resolveProperties({
+    return (0, properties_1.resolveProperties)({
         signerAddress: signer.getAddress(),
         publicKeyType: signer.getPublicKeyType(),
         compressedPublicKey: signer.getCompressedPublicKey()
@@ -181,8 +208,8 @@ function setAliasStatus(name, status, signer, overrides) {
         if (!nonce) {
             nonce = signer.provider.getTransactionCount(signerAddress, "pending");
         }
-        return properties_1.resolveProperties({ nonce: nonce }).then(({ nonce }) => {
-            let transaction = misc_1.sortObject({
+        return (0, properties_1.resolveProperties)({ nonce: nonce }).then(({ nonce }) => {
+            let transaction = (0, misc_1.sortObject)({
                 payload: {
                     alias: {
                         from: signerAddress,
@@ -192,14 +219,14 @@ function setAliasStatus(name, status, signer, overrides) {
                     },
                     pub_key: {
                         type: "tendermint/" + publicKeyType,
-                        value: base64_1.encode(compressedPublicKey)
+                        value: (0, base64_1.encode)(compressedPublicKey)
                     },
                     signature: ""
                 },
                 signatures: []
             });
             return signer.signMessage(JSON.stringify(transaction.payload.alias), true).then((signature) => {
-                transaction.payload.signature = base64_1.encode(signature);
+                transaction.payload.signature = (0, base64_1.encode)(signature);
                 return transaction;
             });
         });

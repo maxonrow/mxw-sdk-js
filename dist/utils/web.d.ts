@@ -1,4 +1,4 @@
-export declare type ConnectionInfo = {
+export type ConnectionInfo = {
     url: string;
     user?: string;
     password?: string;
@@ -12,7 +12,7 @@ export declare type ConnectionInfo = {
 export interface OnceBlockable {
     once(eventName: "block", handler: () => void): void;
 }
-export declare type PollOptions = {
+export type PollOptions = {
     timeout?: number;
     floor?: number;
     ceiling?: number;

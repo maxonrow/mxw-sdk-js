@@ -1,9 +1,9 @@
 'use strict';
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.randomBytes = randomBytes;
 const bytes_1 = require("./bytes");
 const crypto_1 = require("crypto");
 function randomBytes(length) {
-    return bytes_1.arrayify(crypto_1.randomBytes(length));
+    return (0, bytes_1.arrayify)((0, crypto_1.randomBytes)(length));
 }
-exports.randomBytes = randomBytes;
 //# sourceMappingURL=random-bytes.js.map

@@ -1,12 +1,39 @@
 'use strict';
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
-    result["default"] = mod;
-    return result;
-};
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || (function () {
+    var ownKeys = function(o) {
+        ownKeys = Object.getOwnPropertyNames || function (o) {
+            var ar = [];
+            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
+            return ar;
+        };
+        return ownKeys(o);
+    };
+    return function (mod) {
+        if (mod && mod.__esModule) return mod;
+        var result = {};
+        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
+        __setModuleDefault(result, mod);
+        return result;
+    };
+})();
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.Wallet = void 0;
 const bytes_1 = require("./utils/bytes");
 const hash_1 = require("./utils/hash");
 const hdnode_1 = require("./utils/hdnode");
@@ -30,12 +57,12 @@ class Wallet extends abstract_signer_1.Signer {
         errors.checkNew(this, Wallet);
         // Make sure we have a valid signing key
         if (signing_key_1.SigningKey.isSigningKey(privateKey)) {
-            properties_1.defineReadOnly(this, 'signingKey', privateKey);
+            (0, properties_1.defineReadOnly)(this, 'signingKey', privateKey);
         }
         else {
-            properties_1.defineReadOnly(this, 'signingKey', new signing_key_1.SigningKey(privateKey));
+            (0, properties_1.defineReadOnly)(this, 'signingKey', new signing_key_1.SigningKey(privateKey));
         }
-        properties_1.defineReadOnly(this, 'provider', provider);
+        (0, properties_1.defineReadOnly)(this, 'provider', provider);
     }
     get address() { return this.signingKey.address; }
     get hexAddress() { return this.signingKey.hexAddress; }
@@ -88,7 +115,7 @@ class Wallet extends abstract_signer_1.Signer {
         if (!this.provider) {
             errors.throwError('missing provider', errors.NOT_INITIALIZED, { argument: 'provider' });
         }
-        return transaction_1.populateTransaction(transaction, this.provider, this.address).then((tx) => {
+        return (0, transaction_1.populateTransaction)(transaction, this.provider, this.address).then((tx) => {
             return this.sign(tx, overrides).then((signedTransaction) => {
                 return this.provider.sendTransaction(signedTransaction, overrides).catch(error => {
                     // Clear the cached nonce when failure happened to prevent it out of sequence
@@ -100,7 +127,7 @@ class Wallet extends abstract_signer_1.Signer {
     }
     sign(transaction, overrides) {
         if (transaction.chainId == null || transaction.nonce == null || transaction.accountNumber == null) {
-            transaction = properties_1.shallowCopy(transaction);
+            transaction = (0, properties_1.shallowCopy)(transaction);
             if (transaction.chainId == null) {
                 transaction.chainId = this.provider.getNetwork().then((network) => network.chainId);
             }
@@ -111,7 +138,7 @@ class Wallet extends abstract_signer_1.Signer {
                 transaction.accountNumber = this.getAccountNumber();
             }
         }
-        return properties_1.resolveProperties(transaction).then((tx) => {
+        return (0, properties_1.resolveProperties)(transaction).then((tx) => {
             if (!tx.chainId || !tx.nonce || !tx.accountNumber || !tx.value || !tx.value.msg || !Array.isArray(tx.value.msg)) {
                 errors.throwError('missing transaction field', errors.MISSING_ARGUMENT, { argument: 'value', value: tx });
             }
@@ -140,7 +167,7 @@ class Wallet extends abstract_signer_1.Signer {
             this.nonce = tx.nonce;
             payload.sequence = tx.nonce.toString();
             // Convert number and big number to string
-            payload = misc_1.iterate(payload, function (key, value, type) {
+            payload = (0, misc_1.iterate)(payload, function (key, value, type) {
                 switch (type) {
                     case "Number":
                     case "BigNumber":
@@ -148,15 +175,15 @@ class Wallet extends abstract_signer_1.Signer {
                 }
                 return value;
             });
-            payload = misc_1.sortObject(payload);
+            payload = (0, misc_1.sortObject)(payload);
             // Log signature payload
             if (overrides && overrides.logSignaturePayload) {
                 overrides.logSignaturePayload(payload);
             }
-            let bytes = utils_1.toUtf8Bytes(JSON.stringify(payload));
-            let hash = bytes_1.arrayify(sha2_1.sha256(bytes));
+            let bytes = (0, utils_1.toUtf8Bytes)(JSON.stringify(payload));
+            let hash = (0, bytes_1.arrayify)((0, sha2_1.sha256)(bytes));
             let signature = this.signingKey.signDigest(hash);
-            let signedTransaction = transaction_1.serialize(tx, signature, this.compressedPublicKey);
+            let signedTransaction = (0, transaction_1.serialize)(tx, signature, this.compressedPublicKey);
             // Log signedTransaction
             if (overrides && overrides.logSignedTransaction) {
                 overrides.logSignedTransaction(signedTransaction);
@@ -165,7 +192,7 @@ class Wallet extends abstract_signer_1.Signer {
         });
     }
     signMessage(message, excludeRecoveryParam) {
-        return Promise.resolve(bytes_1.joinSignature(this.signingKey.signDigest(hash_1.hashMessage(message)), excludeRecoveryParam ? false : true));
+        return Promise.resolve((0, bytes_1.joinSignature)(this.signingKey.signDigest((0, hash_1.hashMessage)(message)), excludeRecoveryParam ? false : true));
     }
     getBalance(blockTag) {
         if (!this.provider) {
@@ -266,14 +293,14 @@ class Wallet extends abstract_signer_1.Signer {
         if (!this.provider) {
             errors.throwError('missing provider', errors.NOT_INITIALIZED, { argument: 'provider' });
         }
-        properties_1.checkProperties(appFee, {
+        (0, properties_1.checkProperties)(appFee, {
             to: true,
             value: true
         }, true);
-        if (utils_1.bigNumberify(appFee.value).lte(0)) {
+        if ((0, utils_1.bigNumberify)(appFee.value).lte(0)) {
             errors.throwError('create alias transaction require non-zero application fee', errors.MISSING_FEES, { value: appFee });
         }
-        return properties_1.resolveProperties({ name: name }).then(({ name }) => {
+        return (0, properties_1.resolveProperties)({ name: name }).then(({ name }) => {
             let tx = this.provider.getTransactionRequest("nameservice", "nameservice-createAlias", {
                 appFeeTo: appFee.to,
                 appFeeValue: appFee.value.toString(),
@@ -298,7 +325,7 @@ class Wallet extends abstract_signer_1.Signer {
         }
         if (this.mnemonic) {
             // Make sure we don't accidentally bubble the mnemonic up the call-stack
-            options = properties_1.shallowCopy(options);
+            options = (0, properties_1.shallowCopy)(options);
             // Set the mnemonic and path
             options.mnemonic = this.mnemonic;
             options.path = this.path;
@@ -318,15 +345,15 @@ class Wallet extends abstract_signer_1.Signer {
         if (!options.entropyLength) {
             options.entropyLength = 16;
         }
-        let entropy = random_bytes_1.randomBytes(options.entropyLength);
+        let entropy = (0, random_bytes_1.randomBytes)(options.entropyLength);
         if (options.extraEntropy) {
-            entropy = bytes_1.arrayify(sha2_1.sha256(bytes_1.concat([entropy, options.extraEntropy])).substring(0, 34));
+            entropy = (0, bytes_1.arrayify)((0, sha2_1.sha256)((0, bytes_1.concat)([entropy, options.extraEntropy])).substring(0, 34));
         }
-        let mnemonic = hdnode_1.entropyToMnemonic(entropy, options.locale);
+        let mnemonic = (0, hdnode_1.entropyToMnemonic)(entropy, options.locale);
         return Wallet.fromMnemonic(mnemonic, options.path, options.locale);
     }
     static fromEncryptedJson(json, password, progressCallback) {
-        if (json_wallet_1.isSecretStorageWallet(json)) {
+        if ((0, json_wallet_1.isSecretStorageWallet)(json)) {
             return secretStorage.decrypt(json, password, progressCallback).then(function (signingKey) {
                 return new Wallet(signingKey);
             }).catch(error => {
@@ -341,7 +368,7 @@ class Wallet extends abstract_signer_1.Signer {
         if (!path) {
             path = hdnode_1.defaultPath;
         }
-        return new Wallet(hdnode_1.fromMnemonic(mnemonic, wordlist).derivePath(path));
+        return new Wallet((0, hdnode_1.fromMnemonic)(mnemonic, wordlist).derivePath(path));
     }
 }
 exports.Wallet = Wallet;

@@ -1,24 +1,52 @@
 'use strict';
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
-    result["default"] = mod;
-    return result;
-};
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || (function () {
+    var ownKeys = function(o) {
+        ownKeys = Object.getOwnPropertyNames || function (o) {
+            var ar = [];
+            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
+            return ar;
+        };
+        return ownKeys(o);
+    };
+    return function (mod) {
+        if (mod && mod.__esModule) return mod;
+        var result = {};
+        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
+        __setModuleDefault(result, mod);
+        return result;
+    };
+})();
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.version = exports.utils = exports.errors = exports.constants = exports.providers = exports.wordlists = exports.nameService = exports.nonFungibleTokenItem = exports.nonFungibleToken = exports.token = exports.auth = exports.Kyc = exports.Wallet = exports.Signer = void 0;
+exports.getDefaultProvider = getDefaultProvider;
 const constants = __importStar(require("./constants"));
 exports.constants = constants;
 const errors = __importStar(require("./errors"));
 exports.errors = errors;
 const abstract_signer_1 = require("./abstract-signer");
-exports.Signer = abstract_signer_1.Signer;
+Object.defineProperty(exports, "Signer", { enumerable: true, get: function () { return abstract_signer_1.Signer; } });
 const wallet_1 = require("./wallet");
-exports.Wallet = wallet_1.Wallet;
+Object.defineProperty(exports, "Wallet", { enumerable: true, get: function () { return wallet_1.Wallet; } });
 const auth = __importStar(require("./kyc"));
 exports.auth = auth;
 const kyc_1 = require("./kyc");
-exports.Kyc = kyc_1.Kyc;
+Object.defineProperty(exports, "Kyc", { enumerable: true, get: function () { return kyc_1.Kyc; } });
 const token = __importStar(require("./token"));
 exports.token = token;
 const nonFungibleToken = __importStar(require("./non-fungible-token"));
@@ -53,5 +81,4 @@ function getDefaultProvider(network) {
     }
     return n._defaultProvider(providers);
 }
-exports.getDefaultProvider = getDefaultProvider;
 //# sourceMappingURL=mxw.js.map

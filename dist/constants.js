@@ -1,5 +1,6 @@
 'use strict';
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.MaxUint256 = exports.CinPerMxw = exports.Two = exports.One = exports.Zero = exports.NegativeOne = exports.HashZero = exports.AddressZero = exports.KycAddressPrefix = exports.ValOperatorAddressPrefix = exports.AddressPrefix = exports.ZeroFee = void 0;
 const bignumber_1 = require("./utils/bignumber");
 const units_1 = require("./utils/units");
 const AddressPrefix = 'mxw';
@@ -23,16 +24,16 @@ const ZeroFee = {
     gas: '0'
 };
 exports.ZeroFee = ZeroFee;
-const NegativeOne = bignumber_1.bigNumberify(-1);
+const NegativeOne = (0, bignumber_1.bigNumberify)(-1);
 exports.NegativeOne = NegativeOne;
-const Zero = bignumber_1.bigNumberify(0);
+const Zero = (0, bignumber_1.bigNumberify)(0);
 exports.Zero = Zero;
-const One = bignumber_1.bigNumberify(1);
+const One = (0, bignumber_1.bigNumberify)(1);
 exports.One = One;
-const Two = bignumber_1.bigNumberify(2);
+const Two = (0, bignumber_1.bigNumberify)(2);
 exports.Two = Two;
-const CinPerMxw = bignumber_1.bigNumberify('1000000000000000000');
+const CinPerMxw = (0, bignumber_1.bigNumberify)('1000000000000000000');
 exports.CinPerMxw = CinPerMxw;
-const MaxUint256 = bignumber_1.bigNumberify('0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff');
+const MaxUint256 = (0, bignumber_1.bigNumberify)('0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff');
 exports.MaxUint256 = MaxUint256;
 //# sourceMappingURL=constants.js.map

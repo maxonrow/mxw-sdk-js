@@ -1,12 +1,62 @@
 'use strict';
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
-    result["default"] = mod;
-    return result;
-};
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || (function () {
+    var ownKeys = function(o) {
+        ownKeys = Object.getOwnPropertyNames || function (o) {
+            var ar = [];
+            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
+            return ar;
+        };
+        return ownKeys(o);
+    };
+    return function (mod) {
+        if (mod && mod.__esModule) return mod;
+        var result = {};
+        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
+        __setModuleDefault(result, mod);
+        return result;
+    };
+})();
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.isUndefinedOrNull = isUndefinedOrNull;
+exports.isUndefinedOrNullOrEmpty = isUndefinedOrNullOrEmpty;
+exports.sortObject = sortObject;
+exports.iterate = iterate;
+exports.convertObject = convertObject;
+exports.checkFormat = checkFormat;
+exports.allowNull = allowNull;
+exports.notAllowNull = notAllowNull;
+exports.allowNullOrEmpty = allowNullOrEmpty;
+exports.notAllowNullOrEmpty = notAllowNullOrEmpty;
+exports.expectTypeOf = expectTypeOf;
+exports.arrayOf = arrayOf;
+exports.checkHash = checkHash;
+exports.checkNumber = checkNumber;
+exports.checkNumberString = checkNumberString;
+exports.checkBigNumber = checkBigNumber;
+exports.checkBigNumberString = checkBigNumberString;
+exports.checkBoolean = checkBoolean;
+exports.checkString = checkString;
+exports.checkTimestamp = checkTimestamp;
+exports.checkAddress = checkAddress;
+exports.checkHex = checkHex;
+exports.checkHexAddress = checkHexAddress;
+exports.checkAny = checkAny;
 const bignumber_1 = require("../utils/bignumber");
 const bytes_1 = require("../utils/bytes");
 const properties_1 = require("./properties");
@@ -22,7 +72,6 @@ function isUndefinedOrNull(v) {
     }
     return true;
 }
-exports.isUndefinedOrNull = isUndefinedOrNull;
 function isUndefinedOrNullOrEmpty(v) {
     if (v) {
         if ("string" === typeof (v)) {
@@ -39,7 +88,6 @@ function isUndefinedOrNullOrEmpty(v) {
     }
     return true;
 }
-exports.isUndefinedOrNullOrEmpty = isUndefinedOrNullOrEmpty;
 function sortObject(obj) {
     if ("object" == typeof obj) {
         let sorted = (Array.isArray(obj)) ? [] : {};
@@ -63,7 +111,6 @@ function sortObject(obj) {
     }
     return obj;
 }
-exports.sortObject = sortObject;
 function iterate(obj, modifier) {
     if (obj && "object" == typeof obj) {
         let modified = (Array.isArray(obj)) ? [] : {};
@@ -71,7 +118,7 @@ function iterate(obj, modifier) {
             let data = obj[key];
             if (undefined != data) {
                 let type;
-                if (properties_1.isType(data, "BigNumber")) {
+                if ((0, properties_1.isType)(data, "BigNumber")) {
                     type = "BigNumber";
                 }
                 else {
@@ -103,7 +150,6 @@ function iterate(obj, modifier) {
     }
     return obj;
 }
-exports.iterate = iterate;
 function convertObject(object, convert, depth) {
     if ("object" == typeof object) {
         let stringified = (Array.isArray(object)) ? [] : {};
@@ -125,7 +171,6 @@ function convertObject(object, convert, depth) {
     }
     return object;
 }
-exports.convertObject = convertObject;
 function checkFormat(format, object) {
     let result = {};
     for (let key in format) {
@@ -155,7 +200,6 @@ function checkFormat(format, object) {
     }
     return result;
 }
-exports.checkFormat = checkFormat;
 function allowNull(check, nullValue) {
     return (function (value) {
         if (value == null) {
@@ -164,7 +208,6 @@ function allowNull(check, nullValue) {
         return check(value);
     });
 }
-exports.allowNull = allowNull;
 function notAllowNull(check) {
     return (function (value) {
         if (value == null) {
@@ -173,7 +216,6 @@ function notAllowNull(check) {
         return check(value);
     });
 }
-exports.notAllowNull = notAllowNull;
 function allowNullOrEmpty(check, nullValue) {
     return (function (value) {
         if (value == null || '' === value || (Array.isArray(value) && 0 === value.length)) {
@@ -182,7 +224,6 @@ function allowNullOrEmpty(check, nullValue) {
         return check(value);
     });
 }
-exports.allowNullOrEmpty = allowNullOrEmpty;
 function notAllowNullOrEmpty(check) {
     return (function (value) {
         if (isUndefinedOrNullOrEmpty(value)) {
@@ -191,7 +232,6 @@ function notAllowNullOrEmpty(check) {
         return check(value);
     });
 }
-exports.notAllowNullOrEmpty = notAllowNullOrEmpty;
 function expectTypeOf(check, type) {
     return (function (value) {
         if (type !== typeof value) {
@@ -200,7 +240,6 @@ function expectTypeOf(check, type) {
         return check(value);
     });
 }
-exports.expectTypeOf = expectTypeOf;
 function arrayOf(check) {
     return (function (array) {
         if (!Array.isArray(array)) {
@@ -213,35 +252,29 @@ function arrayOf(check) {
         return result;
     });
 }
-exports.arrayOf = arrayOf;
 function checkHash(hash, requirePrefix) {
     if (typeof (hash) === 'string') {
         if (!requirePrefix && hash.substring(0, 2) !== '0x') {
             hash = '0x' + hash;
         }
-        if (bytes_1.hexDataLength(hash) === 32) {
+        if ((0, bytes_1.hexDataLength)(hash) === 32) {
             return hash.toLowerCase();
         }
     }
     throw new Error('invalid hash - ' + hash);
 }
-exports.checkHash = checkHash;
 function checkNumber(number) {
-    return bignumber_1.bigNumberify(number).toNumber();
+    return (0, bignumber_1.bigNumberify)(number).toNumber();
 }
-exports.checkNumber = checkNumber;
 function checkNumberString(number) {
-    return bignumber_1.bigNumberify(number).toNumber().toString();
+    return (0, bignumber_1.bigNumberify)(number).toNumber().toString();
 }
-exports.checkNumberString = checkNumberString;
 function checkBigNumber(number) {
-    return bignumber_1.bigNumberify(number);
+    return (0, bignumber_1.bigNumberify)(number);
 }
-exports.checkBigNumber = checkBigNumber;
 function checkBigNumberString(value) {
-    return bignumber_1.bigNumberify(value).toString();
+    return (0, bignumber_1.bigNumberify)(value).toString();
 }
-exports.checkBigNumberString = checkBigNumberString;
 function checkBoolean(value) {
     if (typeof (value) === 'boolean') {
         return value;
@@ -256,50 +289,43 @@ function checkBoolean(value) {
     }
     throw new Error('invalid boolean - ' + value);
 }
-exports.checkBoolean = checkBoolean;
 function checkString(string) {
     if (typeof (string) !== 'string') {
         throw new Error('invalid string');
     }
     return string;
 }
-exports.checkString = checkString;
 function checkTimestamp(string) {
     if (typeof (string) !== 'string') {
         throw new Error('invalid timestanmp');
     }
     return string;
 }
-exports.checkTimestamp = checkTimestamp;
 function checkAddress(string) {
     if (typeof (string) !== 'string') {
         throw new Error('invalid address');
     }
     return string;
 }
-exports.checkAddress = checkAddress;
 function checkHex(string) {
     if (typeof (string) === 'string') {
         if (!string.startsWith("0x"))
             string = "0x" + string;
-        if (bytes_1.isHexString(string))
+        if ((0, bytes_1.isHexString)(string))
             return string;
     }
     throw new Error('invalid hex - ' + string);
 }
-exports.checkHex = checkHex;
 function checkHexAddress(string) {
     if (typeof (string) === 'string') {
         if (!string.startsWith("0x"))
             string = "0x" + string;
-        if (bytes_1.isHexString(string))
+        if ((0, bytes_1.isHexString)(string))
             return string;
     }
     throw new Error('invalid hex address - ' + string);
 }
-exports.checkHexAddress = checkHexAddress;
 function checkAny(value) {
     return value;
 }
-exports.checkAny = checkAny;
 //# sourceMappingURL=misc.js.map

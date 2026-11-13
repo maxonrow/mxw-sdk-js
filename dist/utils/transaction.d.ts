@@ -1,7 +1,7 @@
 import { Arrayish, Signature } from './bytes';
 import { BigNumberish } from './bignumber';
 import { Provider, TransactionFee, TransactionRequest } from '../providers/abstract-provider';
-export declare type UnsignedTransaction = {
+export type UnsignedTransaction = {
     type?: string;
     value?: {
         msg?: Array<{

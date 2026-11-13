@@ -1,5 +1,18 @@
 'use strict';
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.SIGNATURE_FAILED = exports.INVALID_FORMAT = exports.UNSUPPORTED_OPERATION = exports.REPLACEMENT_UNDERPRICED = exports.NONCE_EXPIRED = exports.INSUFFICIENT_FEES = exports.INSUFFICIENT_FUNDS = exports.NUMERIC_FAULT = exports.UNEXPECTED_ARGUMENT = exports.MISSING_FEES = exports.MISSING_ARGUMENT = exports.INVALID_ARGUMENT = exports.CALL_EXCEPTION = exports.MISSING_NEW = exports.NOT_IMPLEMENTED = exports.UNKNOWN_ERROR = exports.CONNECTION_ERROR = exports.INVALID_ADDRESS = exports.INVALID_PASSWORD = exports.EXISTS = exports.NOT_REGISTERED = exports.UNEXPECTED_RESULT = exports.FORBIDDEN = exports.NOT_ALLOWED = exports.NOT_AVAILABLE = exports.RECEIVER_KYC_REQUIRED = exports.KYC_REQUIRED = exports.NOT_FOUND = exports.NOT_INITIALIZED = void 0;
+exports.throwError = throwError;
+exports.createError = createError;
+exports.checkNew = checkNew;
+exports.checkArgumentCount = checkArgumentCount;
+exports.setCensorship = setCensorship;
+exports.checkNormalize = checkNormalize;
+exports.setLogLevel = setLogLevel;
+exports.error = error;
+exports.warn = warn;
+exports.info = info;
+exports.normal = normal;
+exports.debug = debug;
 const mxw_1 = require("./mxw");
 // Object not initialized
 exports.NOT_INITIALIZED = 'NOT_INITIALIZED';
@@ -97,7 +110,6 @@ let _censorErrors = false;
 function throwError(message, code, params) {
     throw createError(message, code, params);
 }
-exports.throwError = throwError;
 // @TODO: Enum
 function createError(message, code, params) {
     if (_censorErrors) {
@@ -132,13 +144,11 @@ function createError(message, code, params) {
     });
     return error;
 }
-exports.createError = createError;
 function checkNew(self, kind) {
     if (!(self instanceof kind)) {
         throwError('missing new', exports.MISSING_NEW, { name: kind.name });
     }
 }
-exports.checkNew = checkNew;
 function checkArgumentCount(count, expectedCount, suffix) {
     if (!suffix) {
         suffix = '';
@@ -150,7 +160,6 @@ function checkArgumentCount(count, expectedCount, suffix) {
         throwError('too many arguments' + suffix, exports.UNEXPECTED_ARGUMENT, { count: count, expectedCount: expectedCount });
     }
 }
-exports.checkArgumentCount = checkArgumentCount;
 function setCensorship(censorship, permanent) {
     if (_permanentCensorErrors) {
         throwError('error censorship permanent', exports.UNSUPPORTED_OPERATION, { operation: 'setCensorship' });
@@ -158,7 +167,6 @@ function setCensorship(censorship, permanent) {
     _censorErrors = !!censorship;
     _permanentCensorErrors = !!permanent;
 }
-exports.setCensorship = setCensorship;
 function checkNormalize() {
     try {
         // Make sure all forms of normalization are supported
@@ -178,7 +186,6 @@ function checkNormalize() {
         throwError('platform missing String.prototype.normalize', exports.UNSUPPORTED_OPERATION, { operation: 'String.prototype.normalize', form: error.message });
     }
 }
-exports.checkNormalize = checkNormalize;
 const LogLevels = { debug: 1, normal: 2, info: 2, warn: 3, error: 4, off: 5 };
 let LogLevel = LogLevels["normal"];
 function setLogLevel(logLevel) {
@@ -189,7 +196,6 @@ function setLogLevel(logLevel) {
     }
     LogLevel = level;
 }
-exports.setLogLevel = setLogLevel;
 function log(logLevel, args) {
     if (LogLevel > LogLevels[logLevel]) {
         return;
@@ -199,21 +205,16 @@ function log(logLevel, args) {
 function error(...args) {
     log("error", args);
 }
-exports.error = error;
 function warn(...args) {
     log("warn", args);
 }
-exports.warn = warn;
 function info(...args) {
     log("info", args);
 }
-exports.info = info;
 function normal(...args) {
     log("normal", args);
 }
-exports.normal = normal;
 function debug(...args) {
     log("debug", args);
 }
-exports.debug = debug;
 //# sourceMappingURL=errors.js.map

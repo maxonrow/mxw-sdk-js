@@ -1,12 +1,39 @@
 'use strict';
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
-    result["default"] = mod;
-    return result;
-};
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || (function () {
+    var ownKeys = function(o) {
+        ownKeys = Object.getOwnPropertyNames || function (o) {
+            var ar = [];
+            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
+            return ar;
+        };
+        return ownKeys(o);
+    };
+    return function (mod) {
+        if (mod && mod.__esModule) return mod;
+        var result = {};
+        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
+        __setModuleDefault(result, mod);
+        return result;
+    };
+})();
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.JsonRpcProvider = void 0;
 // See: https://github.com/ethereum/wiki/wiki/JSON-RPC
 const base_provider_1 = require("./base-provider");
 const errors = __importStar(require("../errors"));
@@ -25,7 +52,7 @@ class JsonRpcProvider extends base_provider_1.BaseProvider {
     constructor(url, network) {
         // One parameter, but it is a network name, so swap it with the URL
         if (typeof (url) === 'string') {
-            if (network === null && networks_1.getNetwork(url)) {
+            if (network === null && (0, networks_1.getNetwork)(url)) {
                 network = url;
                 url = null;
             }
@@ -43,7 +70,7 @@ class JsonRpcProvider extends base_provider_1.BaseProvider {
                         if (result && result.response && result.response.data) {
                             chainId = result.response.data;
                         }
-                        return resolve(networks_1.getNetwork(chainId));
+                        return resolve((0, networks_1.getNetwork)(chainId));
                     }).catch((error) => {
                         reject(error);
                     });
@@ -91,7 +118,7 @@ class JsonRpcProvider extends base_provider_1.BaseProvider {
             request: request,
             provider: this
         });
-        return web_1.fetchJson(this.connection, null, JSON.stringify(request), getResult).then((result) => {
+        return (0, web_1.fetchJson)(this.connection, null, JSON.stringify(request), getResult).then((result) => {
             this.emit('rpc', {
                 action: 'response',
                 request: request,
@@ -125,7 +152,7 @@ class JsonRpcProvider extends base_provider_1.BaseProvider {
                 });
             case 'getTransaction':
             case 'getTransactionReceipt':
-                return this.send('decoded_tx', [base64_1.encode(params.transactionHash), null]).then((result) => {
+                return this.send('decoded_tx', [(0, base64_1.encode)(params.transactionHash), null]).then((result) => {
                     // errors.debug("RECEIPT:", JSON.stringify(result));
                     if (result.tx_result && result.tx_result.log) {
                         try {
@@ -159,7 +186,7 @@ class JsonRpcProvider extends base_provider_1.BaseProvider {
                     if (result && result.response) {
                         if (result.response.value) {
                             try {
-                                let value = utf8_1.toUtf8String(base64_1.decode(result.response.value));
+                                let value = (0, utf8_1.toUtf8String)((0, base64_1.decode)(result.response.value));
                                 return JSON.parse(value);
                             }
                             catch (error) {
@@ -206,7 +233,7 @@ class JsonRpcProvider extends base_provider_1.BaseProvider {
                 return this.send('latest_block_height', []);
             case 'isWhitelisted':
                 return this.send('is_whitelisted', [params.address]).then(result => {
-                    if (!misc_1.isUndefinedOrNullOrEmpty(result)) {
+                    if (!(0, misc_1.isUndefinedOrNullOrEmpty)(result)) {
                         return result;
                     }
                     throw this.checkResponseLog(method, result, null);
@@ -216,8 +243,8 @@ class JsonRpcProvider extends base_provider_1.BaseProvider {
                     if (result && result.response) {
                         try {
                             let value = "";
-                            if (!misc_1.isUndefinedOrNull(result.response.value)) {
-                                value = utf8_1.toUtf8String(base64_1.decode(result.response.value));
+                            if (!(0, misc_1.isUndefinedOrNull)(result.response.value)) {
+                                value = (0, utf8_1.toUtf8String)((0, base64_1.decode)(result.response.value));
                             }
                             if ("" === value) {
                                 value = "0000000000000000000000000000000000000000000000000000000000000000";
@@ -234,8 +261,8 @@ class JsonRpcProvider extends base_provider_1.BaseProvider {
                     if (result && result.response) {
                         if (result.response.value) {
                             try {
-                                let value = base64_1.decode(result.response.value);
-                                return JSON.parse(utf8_1.toUtf8String(value));
+                                let value = (0, base64_1.decode)(result.response.value);
+                                return JSON.parse((0, utf8_1.toUtf8String)(value));
                             }
                             catch (error) {
                             }
@@ -248,8 +275,8 @@ class JsonRpcProvider extends base_provider_1.BaseProvider {
                     if (result && result.response) {
                         if (result.response.value) {
                             try {
-                                let value = base64_1.decode(result.response.value);
-                                return JSON.parse(utf8_1.toUtf8String(value));
+                                let value = (0, base64_1.decode)(result.response.value);
+                                return JSON.parse((0, utf8_1.toUtf8String)(value));
                             }
                             catch (error) {
                             }
@@ -262,8 +289,8 @@ class JsonRpcProvider extends base_provider_1.BaseProvider {
                     if (result && result.response) {
                         if (result.response.value) {
                             try {
-                                let value = base64_1.decode(result.response.value);
-                                return JSON.parse(utf8_1.toUtf8String(value));
+                                let value = (0, base64_1.decode)(result.response.value);
+                                return JSON.parse((0, utf8_1.toUtf8String)(value));
                             }
                             catch (error) {
                             }
@@ -287,8 +314,8 @@ class JsonRpcProvider extends base_provider_1.BaseProvider {
                     if (result && result.response) {
                         if (result.response.value) {
                             try {
-                                let value = base64_1.decode(result.response.value);
-                                return JSON.parse(utf8_1.toUtf8String(value));
+                                let value = (0, base64_1.decode)(result.response.value);
+                                return JSON.parse((0, utf8_1.toUtf8String)(value));
                             }
                             catch (error) {
                             }
@@ -301,8 +328,8 @@ class JsonRpcProvider extends base_provider_1.BaseProvider {
                     if (result && result.response) {
                         if (result.response.value) {
                             try {
-                                let value = base64_1.decode(result.response.value);
-                                return JSON.parse(utf8_1.toUtf8String(value));
+                                let value = (0, base64_1.decode)(result.response.value);
+                                return JSON.parse((0, utf8_1.toUtf8String)(value));
                             }
                             catch (error) {
                             }
@@ -315,8 +342,8 @@ class JsonRpcProvider extends base_provider_1.BaseProvider {
                     if (result && result.response) {
                         if (result.response.value) {
                             try {
-                                let value = base64_1.decode(result.response.value);
-                                return utf8_1.toUtf8String(value);
+                                let value = (0, base64_1.decode)(result.response.value);
+                                return (0, utf8_1.toUtf8String)(value);
                             }
                             catch (error) {
                             }
@@ -333,8 +360,8 @@ class JsonRpcProvider extends base_provider_1.BaseProvider {
                     if (result && result.response) {
                         if (result.response.value) {
                             try {
-                                let value = base64_1.decode(result.response.value);
-                                return utf8_1.toUtf8String(value);
+                                let value = (0, base64_1.decode)(result.response.value);
+                                return (0, utf8_1.toUtf8String)(value);
                             }
                             catch (error) {
                             }
@@ -351,7 +378,7 @@ class JsonRpcProvider extends base_provider_1.BaseProvider {
                     if (result && result.response) {
                         if (result.response.value) {
                             try {
-                                let value = utf8_1.toUtf8String(base64_1.decode(result.response.value));
+                                let value = (0, utf8_1.toUtf8String)((0, base64_1.decode)(result.response.value));
                                 return JSON.parse(value);
                             }
                             catch (error) {
@@ -373,7 +400,7 @@ class JsonRpcProvider extends base_provider_1.BaseProvider {
     }
     // checkResponseLog(method: string, log: string, result: any, params?: any): any {
     checkResponseLog(method, result, code, message, params) {
-        return checkResponseLog(this, method, result, misc_1.isUndefinedOrNullOrEmpty(code) ? errors.UNEXPECTED_RESULT : code, message, params);
+        return checkResponseLog(this, method, result, (0, misc_1.isUndefinedOrNullOrEmpty)(code) ? errors.UNEXPECTED_RESULT : code, message, params);
     }
 }
 exports.JsonRpcProvider = JsonRpcProvider;
@@ -388,9 +415,9 @@ function extractLog(log) {
     }
     if ("object" === typeof (log)) {
         return {
-            code: misc_1.isUndefinedOrNullOrEmpty(log.code) ? -1 : log.code,
-            codespace: misc_1.isUndefinedOrNullOrEmpty(log.codespace) ? "" : log.codespace,
-            message: misc_1.isUndefinedOrNullOrEmpty(log.message) ? "" : log.message,
+            code: (0, misc_1.isUndefinedOrNullOrEmpty)(log.code) ? -1 : log.code,
+            codespace: (0, misc_1.isUndefinedOrNullOrEmpty)(log.codespace) ? "" : log.codespace,
+            message: (0, misc_1.isUndefinedOrNullOrEmpty)(log.message) ? "" : log.message,
             log: JSON.stringify(log)
         };
     }

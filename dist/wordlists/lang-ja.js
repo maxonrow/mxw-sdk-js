@@ -1,12 +1,39 @@
 "use strict";
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
-    result["default"] = mod;
-    return result;
-};
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || (function () {
+    var ownKeys = function(o) {
+        ownKeys = Object.getOwnPropertyNames || function (o) {
+            var ar = [];
+            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
+            return ar;
+        };
+        return ownKeys(o);
+    };
+    return function (mod) {
+        if (mod && mod.__esModule) return mod;
+        var result = {};
+        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
+        __setModuleDefault(result, mod);
+        return result;
+    };
+})();
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.langJa = void 0;
 const wordlist_1 = require("../utils/wordlist");
 const bytes_1 = require("../utils/bytes");
 const utf8_1 = require("../utils/utf8");
@@ -31,7 +58,7 @@ const data = [
 const mapping = "~~AzB~X~a~KN~Q~D~S~C~G~E~Y~p~L~I~O~eH~g~V~hxyumi~~U~~Z~~v~~s~~dkoblPjfnqwMcRTr~W~~~F~~~~~Jt";
 let wordlist = null;
 function hex(word) {
-    return bytes_1.hexlify(utf8_1.toUtf8Bytes(word));
+    return (0, bytes_1.hexlify)((0, utf8_1.toUtf8Bytes)(word));
 }
 const KiYoKu = '0xe3818de38284e3818f';
 const KyoKu = '0xe3818de38283e3818f';
@@ -43,13 +70,13 @@ function loadWords(lang) {
     // Transforms for normalizing (sort is a not quite UTF-8)
     var transform = {};
     // Delete the diacritic marks
-    transform[utf8_1.toUtf8String([227, 130, 154])] = false;
-    transform[utf8_1.toUtf8String([227, 130, 153])] = false;
+    transform[(0, utf8_1.toUtf8String)([227, 130, 154])] = false;
+    transform[(0, utf8_1.toUtf8String)([227, 130, 153])] = false;
     // Some simple transforms that sort out most of the order
-    transform[utf8_1.toUtf8String([227, 130, 133])] = utf8_1.toUtf8String([227, 130, 134]);
-    transform[utf8_1.toUtf8String([227, 129, 163])] = utf8_1.toUtf8String([227, 129, 164]);
-    transform[utf8_1.toUtf8String([227, 130, 131])] = utf8_1.toUtf8String([227, 130, 132]);
-    transform[utf8_1.toUtf8String([227, 130, 135])] = utf8_1.toUtf8String([227, 130, 136]);
+    transform[(0, utf8_1.toUtf8String)([227, 130, 133])] = (0, utf8_1.toUtf8String)([227, 130, 134]);
+    transform[(0, utf8_1.toUtf8String)([227, 129, 163])] = (0, utf8_1.toUtf8String)([227, 129, 164]);
+    transform[(0, utf8_1.toUtf8String)([227, 130, 131])] = (0, utf8_1.toUtf8String)([227, 130, 132]);
+    transform[(0, utf8_1.toUtf8String)([227, 130, 135])] = (0, utf8_1.toUtf8String)([227, 130, 136]);
     // Normalize words using the transform
     function normalize(word) {
         var result = '';
@@ -89,7 +116,7 @@ function loadWords(lang) {
                 word.push((k & 0x40) ? 130 : 129);
                 word.push((k & 0x3f) + 128);
             }
-            wordlist.push(utf8_1.toUtf8String(word));
+            wordlist.push((0, utf8_1.toUtf8String)(word));
         }
     }
     wordlist.sort(sortJapanese);
@@ -102,7 +129,7 @@ function loadWords(lang) {
         wordlist[442] = wordlist[443];
         wordlist[443] = tmp;
     }
-    if (wordlist_1.check(lang) !== '0x2eed0aef492291e061633d7ad8117f1a2b03eb80a29d0e4e3117ac2528d05ffd') {
+    if ((0, wordlist_1.check)(lang) !== '0x2eed0aef492291e061633d7ad8117f1a2b03eb80a29d0e4e3117ac2528d05ffd') {
         wordlist = null;
         throw new Error('BIP39 Wordlist for ja (Japanese) FAILED');
     }
@@ -129,5 +156,5 @@ class LangJa extends wordlist_1.Wordlist {
 }
 const langJa = new LangJa();
 exports.langJa = langJa;
-wordlist_1.register(langJa);
+(0, wordlist_1.register)(langJa);
 //# sourceMappingURL=lang-ja.js.map

@@ -5,7 +5,7 @@ export declare function sortObject(obj: any): any;
 export declare function iterate(obj: any, modifier?: (key: string, value: any, type: string) => any): any;
 export declare function convertObject(object: any, convert?: (key: string, value: any) => any, depth?: number): any;
 export declare function checkFormat(format: any, object: any): any;
-export declare type CheckFormatFunc = (value: any) => any;
+export type CheckFormatFunc = (value: any) => any;
 export declare function allowNull(check: CheckFormatFunc, nullValue?: any): CheckFormatFunc;
 export declare function notAllowNull(check: CheckFormatFunc): CheckFormatFunc;
 export declare function allowNullOrEmpty(check: CheckFormatFunc, nullValue?: any): CheckFormatFunc;

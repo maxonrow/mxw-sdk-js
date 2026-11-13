@@ -1,15 +1,43 @@
 'use strict';
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || (function () {
+    var ownKeys = function(o) {
+        ownKeys = Object.getOwnPropertyNames || function (o) {
+            var ar = [];
+            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
+            return ar;
+        };
+        return ownKeys(o);
+    };
+    return function (mod) {
+        if (mod && mod.__esModule) return mod;
+        var result = {};
+        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
+        __setModuleDefault(result, mod);
+        return result;
+    };
+})();
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
-    result["default"] = mod;
-    return result;
-};
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.fetchJson = fetchJson;
+exports.poll = poll;
 const axios_1 = __importDefault(require("axios"));
 const base64_1 = require("./base64");
 const properties_1 = require("./properties");
@@ -42,7 +70,7 @@ function fetchJson(connection, path, json, processFunc) {
             let authorization = connection.user + ':' + connection.password;
             headers['authorization'] = {
                 key: 'Authorization',
-                value: 'Basic ' + base64_1.encode(utf8_1.toUtf8Bytes(authorization))
+                value: 'Basic ' + (0, base64_1.encode)((0, utf8_1.toUtf8Bytes)(authorization))
             };
         }
     }
@@ -87,12 +115,11 @@ function fetchJson(connection, path, json, processFunc) {
         return responseHandler(error, undefined);
     });
 }
-exports.fetchJson = fetchJson;
 function poll(func, options) {
     if (!options) {
         options = {};
     }
-    options = properties_1.shallowCopy(options);
+    options = (0, properties_1.shallowCopy)(options);
     if (options.floor == null) {
         options.floor = 0;
     }
@@ -164,5 +191,4 @@ function poll(func, options) {
         check();
     });
 }
-exports.poll = poll;
 //# sourceMappingURL=web.js.map

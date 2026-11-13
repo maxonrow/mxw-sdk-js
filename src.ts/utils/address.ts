@@ -18,7 +18,7 @@ function getChecksum(address: string): string {
     let chars = address.substring(2).split('');
 
     if (address.match(/^(0x)?[0-9a-fA-F]{40}$/)) {
-        let hashed = new Uint8Array(40);
+        let hashed: Uint8Array = new Uint8Array(40);
         for (let i = 0; i < 40; i++) {
             hashed[i] = chars[i].charCodeAt(0);
         }
@@ -34,7 +34,7 @@ function getChecksum(address: string): string {
         }
     }
     else if (address.match(/^(0x)?[0-9a-fA-F]{64}$/)) {
-        let hashed = new Uint8Array(64);
+        let hashed: Uint8Array = new Uint8Array(64);
         for (let i = 0; i < 64; i++) {
             hashed[i] = chars[i].charCodeAt(0);
         }

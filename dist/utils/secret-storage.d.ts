@@ -1,8 +1,8 @@
 import { SigningKey } from './signing-key';
 import { Arrayish } from './bytes';
 import { Wordlist } from './wordlist';
-export declare type ProgressCallback = (percent: number) => void;
-export declare type EncryptOptions = {
+export type ProgressCallback = (percent: number) => void;
+export type EncryptOptions = {
     iv?: Arrayish;
     entropy?: Arrayish;
     mnemonic?: string;

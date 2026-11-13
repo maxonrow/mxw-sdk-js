@@ -1,12 +1,48 @@
 'use strict';
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
-    result["default"] = mod;
-    return result;
-};
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || (function () {
+    var ownKeys = function(o) {
+        ownKeys = Object.getOwnPropertyNames || function (o) {
+            var ar = [];
+            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
+            return ar;
+        };
+        return ownKeys(o);
+    };
+    return function (mod) {
+        if (mod && mod.__esModule) return mod;
+        var result = {};
+        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
+        __setModuleDefault(result, mod);
+        return result;
+    };
+})();
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.defineReadOnly = defineReadOnly;
+exports.setType = setType;
+exports.isType = isType;
+exports.changeKey = changeKey;
+exports.camelize = camelize;
+exports.resolveProperties = resolveProperties;
+exports.checkProperties = checkProperties;
+exports.shallowCopy = shallowCopy;
+exports.deepCopy = deepCopy;
+exports.inheritable = inheritable;
 const errors = __importStar(require("../errors"));
 const misc_1 = require("./misc");
 function defineReadOnly(object, name, value) {
@@ -16,17 +52,14 @@ function defineReadOnly(object, name, value) {
         writable: false,
     });
 }
-exports.defineReadOnly = defineReadOnly;
 // There are some issues with instanceof with npm link, so we use this
 // to ensure types are what we expect.
 function setType(object, type) {
     Object.defineProperty(object, '_objectType_', { configurable: false, value: type, writable: false });
 }
-exports.setType = setType;
 function isType(object, type) {
     return (object && object._objectType_ === type);
 }
-exports.isType = isType;
 function changeKey(object, name, newName) {
     if (!object || name == newName) {
         return;
@@ -42,7 +75,6 @@ function changeKey(object, name, newName) {
     }
     delete object[name];
 }
-exports.changeKey = changeKey;
 function camelize(object, rename, depth) {
     for (let key in object) {
         try {
@@ -71,7 +103,6 @@ function camelize(object, rename, depth) {
     }
     return object;
 }
-exports.camelize = camelize;
 function camelCase(str) {
     return str.replace(/_([a-z])/g, function (g) { return g[1].toUpperCase(); });
 }
@@ -94,7 +125,6 @@ function resolveProperties(object) {
         return result;
     });
 }
-exports.resolveProperties = resolveProperties;
 function checkProperties(object, properties, mandate) {
     if (!object || typeof (object) !== 'object') {
         errors.throwError('invalid object', errors.INVALID_ARGUMENT, {
@@ -103,7 +133,7 @@ function checkProperties(object, properties, mandate) {
         });
     }
     Object.keys(object).forEach((key) => {
-        if (misc_1.isUndefinedOrNull(properties[key])) {
+        if ((0, misc_1.isUndefinedOrNull)(properties[key])) {
             errors.throwError('invalid object key - ' + key, errors.INVALID_ARGUMENT, {
                 argument: 'transaction',
                 value: object,
@@ -113,7 +143,7 @@ function checkProperties(object, properties, mandate) {
     });
     if (mandate) {
         Object.keys(properties).forEach((key) => {
-            if (properties[key] && misc_1.isUndefinedOrNull(object[key])) {
+            if (properties[key] && (0, misc_1.isUndefinedOrNull)(object[key])) {
                 errors.throwError('missing object key - ' + key, errors.MISSING_ARGUMENT, {
                     argument: 'transaction',
                     value: object,
@@ -123,7 +153,6 @@ function checkProperties(object, properties, mandate) {
         });
     }
 }
-exports.checkProperties = checkProperties;
 function shallowCopy(object) {
     let result = {};
     for (var key in object) {
@@ -131,7 +160,6 @@ function shallowCopy(object) {
     }
     return result;
 }
-exports.shallowCopy = shallowCopy;
 let opaque = { boolean: true, number: true, string: true };
 function deepCopy(object, frozen) {
     // Opaque objects are not mutable, so safe to copy by assignment
@@ -176,7 +204,6 @@ function deepCopy(object, frozen) {
     }
     throw new Error('Cannot deepCopy ' + typeof (object));
 }
-exports.deepCopy = deepCopy;
 // See: https://github.com/isaacs/inherits/blob/master/inherits_browser.js
 function inherits(ctor, superCtor) {
     ctor.super_ = superCtor;
@@ -195,5 +222,4 @@ function inheritable(parent) {
         defineReadOnly(child, 'inherits', inheritable(child));
     };
 }
-exports.inheritable = inheritable;
 //# sourceMappingURL=properties.js.map

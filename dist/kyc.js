@@ -1,12 +1,39 @@
 'use strict';
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
-    result["default"] = mod;
-    return result;
-};
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || (function () {
+    var ownKeys = function(o) {
+        ownKeys = Object.getOwnPropertyNames || function (o) {
+            var ar = [];
+            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
+            return ar;
+        };
+        return ownKeys(o);
+    };
+    return function (mod) {
+        if (mod && mod.__esModule) return mod;
+        var result = {};
+        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
+        __setModuleDefault(result, mod);
+        return result;
+    };
+})();
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.Kyc = void 0;
 const properties_1 = require("./utils/properties");
 const misc_1 = require("./utils/misc");
 const sha2_1 = require("./utils/sha2");
@@ -39,10 +66,10 @@ const formatKycData = {
 };
 const formatKycTransaction = {
     payload: function (value) {
-        return misc_1.checkFormat(formatKycData, value);
+        return (0, misc_1.checkFormat)(formatKycData, value);
     },
-    signatures: misc_1.arrayOf(function (value) {
-        return misc_1.checkFormat({
+    signatures: (0, misc_1.arrayOf)(function (value) {
+        return (0, misc_1.checkFormat)({
             pub_key: {
                 type: misc_1.checkString,
                 value: misc_1.checkString
@@ -65,10 +92,10 @@ const formatKycRevoke = {
 };
 const formatKycRevokeTransaction = {
     payload: function (value) {
-        return misc_1.checkFormat(formatKycRevoke, value);
+        return (0, misc_1.checkFormat)(formatKycRevoke, value);
     },
-    signatures: misc_1.arrayOf(function (value) {
-        return misc_1.checkFormat({
+    signatures: (0, misc_1.arrayOf)(function (value) {
+        return (0, misc_1.checkFormat)({
             pub_key: {
                 type: misc_1.checkString,
                 value: misc_1.checkString
@@ -81,12 +108,12 @@ class Kyc {
     constructor(signerOrProvider) {
         errors.checkNew(this, Kyc);
         if (abstract_signer_1.Signer.isSigner(signerOrProvider)) {
-            properties_1.defineReadOnly(this, 'provider', signerOrProvider.provider);
-            properties_1.defineReadOnly(this, 'signer', signerOrProvider);
+            (0, properties_1.defineReadOnly)(this, 'provider', signerOrProvider.provider);
+            (0, properties_1.defineReadOnly)(this, 'signer', signerOrProvider);
         }
         else if (abstract_provider_1.Provider.isProvider(signerOrProvider)) {
-            properties_1.defineReadOnly(this, 'provider', signerOrProvider);
-            properties_1.defineReadOnly(this, 'signer', null);
+            (0, properties_1.defineReadOnly)(this, 'provider', signerOrProvider);
+            (0, properties_1.defineReadOnly)(this, 'signer', null);
         }
         else {
             return errors.throwError('invalid signer or provider', errors.INVALID_ARGUMENT, { arg: 'signerOrProvider', value: signerOrProvider });
@@ -127,9 +154,9 @@ class Kyc {
         if (!this.provider) {
             errors.throwError("missing provider", errors.NOT_INITIALIZED, { arg: "provider" });
         }
-        properties_1.checkProperties(transaction, { payload: true, signatures: true });
-        misc_1.checkFormat(formatKycTransaction, transaction);
-        return properties_1.resolveProperties({ signerAddress: this.signer.getAddress() }).then(({ signerAddress }) => {
+        (0, properties_1.checkProperties)(transaction, { payload: true, signatures: true });
+        (0, misc_1.checkFormat)(formatKycTransaction, transaction);
+        return (0, properties_1.resolveProperties)({ signerAddress: this.signer.getAddress() }).then(({ signerAddress }) => {
             let tx = this.provider.getTransactionRequest("kyc", "kyc-whitelist", {
                 kycData: transaction,
                 owner: signerAddress,
@@ -149,11 +176,11 @@ class Kyc {
         if (!keyComponent) {
             errors.throwError("missing key component", errors.MISSING_ARGUMENT, { arg: "keyComponent" });
         }
-        properties_1.checkProperties(keyComponent, { country: true, idType: true, id: true, idExpiry: true, dob: true, seed: true });
-        keyComponent = misc_1.checkFormat(formatKycKeyComponent, keyComponent);
+        (0, properties_1.checkProperties)(keyComponent, { country: true, idType: true, id: true, idExpiry: true, dob: true, seed: true });
+        keyComponent = (0, misc_1.checkFormat)(formatKycKeyComponent, keyComponent);
         // Hash the KYC components to become KYC address
-        let hash = sha2_1.sha256(utils_1.toUtf8Bytes(JSON.stringify(misc_1.sortObject(keyComponent))));
-        return utils_1.computeAddress(hash, constants_1.KycAddressPrefix);
+        let hash = (0, sha2_1.sha256)((0, utils_1.toUtf8Bytes)(JSON.stringify((0, misc_1.sortObject)(keyComponent))));
+        return (0, utils_1.computeAddress)(hash, constants_1.KycAddressPrefix);
     }
     /**
      * Wallet to sign kyc address
@@ -171,7 +198,7 @@ class Kyc {
         if ("string" !== typeof keyComponentOrAddress) {
             return this.sign(this.getKycAddress(keyComponentOrAddress), overrides);
         }
-        return properties_1.resolveProperties({
+        return (0, properties_1.resolveProperties)({
             signerAddress: this.signer.getAddress(),
             publicKeyType: this.signer.getPublicKeyType(),
             compressedPublicKey: this.signer.getCompressedPublicKey()
@@ -180,8 +207,8 @@ class Kyc {
             if (!nonce) {
                 nonce = this.provider.getTransactionCount(signerAddress, "pending");
             }
-            return properties_1.resolveProperties({ nonce: nonce }).then(({ nonce }) => {
-                let kycData = misc_1.sortObject({
+            return (0, properties_1.resolveProperties)({ nonce: nonce }).then(({ nonce }) => {
+                let kycData = (0, misc_1.sortObject)({
                     kyc: {
                         from: signerAddress,
                         kycAddress: keyComponentOrAddress,
@@ -189,12 +216,12 @@ class Kyc {
                     },
                     pub_key: {
                         type: "tendermint/" + publicKeyType,
-                        value: base64_1.encode(compressedPublicKey)
+                        value: (0, base64_1.encode)(compressedPublicKey)
                     },
                     signature: ""
                 });
                 return this.signer.signMessage(JSON.stringify(kycData.kyc), true).then((signature) => {
-                    kycData.signature = base64_1.encode(signature);
+                    kycData.signature = (0, base64_1.encode)(signature);
                     return kycData;
                 });
             });
@@ -209,21 +236,21 @@ class Kyc {
         if (!this.signer) {
             errors.throwError('sign kyc require signer', errors.NOT_INITIALIZED, { arg: 'signer' });
         }
-        properties_1.checkProperties(transaction, { payload: true, signatures: true });
-        misc_1.checkFormat(formatKycTransaction, transaction);
-        return properties_1.resolveProperties({
+        (0, properties_1.checkProperties)(transaction, { payload: true, signatures: true });
+        (0, misc_1.checkFormat)(formatKycTransaction, transaction);
+        return (0, properties_1.resolveProperties)({
             signerAddress: this.signer.getAddress(),
             publicKeyType: this.signer.getPublicKeyType(),
             compressedPublicKey: this.signer.getCompressedPublicKey()
         }).then(({ signerAddress, publicKeyType, compressedPublicKey }) => {
-            transaction = misc_1.sortObject(transaction);
+            transaction = (0, misc_1.sortObject)(transaction);
             return this.signer.signMessage(JSON.stringify(transaction.payload), true).then((signature) => {
                 transaction.signatures.push({
                     pub_key: {
                         type: "tendermint/" + publicKeyType,
-                        value: base64_1.encode(compressedPublicKey)
+                        value: (0, base64_1.encode)(compressedPublicKey)
                     },
-                    signature: base64_1.encode(signature)
+                    signature: (0, base64_1.encode)(signature)
                 });
                 return transaction;
             });
@@ -254,7 +281,7 @@ class Kyc {
         if (!address) {
             errors.throwError('create revocation transaction require address', errors.MISSING_ARGUMENT, { arg: 'address' });
         }
-        return properties_1.resolveProperties({
+        return (0, properties_1.resolveProperties)({
             signerAddress: signer.getAddress(),
             publicKeyType: signer.getPublicKeyType(),
             compressedPublicKey: signer.getCompressedPublicKey()
@@ -263,8 +290,8 @@ class Kyc {
             if (!nonce) {
                 nonce = signer.provider.getTransactionCount(signerAddress, "pending");
             }
-            return properties_1.resolveProperties({ nonce: nonce }).then(({ nonce }) => {
-                let transaction = misc_1.sortObject({
+            return (0, properties_1.resolveProperties)({ nonce: nonce }).then(({ nonce }) => {
+                let transaction = (0, misc_1.sortObject)({
                     payload: {
                         kyc: {
                             from: signerAddress,
@@ -273,14 +300,14 @@ class Kyc {
                         },
                         pub_key: {
                             type: "tendermint/" + publicKeyType,
-                            value: base64_1.encode(compressedPublicKey)
+                            value: (0, base64_1.encode)(compressedPublicKey)
                         },
                         signature: ""
                     },
                     signatures: []
                 });
                 return signer.signMessage(JSON.stringify(transaction.payload.kyc), true).then((signature) => {
-                    transaction.payload.signature = base64_1.encode(signature);
+                    transaction.payload.signature = (0, base64_1.encode)(signature);
                     return transaction;
                 });
             });
@@ -296,15 +323,15 @@ class Kyc {
         if (!abstract_signer_1.Signer.isSigner(signer)) {
             errors.throwError('sign revocation transaction require signer', errors.MISSING_ARGUMENT, { arg: 'signer' });
         }
-        properties_1.checkProperties(transaction, { payload: true, signatures: true });
-        transaction = misc_1.checkFormat(formatKycRevokeTransaction, transaction);
-        return properties_1.resolveProperties({
+        (0, properties_1.checkProperties)(transaction, { payload: true, signatures: true });
+        transaction = (0, misc_1.checkFormat)(formatKycRevokeTransaction, transaction);
+        return (0, properties_1.resolveProperties)({
             signerAddress: signer.getAddress(),
             publicKeyType: signer.getPublicKeyType(),
             compressedPublicKey: signer.getCompressedPublicKey()
         }).then(({ signerAddress, publicKeyType, compressedPublicKey }) => {
             // Convert number and big number to string
-            transaction = misc_1.iterate(transaction, function (key, value, type) {
+            transaction = (0, misc_1.iterate)(transaction, function (key, value, type) {
                 switch (type) {
                     case "Number":
                     case "BigNumber":
@@ -312,14 +339,14 @@ class Kyc {
                 }
                 return value;
             });
-            transaction = misc_1.sortObject(transaction);
+            transaction = (0, misc_1.sortObject)(transaction);
             return signer.signMessage(JSON.stringify(transaction.payload), true).then((signature) => {
                 transaction.signatures.push({
                     pub_key: {
                         type: "tendermint/" + publicKeyType,
-                        value: base64_1.encode(compressedPublicKey)
+                        value: (0, base64_1.encode)(compressedPublicKey)
                     },
-                    signature: base64_1.encode(signature)
+                    signature: (0, base64_1.encode)(signature)
                 });
                 return transaction;
             });
@@ -358,9 +385,9 @@ class Kyc {
         if (!signer.provider) {
             errors.throwError('send revocation transaction require provider', errors.MISSING_ARGUMENT, { arg: 'provider' });
         }
-        properties_1.checkProperties(transaction, { payload: true, signatures: true });
-        transaction = misc_1.checkFormat(formatKycRevokeTransaction, transaction);
-        return properties_1.resolveProperties({ signerAddress: signer.getAddress() }).then(({ signerAddress }) => {
+        (0, properties_1.checkProperties)(transaction, { payload: true, signatures: true });
+        transaction = (0, misc_1.checkFormat)(formatKycRevokeTransaction, transaction);
+        return (0, properties_1.resolveProperties)({ signerAddress: signer.getAddress() }).then(({ signerAddress }) => {
             let tx = signer.provider.getTransactionRequest("kyc", "kyc-revokeWhitelist", {
                 payload: transaction.payload,
                 signatures: transaction.signatures,
@@ -406,11 +433,11 @@ class Kyc {
                 return this.getBindTransactionRequest(address, kycAddress, signer, overrides);
             });
         }
-        let params = misc_1.checkFormat({
+        let params = (0, misc_1.checkFormat)({
             kycAddress: misc_1.checkString
         }, { kycAddress });
         return signer.provider.resolveName(addressOrName).then((address) => {
-            return properties_1.resolveProperties({ signerAddress: signer.getAddress() }).then(({ signerAddress }) => {
+            return (0, properties_1.resolveProperties)({ signerAddress: signer.getAddress() }).then(({ signerAddress }) => {
                 let tx = signer.provider.getTransactionRequest("kyc", "kyc-bind", {
                     from: signerAddress,
                     to: address,
@@ -457,11 +484,11 @@ class Kyc {
                 return this.getUnbindTransactionRequest(address, kycAddress, signer, overrides);
             });
         }
-        let params = misc_1.checkFormat({
+        let params = (0, misc_1.checkFormat)({
             kycAddress: misc_1.checkString
         }, { kycAddress });
         return signer.provider.resolveName(addressOrName).then((address) => {
-            return properties_1.resolveProperties({ signerAddress: signer.getAddress() }).then(({ signerAddress }) => {
+            return (0, properties_1.resolveProperties)({ signerAddress: signer.getAddress() }).then(({ signerAddress }) => {
                 let tx = signer.provider.getTransactionRequest("kyc", "kyc-unbind", {
                     from: signerAddress,
                     to: address,

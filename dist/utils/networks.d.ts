@@ -1,9 +1,9 @@
-export declare type Network = {
+export type Network = {
     name: string;
     chainId: string;
     _defaultProvider?: (providers: any) => any;
 };
-export declare type Networkish = Network | string | number;
+export type Networkish = Network | string | number;
 /**
  *  getNetwork
  *

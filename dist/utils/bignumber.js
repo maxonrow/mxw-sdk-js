@@ -1,15 +1,43 @@
 'use strict';
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || (function () {
+    var ownKeys = function(o) {
+        ownKeys = Object.getOwnPropertyNames || function (o) {
+            var ar = [];
+            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
+            return ar;
+        };
+        return ownKeys(o);
+    };
+    return function (mod) {
+        if (mod && mod.__esModule) return mod;
+        var result = {};
+        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
+        __setModuleDefault(result, mod);
+        return result;
+    };
+})();
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
-    result["default"] = mod;
-    return result;
-};
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.BigNumber = void 0;
+exports.bigNumberify = bigNumberify;
 /**
  *  BigNumber
  *
@@ -51,22 +79,22 @@ function _bnify(value) {
 class BigNumber {
     constructor(value) {
         errors.checkNew(this, BigNumber);
-        properties_1.setType(this, 'BigNumber');
+        (0, properties_1.setType)(this, 'BigNumber');
         if (typeof (value) === 'string') {
-            if (bytes_1.isHexString(value)) {
+            if ((0, bytes_1.isHexString)(value)) {
                 if (value == '0x') {
                     value = '0x0';
                 }
-                properties_1.defineReadOnly(this, '_hex', value);
+                (0, properties_1.defineReadOnly)(this, '_hex', value);
             }
-            else if (value[0] === '-' && bytes_1.isHexString(value.substring(1))) {
-                properties_1.defineReadOnly(this, '_hex', value);
+            else if (value[0] === '-' && (0, bytes_1.isHexString)(value.substring(1))) {
+                (0, properties_1.defineReadOnly)(this, '_hex', value);
             }
             else if (value.match(/^-?[0-9]*$/)) {
                 if (value == '') {
                     value = '0';
                 }
-                properties_1.defineReadOnly(this, '_hex', toHex(new bn_js_1.default.BN(value)));
+                (0, properties_1.defineReadOnly)(this, '_hex', toHex(new bn_js_1.default.BN(value)));
             }
             else {
                 errors.throwError('invalid BigNumber string value', errors.INVALID_ARGUMENT, { arg: 'value', value: value });
@@ -77,23 +105,23 @@ class BigNumber {
                 errors.throwError('underflow', errors.NUMERIC_FAULT, { operation: 'setValue', fault: 'underflow', value: value, outputValue: parseInt(String(value)) });
             }
             try {
-                properties_1.defineReadOnly(this, '_hex', toHex(new bn_js_1.default.BN(value)));
+                (0, properties_1.defineReadOnly)(this, '_hex', toHex(new bn_js_1.default.BN(value)));
             }
             catch (error) {
                 errors.throwError('overflow', errors.NUMERIC_FAULT, { operation: 'setValue', fault: 'overflow', details: error.message });
             }
         }
         else if (value instanceof BigNumber) {
-            properties_1.defineReadOnly(this, '_hex', value._hex);
+            (0, properties_1.defineReadOnly)(this, '_hex', value._hex);
         }
         else if (value.toHexString) {
-            properties_1.defineReadOnly(this, '_hex', toHex(toBN(value.toHexString())));
+            (0, properties_1.defineReadOnly)(this, '_hex', toHex(toBN(value.toHexString())));
         }
-        else if (value._hex && bytes_1.isHexString(value._hex)) {
-            properties_1.defineReadOnly(this, '_hex', value._hex);
+        else if (value._hex && (0, bytes_1.isHexString)(value._hex)) {
+            (0, properties_1.defineReadOnly)(this, '_hex', value._hex);
         }
-        else if (bytes_1.isArrayish(value)) {
-            properties_1.defineReadOnly(this, '_hex', toHex(new bn_js_1.default.BN(bytes_1.hexlify(value).substring(2), 16)));
+        else if ((0, bytes_1.isArrayish)(value)) {
+            (0, properties_1.defineReadOnly)(this, '_hex', toHex(new bn_js_1.default.BN((0, bytes_1.hexlify)(value).substring(2), 16)));
         }
         else {
             errors.throwError('invalid BigNumber value', errors.INVALID_ARGUMENT, { arg: 'value', value: value });
@@ -171,7 +199,7 @@ class BigNumber {
         return this._hex;
     }
     static isBigNumber(value) {
-        return properties_1.isType(value, 'BigNumber');
+        return (0, properties_1.isType)(value, 'BigNumber');
     }
 }
 exports.BigNumber = BigNumber;
@@ -181,5 +209,4 @@ function bigNumberify(value) {
     }
     return new BigNumber(value);
 }
-exports.bigNumberify = bigNumberify;
 //# sourceMappingURL=bignumber.js.map

@@ -1,5 +1,8 @@
 'use strict';
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.getAddress = getAddress;
+exports.getHash = getHash;
+exports.deriveAddress = deriveAddress;
 const bytes_1 = require("./bytes");
 const constants_1 = require("../constants");
 const keccak256_1 = require("./keccak256");
@@ -17,7 +20,7 @@ function getChecksum(address) {
         for (let i = 0; i < 40; i++) {
             hashed[i] = chars[i].charCodeAt(0);
         }
-        hashed = bytes_1.arrayify(keccak256_1.keccak256(hashed));
+        hashed = (0, bytes_1.arrayify)((0, keccak256_1.keccak256)(hashed));
         for (let i = 0; i < 40; i += 2) {
             if ((hashed[i >> 1] >> 4) >= 8) {
                 chars[i] = chars[i].toUpperCase();
@@ -32,7 +35,7 @@ function getChecksum(address) {
         for (let i = 0; i < 64; i++) {
             hashed[i] = chars[i].charCodeAt(0);
         }
-        hashed = bytes_1.arrayify(keccak256_1.keccak256(hashed));
+        hashed = (0, bytes_1.arrayify)((0, keccak256_1.keccak256)(hashed));
         for (let i = 0; i < 64; i += 2) {
             if ((hashed[i >> 1] >> 4) >= 8) {
                 chars[i] = chars[i].toUpperCase();
@@ -74,19 +77,17 @@ function getAddress(address) {
             }
         }
     }
-    if (misc_1.isUndefinedOrNullOrEmpty(result)) {
+    if ((0, misc_1.isUndefinedOrNullOrEmpty)(result)) {
         errors.throwError('invalid address', errors.INVALID_ADDRESS, { value: address });
     }
     return result;
 }
-exports.getAddress = getAddress;
 function getHash(hash) {
     if (!hash) {
         throw new Error('missing hash');
     }
-    return getChecksum(bytes_1.hexlify(hash));
+    return getChecksum((0, bytes_1.hexlify)(hash));
 }
-exports.getHash = getHash;
 function deriveAddress(from, nonce) {
     if (!from) {
         throw new Error('missing from address');
@@ -94,10 +95,9 @@ function deriveAddress(from, nonce) {
     if (!nonce) {
         throw new Error('missing nonce');
     }
-    let value = sha2_1.sha256(bytes_1.concat([
-        getAddress(from), bytes_1.stripZeros(bytes_1.hexlify(nonce))
+    let value = (0, sha2_1.sha256)((0, bytes_1.concat)([
+        getAddress(from), (0, bytes_1.stripZeros)((0, bytes_1.hexlify)(nonce))
     ]));
     return getChecksum(value);
 }
-exports.deriveAddress = deriveAddress;
 //# sourceMappingURL=address.js.map

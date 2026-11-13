@@ -2,7 +2,7 @@
 
 import aes from 'aes-js';
 import scrypt from 'scrypt-js';
-import uuid from 'uuid';
+import { v4 as uuidv4 } from 'uuid';
 
 import { SigningKey } from './signing-key';
 import * as HDNode from './hdnode';
@@ -371,7 +371,7 @@ export function encrypt(privateKey: Arrayish | SigningKey, password: Arrayish | 
                 // See: https://github.com/ethereum/wiki/wiki/Web3-Secret-Storage-Definition
                 var data: { [key: string]: any } = {
                     address: address.toLowerCase(),
-                    id: uuid.v4({ random: uuidRandom }),
+                    id: uuidv4({ random: uuidRandom }),
                     version: 3,
                     Crypto: {
                         cipher: 'aes-256-ctr',

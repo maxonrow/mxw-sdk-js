@@ -1,12 +1,42 @@
 "use strict";
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
-    result["default"] = mod;
-    return result;
-};
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || (function () {
+    var ownKeys = function(o) {
+        ownKeys = Object.getOwnPropertyNames || function (o) {
+            var ar = [];
+            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
+            return ar;
+        };
+        return ownKeys(o);
+    };
+    return function (mod) {
+        if (mod && mod.__esModule) return mod;
+        var result = {};
+        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
+        __setModuleDefault(result, mod);
+        return result;
+    };
+})();
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.serialize = serialize;
+exports.parse = parse;
+exports.populateTransaction = populateTransaction;
+exports.getTransactionRequest = getTransactionRequest;
 const constants_1 = require("../constants");
 const errors = __importStar(require("../errors"));
 const bignumber_1 = require("./bignumber");
@@ -25,7 +55,7 @@ const units_1 = require("./units");
 // }
 function handleNumber(value) {
     if (value === '0x') {
-        return bignumber_1.bigNumberify(value).toNumber();
+        return (0, bignumber_1.bigNumberify)(value).toNumber();
     }
     return parseInt(value);
 }
@@ -33,7 +63,7 @@ function handleBigNumber(value) {
     if (value === '0x') {
         return constants_1.Zero;
     }
-    return bignumber_1.bigNumberify(value);
+    return (0, bignumber_1.bigNumberify)(value);
 }
 const transactionFields = [
     { name: 'type' }, { name: 'value' }
@@ -46,14 +76,14 @@ const allowedTransactionValueKeys = {
     type: true, msg: true, fee: true, signatures: true, memo: true
 };
 function checkTransaction(transaction) {
-    properties_1.checkProperties(transaction, allowedTransactionKeys);
+    (0, properties_1.checkProperties)(transaction, allowedTransactionKeys);
     if (transaction.value)
-        properties_1.checkProperties(transaction.value, allowedTransactionValueKeys);
+        (0, properties_1.checkProperties)(transaction.value, allowedTransactionValueKeys);
 }
 function serialize(unsignedTransaction, signature, publicKey) {
     checkTransaction(unsignedTransaction);
     if (!signature) {
-        return base64_1.encode(utf8_1.toUtf8Bytes(JSON.stringify(unsignedTransaction)));
+        return (0, base64_1.encode)((0, utf8_1.toUtf8Bytes)(JSON.stringify(unsignedTransaction)));
     }
     if (!unsignedTransaction.value)
         return errors.throwError('invalid unsigned transaction', errors.INVALID_ARGUMENT, { arg: 'unsignedTransaction', value: unsignedTransaction });
@@ -66,12 +96,12 @@ function serialize(unsignedTransaction, signature, publicKey) {
         }
         // Variable-width (with a maximum)
         if (fieldInfo.maxLength) {
-            value = bytes_1.stripZeros(value);
+            value = (0, bytes_1.stripZeros)(value);
             if (value.length > fieldInfo.maxLength) {
                 errors.throwError('invalid length for ' + fieldInfo.name, errors.INVALID_ARGUMENT, { arg: ('transaction' + fieldInfo.name), value: value });
             }
         }
-        transaction[fieldInfo.name] = 'object' === typeof value ? properties_1.shallowCopy(value) : value;
+        transaction[fieldInfo.name] = 'object' === typeof value ? (0, properties_1.shallowCopy)(value) : value;
     });
     if (!transaction.value.signatures)
         transaction.value.signatures = [];
@@ -79,12 +109,12 @@ function serialize(unsignedTransaction, signature, publicKey) {
         // Have to match the endpoint defined naming convention
         pub_key: {
             type: "tendermint/PubKeySecp256k1",
-            value: base64_1.encode(publicKey)
+            value: (0, base64_1.encode)(publicKey)
         },
-        signature: bytes_1.isArrayish(signature) ? signature : base64_1.encode(bytes_1.joinSignature(signature))
+        signature: (0, bytes_1.isArrayish)(signature) ? signature : (0, base64_1.encode)((0, bytes_1.joinSignature)(signature))
     });
     // Convert number and big number to string
-    transaction = misc_1.iterate(transaction, function (key, value, type) {
+    transaction = (0, misc_1.iterate)(transaction, function (key, value, type) {
         switch (type) {
             case "Number":
             case "BigNumber":
@@ -92,16 +122,15 @@ function serialize(unsignedTransaction, signature, publicKey) {
         }
         return value;
     });
-    transaction = misc_1.sortObject(transaction);
-    return base64_1.encode(utf8_1.toUtf8Bytes(JSON.stringify(transaction)));
+    transaction = (0, misc_1.sortObject)(transaction);
+    return (0, base64_1.encode)((0, utf8_1.toUtf8Bytes)(JSON.stringify(transaction)));
 }
-exports.serialize = serialize;
 function parse(rawTransaction) {
     let tx = {};
     if ("string" === typeof rawTransaction) {
         try {
-            tx.hash = sha2_1.sha256(rawTransaction);
-            rawTransaction = utf8_1.toUtf8String(base64_1.decode(rawTransaction));
+            tx.hash = (0, sha2_1.sha256)(rawTransaction);
+            rawTransaction = (0, utf8_1.toUtf8String)((0, base64_1.decode)(rawTransaction));
             rawTransaction = JSON.parse(rawTransaction);
         }
         catch (error) {
@@ -141,7 +170,6 @@ function parse(rawTransaction) {
     }
     return tx;
 }
-exports.parse = parse;
 function populateTransaction(transaction, provider, from) {
     if (!abstract_provider_1.Provider.isProvider(provider)) {
         errors.throwError('missing provider', errors.INVALID_ARGUMENT, {
@@ -150,7 +178,7 @@ function populateTransaction(transaction, provider, from) {
         });
     }
     checkTransaction(transaction);
-    let tx = properties_1.shallowCopy(transaction);
+    let tx = (0, properties_1.shallowCopy)(transaction);
     if (null == tx.fee) {
         errors.throwError("missing fee", errors.MISSING_FEES, {});
     }
@@ -160,21 +188,20 @@ function populateTransaction(transaction, provider, from) {
     if (null == tx.chainId) {
         tx.chainId = provider.getNetwork().then((network) => network.chainId);
     }
-    return properties_1.resolveProperties(tx);
+    return (0, properties_1.resolveProperties)(tx);
 }
-exports.populateTransaction = populateTransaction;
 function getTransactionRequest(route, transactionType, overrides) {
     let transaction;
     let moduleName = route + "/" + transactionType;
     switch (moduleName) {
         case "bank/bank-send":
             {
-                let params = misc_1.checkFormat({
+                let params = (0, misc_1.checkFormat)({
                     from: misc_1.checkAddress,
                     to: misc_1.checkAddress,
                     value: misc_1.checkBigNumber,
-                    memo: misc_1.allowNullOrEmpty(misc_1.checkString),
-                    denom: misc_1.allowNullOrEmpty(misc_1.checkString)
+                    memo: (0, misc_1.allowNullOrEmpty)(misc_1.checkString),
+                    denom: (0, misc_1.allowNullOrEmpty)(misc_1.checkString)
                 }, overrides);
                 transaction = {
                     type: "cosmos-sdk/StdTx",
@@ -202,10 +229,10 @@ function getTransactionRequest(route, transactionType, overrides) {
             break;
         case "kyc/kyc-whitelist":
             {
-                let params = misc_1.checkFormat({
+                let params = (0, misc_1.checkFormat)({
                     kycData: misc_1.checkAny,
                     owner: misc_1.checkAddress,
-                    memo: misc_1.allowNullOrEmpty(misc_1.checkString)
+                    memo: (0, misc_1.allowNullOrEmpty)(misc_1.checkString)
                 }, overrides);
                 transaction = {
                     type: "cosmos-sdk/StdTx",
@@ -227,11 +254,11 @@ function getTransactionRequest(route, transactionType, overrides) {
             break;
         case "kyc/kyc-revokeWhitelist":
             {
-                let params = misc_1.checkFormat({
+                let params = (0, misc_1.checkFormat)({
                     payload: misc_1.checkAny,
                     signatures: misc_1.checkAny,
                     owner: misc_1.checkAddress,
-                    memo: misc_1.allowNullOrEmpty(misc_1.checkString)
+                    memo: (0, misc_1.allowNullOrEmpty)(misc_1.checkString)
                 }, overrides);
                 transaction = {
                     type: "cosmos-sdk/StdTx",
@@ -254,11 +281,11 @@ function getTransactionRequest(route, transactionType, overrides) {
             break;
         case "kyc/kyc-bind":
             {
-                let params = misc_1.checkFormat({
+                let params = (0, misc_1.checkFormat)({
                     from: misc_1.checkAddress,
                     to: misc_1.checkAddress,
                     kycAddress: misc_1.checkString,
-                    memo: misc_1.allowNullOrEmpty(misc_1.checkString)
+                    memo: (0, misc_1.allowNullOrEmpty)(misc_1.checkString)
                 }, overrides);
                 transaction = {
                     type: "cosmos-sdk/StdTx",
@@ -281,11 +308,11 @@ function getTransactionRequest(route, transactionType, overrides) {
             break;
         case "kyc/kyc-unbind":
             {
-                let params = misc_1.checkFormat({
+                let params = (0, misc_1.checkFormat)({
                     from: misc_1.checkAddress,
                     to: misc_1.checkAddress,
                     kycAddress: misc_1.checkString,
-                    memo: misc_1.allowNullOrEmpty(misc_1.checkString)
+                    memo: (0, misc_1.allowNullOrEmpty)(misc_1.checkString)
                 }, overrides);
                 transaction = {
                     type: "cosmos-sdk/StdTx",
@@ -308,11 +335,11 @@ function getTransactionRequest(route, transactionType, overrides) {
             break;
         case "nameservice/nameservice-setAliasStatus":
             {
-                let params = misc_1.checkFormat({
+                let params = (0, misc_1.checkFormat)({
                     payload: misc_1.checkAny,
                     signatures: misc_1.checkAny,
                     owner: misc_1.checkAddress,
-                    memo: misc_1.allowNullOrEmpty(misc_1.checkString)
+                    memo: (0, misc_1.allowNullOrEmpty)(misc_1.checkString)
                 }, overrides);
                 transaction = {
                     type: "cosmos-sdk/StdTx",
@@ -335,12 +362,12 @@ function getTransactionRequest(route, transactionType, overrides) {
             break;
         case "nameservice/nameservice-createAlias":
             {
-                let params = misc_1.checkFormat({
+                let params = (0, misc_1.checkFormat)({
                     appFeeTo: misc_1.checkString,
                     appFeeValue: misc_1.checkBigNumber,
                     name: misc_1.checkString,
                     owner: misc_1.checkAddress,
-                    memo: misc_1.allowNullOrEmpty(misc_1.checkString)
+                    memo: (0, misc_1.allowNullOrEmpty)(misc_1.checkString)
                 }, overrides);
                 transaction = {
                     type: "cosmos-sdk/StdTx",
@@ -366,15 +393,15 @@ function getTransactionRequest(route, transactionType, overrides) {
             break;
         case "token/token-createFungibleToken":
             {
-                let params = misc_1.checkFormat({
+                let params = (0, misc_1.checkFormat)({
                     appFeeTo: misc_1.checkString,
                     appFeeValue: misc_1.checkBigNumber,
                     name: misc_1.checkString,
                     owner: misc_1.checkAddress,
-                    memo: misc_1.allowNullOrEmpty(misc_1.checkString),
+                    memo: (0, misc_1.allowNullOrEmpty)(misc_1.checkString),
                     decimals: misc_1.checkNumber,
                     fixedSupply: misc_1.checkBoolean,
-                    metadata: misc_1.allowNullOrEmpty(misc_1.checkString),
+                    metadata: (0, misc_1.allowNullOrEmpty)(misc_1.checkString),
                     symbol: misc_1.checkString,
                     maxSupply: misc_1.checkBigNumber
                 }, overrides);
@@ -407,11 +434,11 @@ function getTransactionRequest(route, transactionType, overrides) {
             break;
         case "token/token-setFungibleTokenStatus":
             {
-                let params = misc_1.checkFormat({
+                let params = (0, misc_1.checkFormat)({
                     payload: misc_1.checkAny,
                     signatures: misc_1.checkAny,
                     owner: misc_1.checkAddress,
-                    memo: misc_1.allowNullOrEmpty(misc_1.checkString)
+                    memo: (0, misc_1.allowNullOrEmpty)(misc_1.checkString)
                 }, overrides);
                 transaction = {
                     type: "cosmos-sdk/StdTx",
@@ -434,11 +461,11 @@ function getTransactionRequest(route, transactionType, overrides) {
             break;
         case "token/token-setFungibleTokenAccountStatus":
             {
-                let params = misc_1.checkFormat({
+                let params = (0, misc_1.checkFormat)({
                     payload: misc_1.checkAny,
                     signatures: misc_1.checkAny,
                     owner: misc_1.checkAddress,
-                    memo: misc_1.allowNullOrEmpty(misc_1.checkString)
+                    memo: (0, misc_1.allowNullOrEmpty)(misc_1.checkString)
                 }, overrides);
                 transaction = {
                     type: "cosmos-sdk/StdTx",
@@ -461,12 +488,12 @@ function getTransactionRequest(route, transactionType, overrides) {
             break;
         case "token/token-transferFungibleToken":
             {
-                let params = misc_1.checkFormat({
+                let params = (0, misc_1.checkFormat)({
                     symbol: misc_1.checkString,
                     from: misc_1.checkAddress,
                     to: misc_1.checkAddress,
                     value: misc_1.checkBigNumber,
-                    memo: misc_1.allowNullOrEmpty(misc_1.checkString)
+                    memo: (0, misc_1.allowNullOrEmpty)(misc_1.checkString)
                 }, overrides);
                 transaction = {
                     type: "cosmos-sdk/StdTx",
@@ -490,12 +517,12 @@ function getTransactionRequest(route, transactionType, overrides) {
             break;
         case "token/token-mintFungibleToken":
             {
-                let params = misc_1.checkFormat({
+                let params = (0, misc_1.checkFormat)({
                     symbol: misc_1.checkString,
                     owner: misc_1.checkAddress,
                     to: misc_1.checkAddress,
                     value: misc_1.checkBigNumber,
-                    memo: misc_1.allowNullOrEmpty(misc_1.checkString)
+                    memo: (0, misc_1.allowNullOrEmpty)(misc_1.checkString)
                 }, overrides);
                 transaction = {
                     type: "cosmos-sdk/StdTx",
@@ -519,11 +546,11 @@ function getTransactionRequest(route, transactionType, overrides) {
             break;
         case "token/token-burnFungibleToken":
             {
-                let params = misc_1.checkFormat({
+                let params = (0, misc_1.checkFormat)({
                     symbol: misc_1.checkString,
                     from: misc_1.checkAddress,
                     value: misc_1.checkBigNumber,
-                    memo: misc_1.allowNullOrEmpty(misc_1.checkString)
+                    memo: (0, misc_1.allowNullOrEmpty)(misc_1.checkString)
                 }, overrides);
                 transaction = {
                     type: "cosmos-sdk/StdTx",
@@ -546,11 +573,11 @@ function getTransactionRequest(route, transactionType, overrides) {
             break;
         case "token/token-freezeFungibleToken":
             {
-                let params = misc_1.checkFormat({
+                let params = (0, misc_1.checkFormat)({
                     symbol: misc_1.checkString,
                     target: misc_1.checkAddress,
                     owner: misc_1.checkAddress,
-                    memo: misc_1.allowNullOrEmpty(misc_1.checkString)
+                    memo: (0, misc_1.allowNullOrEmpty)(misc_1.checkString)
                 }, overrides);
                 transaction = {
                     type: "cosmos-sdk/StdTx",
@@ -573,11 +600,11 @@ function getTransactionRequest(route, transactionType, overrides) {
             break;
         case "token/token-unfreezeFungibleToken":
             {
-                let params = misc_1.checkFormat({
+                let params = (0, misc_1.checkFormat)({
                     symbol: misc_1.checkString,
                     target: misc_1.checkAddress,
                     owner: misc_1.checkAddress,
-                    memo: misc_1.allowNullOrEmpty(misc_1.checkString)
+                    memo: (0, misc_1.allowNullOrEmpty)(misc_1.checkString)
                 }, overrides);
                 transaction = {
                     type: "cosmos-sdk/StdTx",
@@ -600,11 +627,11 @@ function getTransactionRequest(route, transactionType, overrides) {
             break;
         case "token/token-transferFungibleTokenOwnership":
             {
-                let params = misc_1.checkFormat({
+                let params = (0, misc_1.checkFormat)({
                     symbol: misc_1.checkString,
                     from: misc_1.checkAddress,
                     to: misc_1.checkAddress,
-                    memo: misc_1.allowNullOrEmpty(misc_1.checkString)
+                    memo: (0, misc_1.allowNullOrEmpty)(misc_1.checkString)
                 }, overrides);
                 transaction = {
                     type: "cosmos-sdk/StdTx",
@@ -627,10 +654,10 @@ function getTransactionRequest(route, transactionType, overrides) {
             break;
         case "token/token-acceptFungibleTokenOwnership":
             {
-                let params = misc_1.checkFormat({
+                let params = (0, misc_1.checkFormat)({
                     symbol: misc_1.checkString,
                     from: misc_1.checkAddress,
-                    memo: misc_1.allowNullOrEmpty(misc_1.checkString)
+                    memo: (0, misc_1.allowNullOrEmpty)(misc_1.checkString)
                 }, overrides);
                 transaction = {
                     type: "cosmos-sdk/StdTx",
@@ -652,14 +679,14 @@ function getTransactionRequest(route, transactionType, overrides) {
             break;
         case "nonFungible/createNonFungibleToken":
             {
-                let params = misc_1.checkFormat({
+                let params = (0, misc_1.checkFormat)({
                     appFeeTo: misc_1.checkString,
                     appFeeValue: misc_1.checkBigNumber,
                     name: misc_1.checkString,
                     owner: misc_1.checkAddress,
-                    memo: misc_1.allowNullOrEmpty(misc_1.checkString),
-                    metadata: misc_1.allowNullOrEmpty(misc_1.checkString),
-                    properties: misc_1.allowNullOrEmpty(misc_1.checkString),
+                    memo: (0, misc_1.allowNullOrEmpty)(misc_1.checkString),
+                    metadata: (0, misc_1.allowNullOrEmpty)(misc_1.checkString),
+                    properties: (0, misc_1.allowNullOrEmpty)(misc_1.checkString),
                     symbol: misc_1.checkString,
                 }, overrides);
                 transaction = {
@@ -689,11 +716,11 @@ function getTransactionRequest(route, transactionType, overrides) {
             break;
         case "nonFungible/setNonFungibleTokenStatus":
             {
-                let params = misc_1.checkFormat({
+                let params = (0, misc_1.checkFormat)({
                     payload: misc_1.checkAny,
                     signatures: misc_1.checkAny,
                     owner: misc_1.checkAddress,
-                    memo: misc_1.allowNullOrEmpty(misc_1.checkString)
+                    memo: (0, misc_1.allowNullOrEmpty)(misc_1.checkString)
                 }, overrides);
                 transaction = {
                     type: "cosmos-sdk/StdTx",
@@ -716,14 +743,14 @@ function getTransactionRequest(route, transactionType, overrides) {
             break;
         case "nonFungible/mintNonFungibleItem":
             {
-                let params = misc_1.checkFormat({
+                let params = (0, misc_1.checkFormat)({
                     itemID: misc_1.checkString,
                     symbol: misc_1.checkString,
                     owner: misc_1.checkAddress,
                     to: misc_1.checkAddress,
-                    metadata: misc_1.allowNullOrEmpty(misc_1.checkString),
-                    properties: misc_1.allowNullOrEmpty(misc_1.checkString),
-                    memo: misc_1.allowNullOrEmpty(misc_1.checkString),
+                    metadata: (0, misc_1.allowNullOrEmpty)(misc_1.checkString),
+                    properties: (0, misc_1.allowNullOrEmpty)(misc_1.checkString),
+                    memo: (0, misc_1.allowNullOrEmpty)(misc_1.checkString),
                 }, overrides);
                 transaction = {
                     type: "cosmos-sdk/StdTx",
@@ -749,12 +776,12 @@ function getTransactionRequest(route, transactionType, overrides) {
             break;
         case "nonFungible/transferNonFungibleItem":
             {
-                let params = misc_1.checkFormat({
+                let params = (0, misc_1.checkFormat)({
                     symbol: misc_1.checkString,
                     from: misc_1.checkString,
                     to: misc_1.checkString,
                     itemID: misc_1.checkString,
-                    memo: misc_1.allowNullOrEmpty(misc_1.checkString)
+                    memo: (0, misc_1.allowNullOrEmpty)(misc_1.checkString)
                 }, overrides);
                 transaction = {
                     type: "cosmos-sdk/StdTx",
@@ -778,11 +805,11 @@ function getTransactionRequest(route, transactionType, overrides) {
             break;
         case "nonFungible/transferNonFungibleTokenOwnership":
             {
-                let params = misc_1.checkFormat({
+                let params = (0, misc_1.checkFormat)({
                     symbol: misc_1.checkString,
                     from: misc_1.checkString,
                     to: misc_1.checkString,
-                    memo: misc_1.allowNullOrEmpty(misc_1.checkString)
+                    memo: (0, misc_1.allowNullOrEmpty)(misc_1.checkString)
                 }, overrides);
                 transaction = {
                     type: "cosmos-sdk/StdTx",
@@ -805,11 +832,11 @@ function getTransactionRequest(route, transactionType, overrides) {
             break;
         case "nonFungible/burnNonFungibleItem":
             {
-                let params = misc_1.checkFormat({
+                let params = (0, misc_1.checkFormat)({
                     symbol: misc_1.checkString,
                     from: misc_1.checkAddress,
                     itemID: misc_1.checkString,
-                    memo: misc_1.allowNullOrEmpty(misc_1.checkString)
+                    memo: (0, misc_1.allowNullOrEmpty)(misc_1.checkString)
                 }, overrides);
                 transaction = {
                     type: "cosmos-sdk/StdTx",
@@ -832,12 +859,12 @@ function getTransactionRequest(route, transactionType, overrides) {
             break;
         case "nonFungible/endorsement":
             {
-                let params = misc_1.checkFormat({
+                let params = (0, misc_1.checkFormat)({
                     symbol: misc_1.checkString,
                     from: misc_1.checkAddress,
                     itemID: misc_1.checkString,
                     metadata: misc_1.checkString,
-                    memo: misc_1.allowNullOrEmpty(misc_1.checkString)
+                    memo: (0, misc_1.allowNullOrEmpty)(misc_1.checkString)
                 }, overrides);
                 transaction = {
                     type: "cosmos-sdk/StdTx",
@@ -861,11 +888,11 @@ function getTransactionRequest(route, transactionType, overrides) {
             break;
         case "nonFungible/setNonFungibleItemStatus":
             {
-                let params = misc_1.checkFormat({
+                let params = (0, misc_1.checkFormat)({
                     payload: misc_1.checkAny,
                     signatures: misc_1.checkAny,
                     owner: misc_1.checkAddress,
-                    memo: misc_1.allowNullOrEmpty(misc_1.checkString)
+                    memo: (0, misc_1.allowNullOrEmpty)(misc_1.checkString)
                 }, overrides);
                 transaction = {
                     type: "cosmos-sdk/StdTx",
@@ -888,12 +915,12 @@ function getTransactionRequest(route, transactionType, overrides) {
             break;
         case "nonFungible/updateItemMetadata":
             {
-                let params = misc_1.checkFormat({
+                let params = (0, misc_1.checkFormat)({
                     symbol: misc_1.checkString,
                     from: misc_1.checkAddress,
                     itemID: misc_1.checkString,
-                    metadata: misc_1.allowNullOrEmpty(misc_1.checkString),
-                    memo: misc_1.allowNullOrEmpty(misc_1.checkString)
+                    metadata: (0, misc_1.allowNullOrEmpty)(misc_1.checkString),
+                    memo: (0, misc_1.allowNullOrEmpty)(misc_1.checkString)
                 }, overrides);
                 transaction = {
                     type: "cosmos-sdk/StdTx",
@@ -917,10 +944,10 @@ function getTransactionRequest(route, transactionType, overrides) {
             break;
         case "nonFungible/acceptNonFungibleTokenOwnership":
             {
-                let params = misc_1.checkFormat({
+                let params = (0, misc_1.checkFormat)({
                     symbol: misc_1.checkString,
                     from: misc_1.checkAddress,
-                    memo: misc_1.allowNullOrEmpty(misc_1.checkString)
+                    memo: (0, misc_1.allowNullOrEmpty)(misc_1.checkString)
                 }, overrides);
                 transaction = {
                     type: "cosmos-sdk/StdTx",
@@ -942,11 +969,11 @@ function getTransactionRequest(route, transactionType, overrides) {
             break;
         case "nonFungible/updateNFTMetadata":
             {
-                let params = misc_1.checkFormat({
+                let params = (0, misc_1.checkFormat)({
                     symbol: misc_1.checkString,
                     from: misc_1.checkAddress,
-                    metadata: misc_1.allowNullOrEmpty(misc_1.checkString),
-                    memo: misc_1.allowNullOrEmpty(misc_1.checkString)
+                    metadata: (0, misc_1.allowNullOrEmpty)(misc_1.checkString),
+                    memo: (0, misc_1.allowNullOrEmpty)(misc_1.checkString)
                 }, overrides);
                 transaction = {
                     type: "cosmos-sdk/StdTx",
@@ -969,11 +996,11 @@ function getTransactionRequest(route, transactionType, overrides) {
             break;
         case "nonFungible/updateNFTEndorserList":
             {
-                let params = misc_1.checkFormat({
+                let params = (0, misc_1.checkFormat)({
                     symbol: misc_1.checkString,
                     from: misc_1.checkAddress,
-                    endorsers: misc_1.allowNullOrEmpty(misc_1.arrayOf(misc_1.checkAddress), null),
-                    memo: misc_1.allowNullOrEmpty(misc_1.checkString)
+                    endorsers: (0, misc_1.allowNullOrEmpty)((0, misc_1.arrayOf)(misc_1.checkAddress), null),
+                    memo: (0, misc_1.allowNullOrEmpty)(misc_1.checkString)
                 }, overrides);
                 transaction = {
                     type: "cosmos-sdk/StdTx",
@@ -996,11 +1023,11 @@ function getTransactionRequest(route, transactionType, overrides) {
             break;
         case "nonFungible/burnNonFungibleToken":
             {
-                let params = misc_1.checkFormat({
+                let params = (0, misc_1.checkFormat)({
                     symbol: misc_1.checkString,
                     from: misc_1.checkAddress,
                     itemID: misc_1.checkString,
-                    memo: misc_1.allowNullOrEmpty(misc_1.checkString)
+                    memo: (0, misc_1.allowNullOrEmpty)(misc_1.checkString)
                 }, overrides);
                 transaction = {
                     type: "cosmos-sdk/StdTx",
@@ -1026,5 +1053,4 @@ function getTransactionRequest(route, transactionType, overrides) {
     }
     return transaction;
 }
-exports.getTransactionRequest = getTransactionRequest;
 //# sourceMappingURL=transaction.js.map

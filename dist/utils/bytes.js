@@ -3,14 +3,54 @@
  *  Conversion Utilities
  *
  */
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
-    result["default"] = mod;
-    return result;
-};
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || (function () {
+    var ownKeys = function(o) {
+        ownKeys = Object.getOwnPropertyNames || function (o) {
+            var ar = [];
+            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
+            return ar;
+        };
+        return ownKeys(o);
+    };
+    return function (mod) {
+        if (mod && mod.__esModule) return mod;
+        var result = {};
+        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
+        __setModuleDefault(result, mod);
+        return result;
+    };
+})();
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.isHexable = isHexable;
+exports.isArrayish = isArrayish;
+exports.arrayify = arrayify;
+exports.concat = concat;
+exports.stripZeros = stripZeros;
+exports.padZeros = padZeros;
+exports.isHexString = isHexString;
+exports.hexlify = hexlify;
+exports.hexDataLength = hexDataLength;
+exports.hexDataSlice = hexDataSlice;
+exports.hexStripZeros = hexStripZeros;
+exports.hexZeroPad = hexZeroPad;
+exports.splitSignature = splitSignature;
+exports.joinSignature = joinSignature;
 const errors = __importStar(require("../errors"));
 ///////////////////////////////
 // Imported Types
@@ -19,7 +59,6 @@ const base64_1 = require("./base64");
 function isHexable(value) {
     return !!(value.toHexString);
 }
-exports.isHexable = isHexable;
 function addSlice(array) {
     if (array.slice) {
         return array;
@@ -42,7 +81,6 @@ function isArrayish(value) {
     }
     return true;
 }
-exports.isArrayish = isArrayish;
 function arrayify(value) {
     if (value == null) {
         errors.throwError('cannot convert null value to array', errors.INVALID_ARGUMENT, { arg: 'value', value: value });
@@ -53,7 +91,7 @@ function arrayify(value) {
     if (typeof (value) === 'string') {
         let match = value.match(/^(0x)?[0-9a-fA-F]*$/);
         if (!match) {
-            return addSlice(base64_1.decode(value));
+            return addSlice((0, base64_1.decode)(value));
         }
         else {
             if (match[1] !== '0x') {
@@ -76,7 +114,6 @@ function arrayify(value) {
     errors.throwError('invalid arrayify value', null, { arg: 'value', value: value, type: typeof (value) });
     return null;
 }
-exports.arrayify = arrayify;
 function concat(objects) {
     var arrays = [];
     var length = 0;
@@ -93,7 +130,6 @@ function concat(objects) {
     }
     return addSlice(result);
 }
-exports.concat = concat;
 function stripZeros(value) {
     let result = arrayify(value);
     if (result.length === 0) {
@@ -110,7 +146,6 @@ function stripZeros(value) {
     }
     return result;
 }
-exports.stripZeros = stripZeros;
 function padZeros(value, length) {
     value = arrayify(value);
     if (length < value.length) {
@@ -120,7 +155,6 @@ function padZeros(value, length) {
     result.set(value, length - value.length);
     return addSlice(result);
 }
-exports.padZeros = padZeros;
 function isHexString(value, length) {
     if (typeof (value) !== 'string' || !value.match(/^0x[0-9A-Fa-f]*$/)) {
         return false;
@@ -130,7 +164,6 @@ function isHexString(value, length) {
     }
     return true;
 }
-exports.isHexString = isHexString;
 const HexCharacters = '0123456789abcdef';
 function hexlify(value) {
     if (isHexable(value)) {
@@ -185,14 +218,12 @@ function hexlify(value) {
     errors.throwError('invalid hexlify value', null, { arg: 'value', value: value });
     return 'never';
 }
-exports.hexlify = hexlify;
 function hexDataLength(data) {
     if (!isHexString(data) || (data.length % 2) !== 0) {
         return null;
     }
     return (data.length - 2) / 2;
 }
-exports.hexDataLength = hexDataLength;
 function hexDataSlice(data, offset, endOffset) {
     if (!isHexString(data)) {
         errors.throwError('invalid hex data', errors.INVALID_ARGUMENT, { arg: 'value', value: data });
@@ -206,7 +237,6 @@ function hexDataSlice(data, offset, endOffset) {
     }
     return '0x' + data.substring(offset);
 }
-exports.hexDataSlice = hexDataSlice;
 function hexStripZeros(value) {
     if (!isHexString(value)) {
         errors.throwError('invalid hex string', errors.INVALID_ARGUMENT, { arg: 'value', value: value });
@@ -216,7 +246,6 @@ function hexStripZeros(value) {
     }
     return value;
 }
-exports.hexStripZeros = hexStripZeros;
 function hexZeroPad(value, length) {
     if (!isHexString(value)) {
         errors.throwError('invalid hex string', errors.INVALID_ARGUMENT, { arg: 'value', value: value });
@@ -226,7 +255,6 @@ function hexZeroPad(value, length) {
     }
     return value;
 }
-exports.hexZeroPad = hexZeroPad;
 function isSignature(value) {
     return (value && value.r != null && value.s != null);
 }
@@ -273,7 +301,6 @@ function splitSignature(signature) {
         v: v
     };
 }
-exports.splitSignature = splitSignature;
 function joinSignature(signature, includeRecoveryParam) {
     signature = splitSignature(signature);
     if (includeRecoveryParam) {
@@ -288,5 +315,4 @@ function joinSignature(signature, includeRecoveryParam) {
         signature.s
     ]));
 }
-exports.joinSignature = joinSignature;
 //# sourceMappingURL=bytes.js.map

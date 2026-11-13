@@ -1,6 +1,6 @@
 import { Hexable } from './bytes';
 import { Arrayish } from './bytes';
-export declare type BigNumberish = BigNumber | string | number | Arrayish;
+export type BigNumberish = BigNumber | string | number | Arrayish;
 export declare class BigNumber implements Hexable {
     private readonly _hex;
     constructor(value: BigNumberish);

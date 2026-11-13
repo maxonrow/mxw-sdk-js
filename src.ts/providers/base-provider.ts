@@ -327,7 +327,7 @@ function checkDeliverTransaction(value: any): DeliverTransaction {
             if (0 < transaction.logs.length) {
                 let log: TransactionLog = transaction.logs[0] as TransactionLog;
 
-                if (log && log.info && 0 <= log.info.nonce) {
+                if (log && log.info && bigNumberify(log.info.nonce).gte(0)) {
                     transaction.nonce = log.info.nonce;
                     log.info.nonce = undefined; // remove it from redundant data
                 }
@@ -428,7 +428,7 @@ function checkTransactionReceipt(transaction: any): TransactionReceipt {
                     if (0 < receipt.result.logs.length) {
                         let log: TransactionLog = receipt.result.logs[0] as TransactionLog;
 
-                        if (log && log.info && 0 <= log.info.nonce) {
+                        if (log && log.info && bigNumberify(log.info.nonce).gte(0)) {
                             receipt.nonce = log.info.nonce;
                             log.info.nonce = undefined; // remove it from redundant data
                         }

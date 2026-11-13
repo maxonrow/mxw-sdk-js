@@ -1,12 +1,39 @@
 'use strict';
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
-    result["default"] = mod;
-    return result;
-};
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || (function () {
+    var ownKeys = function(o) {
+        ownKeys = Object.getOwnPropertyNames || function (o) {
+            var ar = [];
+            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
+            return ar;
+        };
+        return ownKeys(o);
+    };
+    return function (mod) {
+        if (mod && mod.__esModule) return mod;
+        var result = {};
+        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
+        __setModuleDefault(result, mod);
+        return result;
+    };
+})();
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.NonFungibleTokenItem = void 0;
 const properties_1 = require("./utils/properties");
 const errors = __importStar(require("./errors"));
 // Imported Abstracts
@@ -19,21 +46,21 @@ class NonFungibleTokenItem {
         if (!symbol) {
             errors.throwError('symbol is required', errors.MISSING_ARGUMENT, { arg: 'symbol' });
         }
-        properties_1.defineReadOnly(this, 'symbol', symbol);
+        (0, properties_1.defineReadOnly)(this, 'symbol', symbol);
         if (!itemID) {
             errors.throwError('itemID is required', errors.MISSING_ARGUMENT, { arg: 'itemID' });
         }
-        properties_1.defineReadOnly(this, 'itemID', itemID);
+        (0, properties_1.defineReadOnly)(this, 'itemID', itemID);
         if (abstract_signer_1.Signer.isSigner(signerOrProvider)) {
             if (!signerOrProvider.provider) {
                 return errors.throwError('missing provider', errors.INVALID_ARGUMENT, { arg: 'signerOrProvider', value: signerOrProvider });
             }
-            properties_1.defineReadOnly(this, 'provider', signerOrProvider.provider);
-            properties_1.defineReadOnly(this, 'signer', signerOrProvider);
+            (0, properties_1.defineReadOnly)(this, 'provider', signerOrProvider.provider);
+            (0, properties_1.defineReadOnly)(this, 'signer', signerOrProvider);
         }
         else if (abstract_provider_1.Provider.isProvider(signerOrProvider)) {
-            properties_1.defineReadOnly(this, 'provider', signerOrProvider);
-            properties_1.defineReadOnly(this, 'signer', null);
+            (0, properties_1.defineReadOnly)(this, 'provider', signerOrProvider);
+            (0, properties_1.defineReadOnly)(this, 'signer', null);
         }
         else {
             errors.throwError('invalid signer or provider', errors.INVALID_ARGUMENT, { arg: 'signerOrProvider', value: signerOrProvider });
@@ -135,7 +162,7 @@ class NonFungibleTokenItem {
         if (!this.signer) {
             errors.throwError('transfer non fungible token ownership require signer', errors.NOT_INITIALIZED, { arg: 'signer' });
         }
-        return properties_1.resolveProperties({ signerAddress: this.signer.getAddress(), toAddressOrName }).then(({ signerAddress, toAddressOrName }) => {
+        return (0, properties_1.resolveProperties)({ signerAddress: this.signer.getAddress(), toAddressOrName }).then(({ signerAddress, toAddressOrName }) => {
             if (!signerAddress) {
                 return errors.throwError('transfer non fungible token item require signer address', errors.MISSING_ARGUMENT, { arg: 'signerAddress' });
             }
@@ -182,7 +209,7 @@ class NonFungibleTokenItem {
         if (!this.signer) {
             errors.throwError('endorse non fungible token item require signer', errors.NOT_INITIALIZED, { arg: 'signer' });
         }
-        return properties_1.resolveProperties({ address: this.signer.getAddress() }).then(({ address }) => {
+        return (0, properties_1.resolveProperties)({ address: this.signer.getAddress() }).then(({ address }) => {
             if (!address) {
                 return errors.throwError('endorse non fungible token item require signer address', errors.MISSING_ARGUMENT, { arg: 'signerAddress' });
             }
@@ -225,7 +252,7 @@ class NonFungibleTokenItem {
         if (!this.signer) {
             errors.throwError('update non fungible token item metadata require signer', errors.NOT_INITIALIZED, { arg: 'signer' });
         }
-        return properties_1.resolveProperties({ address: this.signer.getAddress() }).then(({ address }) => {
+        return (0, properties_1.resolveProperties)({ address: this.signer.getAddress() }).then(({ address }) => {
             if (!address) {
                 return errors.throwError('update non fungible token item metadata require signer address', errors.MISSING_ARGUMENT, { arg: 'signerAddress' });
             }
@@ -266,7 +293,7 @@ class NonFungibleTokenItem {
         if (!this.signer) {
             errors.throwError('burn non fungible token item require signer', errors.NOT_INITIALIZED, { arg: 'signer' });
         }
-        return properties_1.resolveProperties({ address: this.signer.getAddress() }).then(({ address }) => {
+        return (0, properties_1.resolveProperties)({ address: this.signer.getAddress() }).then(({ address }) => {
             if (!address) {
                 return errors.throwError('burn non fungible token item require signer address', errors.MISSING_ARGUMENT, { arg: 'signerAddress' });
             }

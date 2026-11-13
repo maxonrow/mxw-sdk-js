@@ -39,21 +39,22 @@
  *
  */
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.Base58 = exports.Base32 = exports.BaseX = void 0;
 const bytes_1 = require("./bytes");
 const properties_1 = require("./properties");
 class BaseX {
     constructor(alphabet) {
-        properties_1.defineReadOnly(this, "alphabet", alphabet);
-        properties_1.defineReadOnly(this, "base", alphabet.length);
-        properties_1.defineReadOnly(this, "_alphabetMap", {});
-        properties_1.defineReadOnly(this, "_leader", alphabet.charAt(0));
+        (0, properties_1.defineReadOnly)(this, "alphabet", alphabet);
+        (0, properties_1.defineReadOnly)(this, "base", alphabet.length);
+        (0, properties_1.defineReadOnly)(this, "_alphabetMap", {});
+        (0, properties_1.defineReadOnly)(this, "_leader", alphabet.charAt(0));
         // pre-compute lookup table
         for (let i = 0; i < alphabet.length; i++) {
             this._alphabetMap[alphabet.charAt(i)] = i;
         }
     }
     encode(value) {
-        let source = bytes_1.arrayify(value);
+        let source = (0, bytes_1.arrayify)(value);
         if (source.length === 0) {
             return '';
         }
@@ -110,7 +111,7 @@ class BaseX {
         for (let k = 0; value[k] === this._leader && k < value.length - 1; ++k) {
             bytes.push(0);
         }
-        return bytes_1.arrayify(new Uint8Array(bytes.reverse()));
+        return (0, bytes_1.arrayify)(new Uint8Array(bytes.reverse()));
     }
 }
 exports.BaseX = BaseX;

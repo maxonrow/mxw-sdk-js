@@ -1,12 +1,39 @@
 'use strict';
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
-    result["default"] = mod;
-    return result;
-};
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || (function () {
+    var ownKeys = function(o) {
+        ownKeys = Object.getOwnPropertyNames || function (o) {
+            var ar = [];
+            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
+            return ar;
+        };
+        return ownKeys(o);
+    };
+    return function (mod) {
+        if (mod && mod.__esModule) return mod;
+        var result = {};
+        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
+        __setModuleDefault(result, mod);
+        return result;
+    };
+})();
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.NonFungibleToken = exports.NFTokenStateFlags = exports.NonFungibleTokenActions = void 0;
 const properties_1 = require("./utils/properties");
 const misc_1 = require("./utils/misc");
 const base64_1 = require("./utils/base64");
@@ -25,7 +52,7 @@ var NonFungibleTokenActions;
     NonFungibleTokenActions["endorse"] = "endorse";
     NonFungibleTokenActions["updateNFTEndorserList"] = "updateNFTEndorserList";
     NonFungibleTokenActions["updateNFTItemMetadata"] = "updateNFTItemMetadata";
-})(NonFungibleTokenActions = exports.NonFungibleTokenActions || (exports.NonFungibleTokenActions = {}));
+})(NonFungibleTokenActions || (exports.NonFungibleTokenActions = NonFungibleTokenActions = {}));
 ;
 var NFTokenStateFlags;
 (function (NFTokenStateFlags) {
@@ -37,7 +64,7 @@ var NFTokenStateFlags;
     NFTokenStateFlags[NFTokenStateFlags["transferable"] = 32] = "transferable";
     NFTokenStateFlags[NFTokenStateFlags["modifiable"] = 64] = "modifiable";
     NFTokenStateFlags[NFTokenStateFlags["public"] = 128] = "public";
-})(NFTokenStateFlags = exports.NFTokenStateFlags || (exports.NFTokenStateFlags = {}));
+})(NFTokenStateFlags || (exports.NFTokenStateFlags = NFTokenStateFlags = {}));
 ;
 class NonFungibleToken {
     constructor(symbol, signerOrProvider) {
@@ -45,17 +72,17 @@ class NonFungibleToken {
         if (!symbol) {
             errors.throwError('symbol is required', errors.MISSING_ARGUMENT, { arg: 'symbol' });
         }
-        properties_1.defineReadOnly(this, 'symbol', symbol);
+        (0, properties_1.defineReadOnly)(this, 'symbol', symbol);
         if (abstract_signer_1.Signer.isSigner(signerOrProvider)) {
             if (!signerOrProvider.provider) {
                 return errors.throwError('missing provider', errors.INVALID_ARGUMENT, { arg: 'signerOrProvider', value: signerOrProvider });
             }
-            properties_1.defineReadOnly(this, 'provider', signerOrProvider.provider);
-            properties_1.defineReadOnly(this, 'signer', signerOrProvider);
+            (0, properties_1.defineReadOnly)(this, 'provider', signerOrProvider.provider);
+            (0, properties_1.defineReadOnly)(this, 'signer', signerOrProvider);
         }
         else if (abstract_provider_1.Provider.isProvider(signerOrProvider)) {
-            properties_1.defineReadOnly(this, 'provider', signerOrProvider);
-            properties_1.defineReadOnly(this, 'signer', null);
+            (0, properties_1.defineReadOnly)(this, 'provider', signerOrProvider);
+            (0, properties_1.defineReadOnly)(this, 'signer', null);
         }
         else {
             errors.throwError('invalid signer or provider', errors.INVALID_ARGUMENT, { arg: 'signerOrProvider', value: signerOrProvider });
@@ -63,13 +90,13 @@ class NonFungibleToken {
     }
     get state() { return this._state; }
     get isApproved() {
-        if (misc_1.isUndefinedOrNullOrEmpty(this._state)) {
+        if ((0, misc_1.isUndefinedOrNullOrEmpty)(this._state)) {
             errors.throwError('not initialized', errors.NOT_INITIALIZED, { arg: 'state' });
         }
         return (NFTokenStateFlags.approved & this._state.flags) ? true : false;
     }
     get isFrozen() {
-        if (misc_1.isUndefinedOrNullOrEmpty(this._state)) {
+        if ((0, misc_1.isUndefinedOrNullOrEmpty)(this._state)) {
             errors.throwError('not initialized', errors.NOT_INITIALIZED, { arg: 'state' });
         }
         return (NFTokenStateFlags.frozen & this._state.flags) ? true : false;
@@ -150,7 +177,7 @@ class NonFungibleToken {
         if (!this.signer) {
             errors.throwError('transfer non fungible token ownership require signer', errors.NOT_INITIALIZED, { arg: 'signer' });
         }
-        return properties_1.resolveProperties({ signerAddress: this.signer.getAddress(), addressOrName: addressOrName }).then(({ signerAddress, addressOrName }) => {
+        return (0, properties_1.resolveProperties)({ signerAddress: this.signer.getAddress(), addressOrName: addressOrName }).then(({ signerAddress, addressOrName }) => {
             if (!signerAddress) {
                 return errors.throwError('transfer non fungible token ownership require signer address', errors.MISSING_ARGUMENT, { required: 'signerAddress' });
             }
@@ -197,7 +224,7 @@ class NonFungibleToken {
             errors.throwError('accept fungible token ownership require signer', errors.NOT_INITIALIZED, { arg: 'signer' });
         }
         this.isUsable; // check token useability, otherwise throw error
-        return properties_1.resolveProperties({ signerAddress: this.signer.getAddress() }).then(({ signerAddress }) => {
+        return (0, properties_1.resolveProperties)({ signerAddress: this.signer.getAddress() }).then(({ signerAddress }) => {
             if (!signerAddress) {
                 return errors.throwError('accept fungible token ownership require signer address', errors.MISSING_ARGUMENT, { required: 'signerAddress' });
             }
@@ -254,29 +281,29 @@ class NonFungibleToken {
         if (tokenProperties && 'string' === typeof (tokenProperties)) {
             tokenProperties = JSON.parse(tokenProperties);
         }
-        properties_1.checkProperties(tokenProperties, {
+        (0, properties_1.checkProperties)(tokenProperties, {
             name: true,
             symbol: true,
-            fee: true,
-            metadata: false,
+            fee: true, // Application fee
+            metadata: false, // Optional
             properties: false //Optional
         }, true);
-        properties_1.checkProperties(tokenProperties.fee, { to: true, value: true });
-        return properties_1.resolveProperties({ address: signer.getAddress() }).then(({ address }) => {
+        (0, properties_1.checkProperties)(tokenProperties.fee, { to: true, value: true });
+        return (0, properties_1.resolveProperties)({ address: signer.getAddress() }).then(({ address }) => {
             if (!address) {
                 errors.throwError('create non fungible token transaction require signer address', errors.MISSING_ARGUMENT, { required: 'signer' });
             }
-            let nonFungibleToken = misc_1.checkFormat({
+            let nonFungibleToken = (0, misc_1.checkFormat)({
                 name: misc_1.checkString,
                 symbol: misc_1.checkString,
-                metadata: misc_1.allowNullOrEmpty(misc_1.checkString),
-                properties: misc_1.allowNullOrEmpty(misc_1.checkString),
+                metadata: (0, misc_1.allowNullOrEmpty)(misc_1.checkString),
+                properties: (0, misc_1.allowNullOrEmpty)(misc_1.checkString),
                 fee: {
                     to: misc_1.checkAddress,
                     value: misc_1.checkBigNumber
                 }
             }, tokenProperties);
-            if (utils_1.bigNumberify(nonFungibleToken.fee.value).lt(0)) {
+            if ((0, utils_1.bigNumberify)(nonFungibleToken.fee.value).lt(0)) {
                 errors.throwError('create non fungible token transaction require non-negative application fee', errors.NUMERIC_FAULT, { value: nonFungibleToken });
             }
             let tx = signer.provider.getTransactionRequest("nonFungible", "createNonFungibleToken", {
@@ -321,7 +348,7 @@ class NonFungibleToken {
         if (!this.signer) {
             errors.throwError('update non fungible token item metadata require signer', errors.NOT_INITIALIZED, { arg: 'signer' });
         }
-        return properties_1.resolveProperties({ address: this.signer.getAddress() }).then(({ address }) => {
+        return (0, properties_1.resolveProperties)({ address: this.signer.getAddress() }).then(({ address }) => {
             if (!address) {
                 return errors.throwError('update non fungible token item metadata require signer address', errors.MISSING_ARGUMENT, { arg: 'signerAddress' });
             }
@@ -363,7 +390,7 @@ class NonFungibleToken {
         if (!this.signer) {
             errors.throwError('update non fungible token endorser list require signer', errors.NOT_INITIALIZED, { arg: 'signer' });
         }
-        return properties_1.resolveProperties({ address: this.signer.getAddress() }).then(({ address }) => {
+        return (0, properties_1.resolveProperties)({ address: this.signer.getAddress() }).then(({ address }) => {
             if (!address) {
                 return errors.throwError('update non fungible token endorser list require signer address', errors.MISSING_ARGUMENT, { arg: 'signerAddress' });
             }
@@ -406,8 +433,8 @@ class NonFungibleToken {
         if (!this.signer) {
             errors.throwError('transfer non fungible token ownership require signer', errors.NOT_INITIALIZED, { arg: 'signer' });
         }
-        properties_1.checkProperties(item, { symbol: true, itemID: true, properties: true, metadata: true });
-        return properties_1.resolveProperties({ signerAddress: this.signer.getAddress(), toAddressOrName: toAddressOrName }).then(({ signerAddress, toAddressOrName }) => {
+        (0, properties_1.checkProperties)(item, { symbol: true, itemID: true, properties: true, metadata: true });
+        return (0, properties_1.resolveProperties)({ signerAddress: this.signer.getAddress(), toAddressOrName: toAddressOrName }).then(({ signerAddress, toAddressOrName }) => {
             if (!signerAddress) {
                 return errors.throwError('mint fungible token require signer address', errors.MISSING_ARGUMENT, { arg: 'signerAddress' });
             }
@@ -436,14 +463,14 @@ class NonFungibleToken {
         if (!abstract_signer_1.Signer.isSigner(signer)) {
             errors.throwError('sign non fungible token status transaction require signer', errors.MISSING_ARGUMENT, { arg: 'signer' });
         }
-        properties_1.checkProperties(transaction, { payload: true, signatures: true });
+        (0, properties_1.checkProperties)(transaction, { payload: true, signatures: true });
         transaction = checkNonFungibleTokenStatus(transaction);
-        return properties_1.resolveProperties({
+        return (0, properties_1.resolveProperties)({
             publicKeyType: signer.getPublicKeyType(),
             compressedPublicKey: signer.getCompressedPublicKey()
         }).then(({ publicKeyType, compressedPublicKey }) => {
             // Convert number and big number to string
-            transaction = misc_1.iterate(transaction, function (key, value, type) {
+            transaction = (0, misc_1.iterate)(transaction, function (key, value, type) {
                 switch (type) {
                     case "Number":
                     case "BigNumber":
@@ -451,14 +478,14 @@ class NonFungibleToken {
                 }
                 return value;
             });
-            transaction = misc_1.sortObject(transaction);
+            transaction = (0, misc_1.sortObject)(transaction);
             return signer.signMessage(JSON.stringify(transaction.payload), true).then((signature) => {
                 transaction.signatures.push({
                     pub_key: {
                         type: "tendermint/" + publicKeyType,
-                        value: base64_1.encode(compressedPublicKey)
+                        value: (0, base64_1.encode)(compressedPublicKey)
                     },
-                    signature: base64_1.encode(signature)
+                    signature: (0, base64_1.encode)(signature)
                 });
                 return transaction;
             });
@@ -474,14 +501,14 @@ class NonFungibleToken {
         if (!abstract_signer_1.Signer.isSigner(signer)) {
             errors.throwError('sign non fungible token status transaction require signer', errors.MISSING_ARGUMENT, { arg: 'signer' });
         }
-        properties_1.checkProperties(transaction, { payload: true, signatures: true });
+        (0, properties_1.checkProperties)(transaction, { payload: true, signatures: true });
         transaction = checkNonFungibleTokenItemStatus(transaction);
-        return properties_1.resolveProperties({
+        return (0, properties_1.resolveProperties)({
             publicKeyType: signer.getPublicKeyType(),
             compressedPublicKey: signer.getCompressedPublicKey()
         }).then(({ publicKeyType, compressedPublicKey }) => {
             // Convert number and big number to string
-            transaction = misc_1.iterate(transaction, function (key, value, type) {
+            transaction = (0, misc_1.iterate)(transaction, function (key, value, type) {
                 switch (type) {
                     case "Number":
                     case "BigNumber":
@@ -489,14 +516,14 @@ class NonFungibleToken {
                 }
                 return value;
             });
-            transaction = misc_1.sortObject(transaction);
+            transaction = (0, misc_1.sortObject)(transaction);
             return signer.signMessage(JSON.stringify(transaction.payload), true).then((signature) => {
                 transaction.signatures.push({
                     pub_key: {
                         type: "tendermint/" + publicKeyType,
-                        value: base64_1.encode(compressedPublicKey)
+                        value: (0, base64_1.encode)(compressedPublicKey)
                     },
-                    signature: base64_1.encode(signature)
+                    signature: (0, base64_1.encode)(signature)
                 });
                 return transaction;
             });
@@ -585,9 +612,9 @@ class NonFungibleToken {
         if (!abstract_signer_1.Signer.isSigner(signer)) {
             errors.throwError('send non fungible token status transaction require signer', errors.MISSING_ARGUMENT, { arg: 'signer' });
         }
-        properties_1.checkProperties(transaction, { payload: true, signatures: true });
+        (0, properties_1.checkProperties)(transaction, { payload: true, signatures: true });
         transaction = checkNonFungibleTokenStatus(transaction);
-        return properties_1.resolveProperties({ signerAddress: signer.getAddress() }).then(({ signerAddress }) => {
+        return (0, properties_1.resolveProperties)({ signerAddress: signer.getAddress() }).then(({ signerAddress }) => {
             let tx = signer.provider.getTransactionRequest("nonFungible", "setNonFungibleTokenStatus", {
                 payload: transaction.payload,
                 signatures: transaction.signatures,
@@ -627,9 +654,9 @@ class NonFungibleToken {
         if (!abstract_signer_1.Signer.isSigner(signer)) {
             errors.throwError('send non fungible token item status transaction require signer', errors.MISSING_ARGUMENT, { arg: 'signer' });
         }
-        properties_1.checkProperties(transaction, { payload: true, signatures: true });
+        (0, properties_1.checkProperties)(transaction, { payload: true, signatures: true });
         transaction = checkNonFungibleTokenItemStatus(transaction);
-        return properties_1.resolveProperties({ signerAddress: signer.getAddress() }).then(({ signerAddress }) => {
+        return (0, properties_1.resolveProperties)({ signerAddress: signer.getAddress() }).then(({ signerAddress }) => {
             let tx = signer.provider.getTransactionRequest("nonFungible", "setNonFungibleItemStatus", {
                 payload: transaction.payload,
                 signatures: transaction.signatures,
@@ -661,11 +688,11 @@ class NonFungibleToken {
 }
 exports.NonFungibleToken = NonFungibleToken;
 function checkNonFungibleTokenFee(data) {
-    let fee = misc_1.checkFormat({
+    let fee = (0, misc_1.checkFormat)({
         action: misc_1.checkString,
         feeName: misc_1.checkString
     }, data);
-    if (misc_1.isUndefinedOrNullOrEmpty(NonFungibleTokenActions[fee.action])) {
+    if ((0, misc_1.isUndefinedOrNullOrEmpty)(NonFungibleTokenActions[fee.action])) {
         return errors.throwError("invalid non fungible token fee", errors.INVALID_ARGUMENT, { value: fee });
     }
     return fee;
@@ -674,7 +701,7 @@ function setNonFungibleTokenStatus(symbol, status, signer, overrides) {
     if (!abstract_signer_1.Signer.isSigner(signer)) {
         errors.throwError('set non fungible token status transaction require signer', errors.MISSING_ARGUMENT, { arg: 'signer' });
     }
-    properties_1.checkProperties({ symbol, status }, { symbol: true, status: true });
+    (0, properties_1.checkProperties)({ symbol, status }, { symbol: true, status: true });
     let tokenFees;
     let mintLimit, transferLimit, endorserListLimit;
     let endorserList = null;
@@ -685,7 +712,7 @@ function setNonFungibleTokenStatus(symbol, status, signer, overrides) {
     pub = (overrides && overrides.pub) ? true : false;
     switch (status) {
         case "APPROVE":
-            let params = misc_1.checkFormat({
+            let params = (0, misc_1.checkFormat)({
                 mintLimit: misc_1.checkBigNumberString,
                 transferLimit: misc_1.checkBigNumberString,
                 endorserListLimit: misc_1.checkBigNumberString
@@ -695,19 +722,19 @@ function setNonFungibleTokenStatus(symbol, status, signer, overrides) {
             endorserListLimit = params.endorserListLimit;
             if (overrides) {
                 if (overrides.tokenFees) {
-                    let tokenProperties = misc_1.checkFormat({
-                        tokenFees: misc_1.arrayOf(checkNonFungibleTokenFee)
+                    let tokenProperties = (0, misc_1.checkFormat)({
+                        tokenFees: (0, misc_1.arrayOf)(checkNonFungibleTokenFee)
                     }, overrides);
                     tokenFees = tokenProperties.tokenFees;
                 }
                 if (overrides.endorserList) {
-                    let endorsers = misc_1.checkFormat({
-                        endorserList: misc_1.allowNullOrEmpty(misc_1.arrayOf(misc_1.checkString), null)
+                    let endorsers = (0, misc_1.checkFormat)({
+                        endorserList: (0, misc_1.allowNullOrEmpty)((0, misc_1.arrayOf)(misc_1.checkString), null)
                     }, overrides);
                     endorserList = endorsers.endorserList;
                 }
             }
-            if (misc_1.isUndefinedOrNullOrEmpty(tokenFees)) {
+            if ((0, misc_1.isUndefinedOrNullOrEmpty)(tokenFees)) {
                 errors.throwError('non fungible token fees are missing', errors.MISSING_ARGUMENT, { arg: 'tokenFees' });
             }
             break;
@@ -724,7 +751,7 @@ function setNonFungibleTokenStatus(symbol, status, signer, overrides) {
         default:
             errors.throwError('invalid non fungible token status', errors.UNEXPECTED_ARGUMENT, { arg: 'status', value: status });
     }
-    return properties_1.resolveProperties({
+    return (0, properties_1.resolveProperties)({
         signerAddress: signer.getAddress(),
         publicKeyType: signer.getPublicKeyType(),
         compressedPublicKey: signer.getCompressedPublicKey()
@@ -733,8 +760,8 @@ function setNonFungibleTokenStatus(symbol, status, signer, overrides) {
         if (!nonce) {
             nonce = signer.provider.getTransactionCount(signerAddress, "pending");
         }
-        return properties_1.resolveProperties({ nonce: nonce }).then(({ nonce }) => {
-            let transaction = misc_1.sortObject(misc_1.iterate({
+        return (0, properties_1.resolveProperties)({ nonce: nonce }).then(({ nonce }) => {
+            let transaction = (0, misc_1.sortObject)((0, misc_1.iterate)({
                 payload: {
                     token: {
                         from: signerAddress,
@@ -753,7 +780,7 @@ function setNonFungibleTokenStatus(symbol, status, signer, overrides) {
                     },
                     pub_key: {
                         type: "tendermint/" + publicKeyType,
-                        value: base64_1.encode(compressedPublicKey)
+                        value: (0, base64_1.encode)(compressedPublicKey)
                     },
                     signature: ""
                 },
@@ -767,16 +794,16 @@ function setNonFungibleTokenStatus(symbol, status, signer, overrides) {
                 return value;
             }));
             return signer.signMessage(JSON.stringify(transaction.payload.token), true).then((signature) => {
-                transaction.payload.signature = base64_1.encode(signature);
+                transaction.payload.signature = (0, base64_1.encode)(signature);
                 return transaction;
             });
         });
     });
 }
 function checkNonFungibleTokenStatus(data) {
-    return misc_1.checkFormat({
+    return (0, misc_1.checkFormat)({
         payload: function (value) {
-            return misc_1.checkFormat({
+            return (0, misc_1.checkFormat)({
                 token: {
                     endorserList: misc_1.checkAny,
                     from: misc_1.checkAddress,
@@ -784,7 +811,7 @@ function checkNonFungibleTokenStatus(data) {
                     nonce: misc_1.checkBigNumber,
                     status: misc_1.checkString,
                     symbol: misc_1.checkString,
-                    tokenFees: misc_1.allowNullOrEmpty(misc_1.arrayOf(checkNonFungibleTokenFee)),
+                    tokenFees: (0, misc_1.allowNullOrEmpty)((0, misc_1.arrayOf)(checkNonFungibleTokenFee)),
                     transferLimit: misc_1.checkBigNumber,
                     burnable: misc_1.checkBoolean,
                     transferable: misc_1.checkBoolean,
@@ -799,8 +826,8 @@ function checkNonFungibleTokenStatus(data) {
                 signature: misc_1.checkString
             }, value);
         },
-        signatures: misc_1.arrayOf(function (value) {
-            return misc_1.checkFormat({
+        signatures: (0, misc_1.arrayOf)(function (value) {
+            return (0, misc_1.checkFormat)({
                 pub_key: {
                     type: misc_1.checkString,
                     value: misc_1.checkString
@@ -827,7 +854,7 @@ function setNonFungibleTokenItemStatus(symbol, itemID, status, signer, overrides
         default:
             errors.throwError('invalid non fungible token item status', errors.UNEXPECTED_ARGUMENT, { arg: 'status', value: status });
     }
-    return properties_1.resolveProperties({
+    return (0, properties_1.resolveProperties)({
         signerAddress: signer.getAddress(),
         publicKeyType: signer.getPublicKeyType(),
         compressedPublicKey: signer.getCompressedPublicKey()
@@ -836,8 +863,8 @@ function setNonFungibleTokenItemStatus(symbol, itemID, status, signer, overrides
         if (!nonce) {
             nonce = signer.provider.getTransactionCount(signerAddress, "pending");
         }
-        return properties_1.resolveProperties({ nonce: nonce }).then(({ nonce }) => {
-            let transaction = misc_1.sortObject(misc_1.iterate({
+        return (0, properties_1.resolveProperties)({ nonce: nonce }).then(({ nonce }) => {
+            let transaction = (0, misc_1.sortObject)((0, misc_1.iterate)({
                 payload: {
                     item: {
                         from: signerAddress,
@@ -848,7 +875,7 @@ function setNonFungibleTokenItemStatus(symbol, itemID, status, signer, overrides
                     },
                     pub_key: {
                         type: "tendermint/" + publicKeyType,
-                        value: base64_1.encode(compressedPublicKey)
+                        value: (0, base64_1.encode)(compressedPublicKey)
                     },
                     signature: ""
                 },
@@ -862,16 +889,16 @@ function setNonFungibleTokenItemStatus(symbol, itemID, status, signer, overrides
                 return value;
             }));
             return signer.signMessage(JSON.stringify(transaction.payload.item), true).then((signature) => {
-                transaction.payload.signature = base64_1.encode(signature);
+                transaction.payload.signature = (0, base64_1.encode)(signature);
                 return transaction;
             });
         });
     });
 }
 function checkNonFungibleTokenItemStatus(data) {
-    return misc_1.checkFormat({
+    return (0, misc_1.checkFormat)({
         payload: function (value) {
-            return misc_1.checkFormat({
+            return (0, misc_1.checkFormat)({
                 item: {
                     from: misc_1.checkAddress,
                     nonce: misc_1.checkBigNumber,
@@ -886,8 +913,8 @@ function checkNonFungibleTokenItemStatus(data) {
                 signature: misc_1.checkString
             }, value);
         },
-        signatures: misc_1.arrayOf(function (value) {
-            return misc_1.checkFormat({
+        signatures: (0, misc_1.arrayOf)(function (value) {
+            return (0, misc_1.checkFormat)({
                 pub_key: {
                     type: misc_1.checkString,
                     value: misc_1.checkString

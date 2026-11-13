@@ -1,12 +1,13 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.Signer = void 0;
 const properties_1 = require("./utils/properties");
 class Signer {
     constructor() {
-        properties_1.setType(this, 'Signer');
+        (0, properties_1.setType)(this, 'Signer');
     }
     static isSigner(value) {
-        return properties_1.isType(value, 'Signer');
+        return (0, properties_1.isType)(value, 'Signer');
     }
 }
 exports.Signer = Signer;

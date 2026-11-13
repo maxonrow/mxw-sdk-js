@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.langKo = void 0;
 const wordlist_1 = require("../utils/wordlist");
 const utf8_1 = require("../utils/utf8");
 const data = [
@@ -20,7 +21,7 @@ function getHangul(code) {
     else if (code >= 19) {
         code = code + 97 - 19;
     }
-    return utf8_1.toUtf8String([225, (code >> 6) + 132, (code & 0x3f) + 128]);
+    return (0, utf8_1.toUtf8String)([225, (code >> 6) + 132, (code & 0x3f) + 128]);
 }
 let wordlist = null;
 function loadWords(lang) {
@@ -39,7 +40,7 @@ function loadWords(lang) {
         }
     });
     wordlist.sort();
-    if (wordlist_1.check(lang) !== '0x9e95f86c167de88f450f0aaf89e87f6624a57f973c67b516e338e8e8b8897f60') {
+    if ((0, wordlist_1.check)(lang) !== '0x9e95f86c167de88f450f0aaf89e87f6624a57f973c67b516e338e8e8b8897f60') {
         wordlist = null;
         throw new Error('BIP39 Wordlist for ko (Korean) FAILED');
     }
@@ -59,5 +60,5 @@ class LangKo extends wordlist_1.Wordlist {
 }
 const langKo = new LangKo();
 exports.langKo = langKo;
-wordlist_1.register(langKo);
+(0, wordlist_1.register)(langKo);
 //# sourceMappingURL=lang-ko.js.map
