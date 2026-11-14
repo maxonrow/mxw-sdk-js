@@ -4,7 +4,6 @@ tests/
 docs/
 Makefile
 package-lock.json
-webpack.config.js
 tsconfig.json
 .babelrc
 .vscode/

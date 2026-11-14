@@ -10,7 +10,6 @@
     "build": "npm run clean && npm run compile",
     "compile": "tsc -p ./tsconfig.json",
     "build-min": "browserify ./src/index.js | uglifyjs -c -m --rename --toplevel --source-map -o ./src/index.min.js",
-    "build-webpack": "webpack",
     "clean": "rm -rf ./dist",
     "test": "mocha --timeout 60000 -r ts-node/register tests/test-*.ts",
     "test-provider": "mocha --timeout 60000 -r ts-node/register tests/test-0500-provider.ts",
@@ -63,7 +62,6 @@
     "@babel/preset-env": "^7.8.4",
     "@babel/preset-react": "^7.8.3",
     "acorn": ">=5.7.4",
-    "babel-loader": "^8.1.0",
     "babel-plugin-transform-class-properties": "^6.24.1",
     "babel-plugin-transform-object-rest-spread": "^6.26.0",
     "chai": "^4.2.0",
@@ -73,8 +71,6 @@
     "mocha": "^8.1.0",
     "ts-node": "^8.6.2",
     "typescript": "^5.4.5",
-    "webpack": "^4.44.1",
-    "webpack-cli": "^3.3.11",
     "@types/node": "^20.11.0"
   },
   "dependencies": {
