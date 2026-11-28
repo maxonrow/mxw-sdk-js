@@ -73,7 +73,6 @@
     "@types/node": "^20.11.0"
   },
   "dependencies": {
-    "@types/node": "^12.12.28",
     "aes-js": "^3.1.2",
     "axios": "^1.21.1",
     "bech32": "^1.1.3",
